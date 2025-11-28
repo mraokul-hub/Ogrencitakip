@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Öğrenci Takip Sistemi</title>
-    <!-- Modern Font ve İkonlar -->
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;800&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
@@ -14,6 +13,7 @@
             --accent: #f43f5e;
             --success: #10b981;
             --warning: #f59e0b;
+            --admin-bg: #1e1b4b; /* Yöneticiye özel koyu tema */
             --bg-gradient: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
             --card-bg: rgba(255, 255, 255, 0.95);
             --text-main: #1f2937;
@@ -39,6 +39,11 @@
             width: 100%;
             max-width: 480px; 
             padding-bottom: 80px;
+        }
+
+        /* Admin için geniş ekran */
+        .container.admin-mode {
+            max-width: 800px;
         }
 
         .card {
@@ -69,14 +74,8 @@
         }
         button:active { transform: scale(0.98); }
 
-        .btn-primary {
-            background: linear-gradient(135deg, var(--primary), var(--primary-light));
-            color: white; box-shadow: 0 4px 15px rgba(79, 70, 229, 0.4);
-        }
-        .btn-logout {
-            background: #fee2e2; color: var(--accent); padding: 8px 16px; 
-            font-size: 0.85rem; width: auto; border-radius: 12px;
-        }
+        .btn-primary { background: linear-gradient(135deg, var(--primary), var(--primary-light)); color: white; box-shadow: 0 4px 15px rgba(79, 70, 229, 0.4); }
+        .btn-logout { background: #fee2e2; color: var(--accent); padding: 8px 16px; font-size: 0.85rem; width: auto; border-radius: 12px; }
 
         .fade-in { animation: fadeIn 0.4s ease-in-out; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
@@ -86,10 +85,7 @@
         .tab.active { background: white; color: var(--primary); box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
 
         .chips { display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; margin-bottom: 20px; }
-        .chip {
-            background: #f3f4f6; padding: 10px 18px; border-radius: 25px; font-size: 0.9rem; font-weight: 500;
-            cursor: pointer; transition: all 0.2s; border: 2px solid transparent;
-        }
+        .chip { background: #f3f4f6; padding: 10px 18px; border-radius: 25px; font-size: 0.9rem; font-weight: 500; cursor: pointer; transition: all 0.2s; border: 2px solid transparent; }
         .chip.active { background: rgba(79, 70, 229, 0.1); color: var(--primary); border-color: var(--primary); font-weight: 700; }
         .chip-edit { background: #fffbeb; color: var(--warning); border-color: #fcd34d; }
 
@@ -98,30 +94,17 @@
         .q-box label { font-size: 0.8rem; color: var(--text-sub); margin-bottom: 6px; display: block; font-weight: 600; }
         .q-box input { text-align: center; font-weight: 700; margin-bottom: 0; }
 
-        .timer-display {
-            font-size: 4rem; font-weight: 800; text-align: center;
-            background: -webkit-linear-gradient(var(--primary), var(--primary-light));
-            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-            margin: 15px 0; font-variant-numeric: tabular-nums; letter-spacing: -2px;
-        }
+        .timer-display { font-size: 4rem; font-weight: 800; text-align: center; background: -webkit-linear-gradient(var(--primary), var(--primary-light)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin: 15px 0; font-variant-numeric: tabular-nums; letter-spacing: -2px; }
         .timer-controls { display: flex; gap: 12px; margin-bottom: 15px; }
         .btn-start { background: var(--success); color: white; }
         .btn-stop { background: var(--accent); color: white; }
-        
         .timer-setting { display: flex; align-items: center; justify-content: center; gap: 10px; margin-bottom: 15px; background: #f9fafb; padding: 12px; border-radius: 16px; }
         .timer-setting input { width: 70px; margin: 0; text-align: center; font-weight: bold; background: white; }
 
-        .streak-badge {
-            background: linear-gradient(135deg, #ffedd5, #fed7aa); color: #c2410c; padding: 8px 16px;
-            border-radius: 20px; font-weight: 800; display: flex; align-items: center; gap: 6px;
-            font-size: 0.95rem; box-shadow: 0 4px 6px rgba(251, 146, 60, 0.2);
-        }
+        .streak-badge { background: linear-gradient(135deg, #ffedd5, #fed7aa); color: #c2410c; padding: 8px 16px; border-radius: 20px; font-weight: 800; display: flex; align-items: center; gap: 6px; font-size: 0.95rem; box-shadow: 0 4px 6px rgba(251, 146, 60, 0.2); }
 
         .mood-selector { display: flex; gap: 12px; margin-bottom: 24px; }
-        .mood-btn {
-            flex: 1; padding: 16px 5px; border: 2px solid #e5e7eb; border-radius: 16px;
-            background: white; cursor: pointer; text-align: center; font-size: 1.8rem; transition: all 0.2s;
-        }
+        .mood-btn { flex: 1; padding: 16px 5px; border: 2px solid #e5e7eb; border-radius: 16px; background: white; cursor: pointer; text-align: center; font-size: 1.8rem; transition: all 0.2s; }
         .mood-btn.selected { border-color: var(--primary); background: #eef2ff; transform: translateY(-3px); box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
         .mood-text { display: block; font-size: 0.75rem; color: var(--text-sub); font-weight: 700; margin-top: 5px; }
 
@@ -140,11 +123,28 @@
         
         .time-btn-group { display: flex; align-items: center; gap: 8px; background: #f9fafb; padding: 8px; border-radius: 16px; margin-bottom: 20px; }
         .btn-adjust { background: white; border: 1px solid #e5e7eb; color: var(--text-main); font-weight: bold; width: 45px; height: 45px; border-radius: 12px; padding: 0; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; }
+
+        /* --- ADMIN STYLES --- */
+        .admin-header { background: linear-gradient(135deg, #1e1b4b, #312e81); color: white; padding: 20px; border-radius: 20px; margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 10px 30px rgba(30, 27, 75, 0.3); }
+        .stat-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; margin-bottom: 20px; }
+        .stat-card { background: white; padding: 15px; border-radius: 16px; text-align: center; box-shadow: var(--shadow); }
+        .stat-val { font-size: 1.5rem; font-weight: 800; color: var(--primary); }
+        .stat-label { font-size: 0.8rem; color: var(--text-sub); text-transform: uppercase; font-weight: 600; }
+        
+        .student-table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+        .student-table th { text-align: left; padding: 12px; color: var(--text-sub); font-size: 0.8rem; text-transform: uppercase; border-bottom: 2px solid #eee; }
+        .student-table td { padding: 15px 12px; border-bottom: 1px solid #eee; font-size: 0.9rem; }
+        .student-row { cursor: pointer; transition: background 0.2s; }
+        .student-row:hover { background: #f9fafb; }
+        .badge-rank { width: 24px; height: 24px; background: #e5e7eb; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; font-size: 0.8rem; font-weight: bold; margin-right: 10px; }
+        .rank-1 { background: #fef3c7; color: #d97706; }
+        .rank-2 { background: #f3f4f6; color: #4b5563; }
+        .rank-3 { background: #ffedd5; color: #c2410c; }
     </style>
 </head>
 <body>
 
-<div class="container fade-in">
+<div class="container fade-in" id="mainContainer">
 
     <!-- 1. GİRİŞ EKRANI -->
     <div id="authScreen" class="card" style="margin-top: 50px;">
@@ -166,54 +166,44 @@
         <div id="authError" class="error-box"></div>
     </div>
 
-    <!-- 2. ANA PANEL (DASHBOARD) -->
+    <!-- 2. ÖĞRENCİ PANELİ -->
     <div id="dashboardScreen" class="hidden fade-in">
         
-        <!-- Üst Bar -->
         <div class="card" style="display:flex; justify-content:space-between; align-items:center; padding: 20px; background:white;">
             <div>
                 <h3 style="margin:0; text-align:left; font-size:1.2rem; color:var(--text-main);">Selam, <span id="studentNameDisplay" style="color:var(--primary);">Öğrenci</span> 👋</h3>
                 <small style="color:var(--text-sub);">Veriler bulut veritabanında güvende.</small>
             </div>
-            <div class="streak-badge">
-                🔥 <span id="streakCount">0</span>
-            </div>
+            <div class="streak-badge">🔥 <span id="streakCount">0</span></div>
         </div>
 
-        <!-- GRAFİK -->
         <div class="card">
             <div style="display:flex; justify-content:space-between; align-items:center;">
                 <h4>HAFTALIK İLERLEME</h4>
                 <button class="btn-logout" onclick="handleLogout()">Çıkış</button>
             </div>
-            
             <div class="chart-wrapper">
                 <canvas id="weeklyChart"></canvas>
             </div>
-            
             <div style="text-align:center; font-size:0.9rem; color:var(--text-sub); margin: 20px 0;">
                 Tamamlanan: <strong id="completedMins" style="color:var(--success); font-size:1.1rem;">0</strong> / <span id="targetMins">1000</span> dk
             </div>
-
             <div style="background:#f9fafb; padding:12px; border-radius:16px; display:flex; justify-content:space-between; align-items:center;">
                 <label style="font-size:0.9rem; color:var(--text-main); font-weight:600;">🎯 Haftalık Hedef (dk):</label>
                 <input type="number" id="weeklyGoalInput" value="1000" onchange="updateGoal()" style="width:90px; margin:0; padding:10px; text-align:center; border:2px solid #e5e7eb;">
             </div>
         </div>
 
-        <!-- ÇALIŞMA GİRİŞ KARTI -->
         <div class="card">
             <div class="tabs">
                 <div class="tab active" onclick="switchTab('manual')" id="tabManual">⚡ Hızlı Giriş</div>
                 <div class="tab" onclick="switchTab('pomodoro')" id="tabPomodoro">⏱️ Sayaçlı</div>
             </div>
 
-            <!-- PANEL 1: MANUEL GİRİŞ -->
+            <!-- MANUEL GİRİŞ -->
             <div id="panelManual" class="fade-in">
                 <label style="margin-bottom:10px; display:block; font-weight:600; font-size:0.9rem; color:var(--text-sub);">DERS SEÇİMİ</label>
-                <div id="chipsManual" class="chips">
-                    <!-- JS ile dolacak -->
-                </div>
+                <div id="chipsManual" class="chips"></div>
                 <input type="hidden" id="selectedSubject" value="">
 
                 <label style="margin-bottom:10px; display:block; font-weight:600; font-size:0.9rem; color:var(--text-sub);">SÜRE (DK)</label>
@@ -229,48 +219,31 @@
                     <div class="mood-btn selected" onclick="selectMood(this, 'Verimli')">🔥<span class="mood-text">Çok</span></div>
                 </div>
                 <input type="hidden" id="selectedMood" value="Verimli">
-
                 <button class="btn-primary" id="saveBtn" onclick="saveData()">KAYDET ✅</button>
             </div>
 
-            <!-- PANEL 2: SAYAÇLI ÇALIŞMA -->
+            <!-- SAYAÇLI -->
             <div id="panelPomodoro" class="hidden fade-in">
                 <p style="text-align:center; color:var(--text-sub); font-size:0.9rem; margin-bottom:15px;">Odaklan ve süreyi başlat.</p>
-                
-                <div id="chipsPomo" class="chips">
-                    <!-- JS ile dolacak -->
-                </div>
+                <div id="chipsPomo" class="chips"></div>
                 <input type="hidden" id="pomoSubject" value="">
-
                 <div class="timer-setting">
                     <label>Süre (dk):</label>
                     <input type="number" id="timerSetDuration" value="30" onchange="updateTimerDuration()">
                 </div>
-
                 <div class="timer-display" id="timerDisplay">30:00</div>
-                
                 <div class="timer-controls">
                     <button class="btn-start" onclick="startTimer()" id="btnTimerStart">BAŞLAT ▶</button>
                     <button class="btn-stop" onclick="resetTimer()" id="btnTimerReset">SIFIRLA ↺</button>
                 </div>
-
                 <div class="question-inputs">
-                    <div class="q-box">
-                        <label>Soru</label>
-                        <input type="number" id="qCount" placeholder="0">
-                    </div>
-                    <div class="q-box">
-                        <label>Doğru</label>
-                        <input type="number" id="qCorrect" placeholder="0">
-                    </div>
+                    <div class="q-box"><label>Soru</label><input type="number" id="qCount" placeholder="0"></div>
+                    <div class="q-box"><label>Doğru</label><input type="number" id="qCorrect" placeholder="0"></div>
                 </div>
-
                 <button class="btn-primary" id="savePomoBtn" onclick="savePomodoroData()">KAYDET ✅</button>
             </div>
-
         </div>
 
-        <!-- GEÇMİŞ LİSTESİ -->
         <div class="card">
             <h4>SON KAYITLAR</h4>
             <ul id="historyList" style="list-style:none; padding:0; margin:0;">
@@ -279,18 +252,66 @@
         </div>
     </div>
 
+    <!-- 3. YÖNETİCİ PANELİ (ADMIN) -->
+    <div id="adminScreen" class="hidden fade-in">
+        <div class="admin-header">
+            <div>
+                <h3 style="margin:0; text-align:left; color:white; font-size:1.3rem;">Yönetici Paneli 👑</h3>
+                <small style="opacity:0.8;">Tüm öğrenciler kontrol altında.</small>
+            </div>
+            <button class="btn-logout" onclick="handleLogout()" style="background:rgba(255,255,255,0.2); color:white;">Çıkış</button>
+        </div>
+
+        <!-- İstatistik Kartları -->
+        <div class="stat-grid">
+            <div class="stat-card">
+                <div class="stat-val" id="adminTotalStudents">0</div>
+                <div class="stat-label">Öğrenci</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-val" id="adminTotalHours">0s</div>
+                <div class="stat-label">Toplam Süre</div>
+            </div>
+        </div>
+
+        <!-- Grafik -->
+        <div class="card">
+            <h4>LİDERLİK TABLOSU (Çalışma Süresi)</h4>
+            <div class="chart-wrapper">
+                <canvas id="adminLeaderboardChart"></canvas>
+            </div>
+        </div>
+
+        <!-- Öğrenci Listesi -->
+        <div class="card">
+            <h4>ÖĞRENCİ LİSTESİ</h4>
+            <div style="overflow-x:auto;">
+                <table class="student-table" id="studentTable">
+                    <thead>
+                        <tr>
+                            <th>Öğrenci</th>
+                            <th>Toplam</th>
+                            <th>Son Giriş</th>
+                        </tr>
+                    </thead>
+                    <tbody id="studentTableBody">
+                        <tr><td colspan="3" style="text-align:center;">Veriler yükleniyor...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
 </div>
 
-<!-- DERS YÖNETİM MODALI -->
+<!-- MODALS -->
 <div id="modalSubjects" class="modal hidden fade-in">
     <div class="modal-content">
         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
             <h3 style="margin:0; text-align:left;">Dersleri Düzenle</h3>
             <button onclick="closeSubjectModal()" style="width:30px; height:30px; padding:0; border-radius:50%; background:#f3f4f6; color:#333;">✕</button>
         </div>
-        
         <div id="subjectListContainer"></div>
-
         <div class="add-sub-group" style="display:flex; gap:10px; margin-top:20px;">
             <input type="text" id="newSubjectName" placeholder="Yeni Ders Ekle" style="margin:0;">
             <button onclick="addSubject()" style="width:60px; background:var(--success); color:white; padding:0; border-radius:12px;">+</button>
@@ -298,9 +319,25 @@
     </div>
 </div>
 
+<!-- Admin Detay Modalı -->
+<div id="modalAdminDetail" class="modal hidden fade-in">
+    <div class="modal-content" style="max-width:500px;">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
+            <h3 style="margin:0; text-align:left;" id="detailStudentName">Öğrenci Detayı</h3>
+            <button onclick="closeAdminDetail()" style="width:30px; height:30px; padding:0; border-radius:50%; background:#f3f4f6; color:#333;">✕</button>
+        </div>
+        <div class="card" style="margin-bottom:0; box-shadow:none; border:1px solid #eee;">
+            <h4>SON ÇALIŞMALARI</h4>
+            <ul id="adminDetailList" style="list-style:none; padding:0; margin:0;">
+                <li style="text-align:center;">Yükleniyor...</li>
+            </ul>
+        </div>
+    </div>
+</div>
+
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js";
-    import { getFirestore, collection, doc, setDoc, getDoc, updateDoc, addDoc, query, where, onSnapshot, serverTimestamp, arrayUnion, arrayRemove } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js";
+    import { getFirestore, collection, doc, setDoc, getDoc, updateDoc, addDoc, getDocs, query, where, onSnapshot, serverTimestamp, arrayUnion, arrayRemove, increment } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js";
     import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged, updateProfile } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-auth.js";
 
     const firebaseConfig = {
@@ -316,40 +353,207 @@
     const db = getFirestore(app);
     const auth = getAuth(app);
 
+    const ADMIN_EMAIL = "mremzi@gmail.com";
+
     let currentUser = null;
     let isLoginMode = true;
     let myChart = null;
+    let adminChart = null;
     let currentWeeklyTotal = 0;
-    let mySubjects = []; // DB'den gelecek
+    let mySubjects = [];
     
     // Timer
     let timerInterval = null;
     let timeLeft = 30 * 60; 
     let isTimerRunning = false;
 
-    // --- AUTH & PROFİL YÖNETİMİ ---
+    // --- AUTH & ROUTING ---
     onAuthStateChanged(auth, async (user) => {
         if (user) {
             currentUser = user;
             document.getElementById('authScreen').classList.add('hidden');
-            document.getElementById('dashboardScreen').classList.remove('hidden');
-            const name = user.displayName || "Öğrenci";
-            document.getElementById('studentNameDisplay').innerText = name.split(' ')[0];
             
-            // 1. Kullanıcı Profili ve Dersleri DB'den Çek (Tabakalı Yapı)
-            await loadUserProfile(user.uid);
-
-            if(!myChart) initChart();
-            listenToData();
+            if(user.email === ADMIN_EMAIL) {
+                // ADMIN GİRİŞİ
+                document.getElementById('adminScreen').classList.remove('hidden');
+                document.getElementById('mainContainer').classList.add('admin-mode');
+                loadAdminDashboard();
+            } else {
+                // STANDART ÖĞRENCİ GİRİŞİ
+                document.getElementById('dashboardScreen').classList.remove('hidden');
+                const name = user.displayName || "Öğrenci";
+                document.getElementById('studentNameDisplay').innerText = name.split(' ')[0];
+                await loadUserProfile(user.uid);
+                if(!myChart) initChart();
+                listenToData();
+            }
         } else {
             currentUser = null;
             document.getElementById('authScreen').classList.remove('hidden');
             document.getElementById('dashboardScreen').classList.add('hidden');
+            document.getElementById('adminScreen').classList.add('hidden');
+            document.getElementById('mainContainer').classList.remove('admin-mode');
         }
     });
 
+    // --- ADMIN DASHBOARD LOGIC ---
+    async function loadAdminDashboard() {
+        const usersRef = collection(db, "users");
+        
+        // Tüm kullanıcıları çek (Gerçek zamanlı değil, sayfa yenilendikçe güncellenir performans için)
+        // İsterseniz onSnapshot ile de yapılabilir ama user sayısı artınca maliyetli olur.
+        // Şimdilik onSnapshot ile yapalım ki anlık olsun.
+        
+        onSnapshot(usersRef, (snapshot) => {
+            const users = [];
+            let totalMins = 0;
+
+            snapshot.forEach(doc => {
+                const data = doc.data();
+                // Admin'i listeye katmayalım veya katalım tercihe bağlı. Katalım.
+                users.push({
+                    id: doc.id,
+                    ...data,
+                    totalMinutes: data.totalMinutes || 0 // Yeni alan, yoksa 0
+                });
+                totalMins += (data.totalMinutes || 0);
+            });
+
+            // Sıralama: En çok çalışandan aza
+            users.sort((a, b) => b.totalMinutes - a.totalMinutes);
+
+            // İstatistikler
+            document.getElementById('adminTotalStudents').innerText = users.length;
+            document.getElementById('adminTotalHours').innerText = Math.round(totalMins / 60) + " sa";
+
+            // Tabloyu Doldur
+            renderAdminTable(users);
+            
+            // Grafiği Çiz
+            renderAdminChart(users);
+        });
+    }
+
+    function renderAdminTable(users) {
+        const tbody = document.getElementById('studentTableBody');
+        tbody.innerHTML = "";
+
+        users.forEach((u, index) => {
+            const tr = document.createElement('tr');
+            tr.className = "student-row";
+            tr.onclick = () => openAdminDetail(u.id, u.displayName);
+            
+            // Tarih Formatı
+            let lastDate = "-";
+            if(u.lastStudyDate) {
+                // Timestamp to Date
+                const date = u.lastStudyDate.toDate ? u.lastStudyDate.toDate() : new Date(u.lastStudyDate);
+                lastDate = date.toLocaleDateString('tr-TR');
+            }
+
+            // Rozet Rengi
+            let badgeClass = "";
+            if(index === 0) badgeClass = "rank-1";
+            else if(index === 1) badgeClass = "rank-2";
+            else if(index === 2) badgeClass = "rank-3";
+
+            const rankBadge = badgeClass ? `<span class="badge-rank ${badgeClass}">${index+1}</span>` : `<span class="badge-rank">${index+1}</span>`;
+
+            tr.innerHTML = `
+                <td>
+                    <div style="display:flex; align-items:center;">
+                        ${rankBadge}
+                        <span style="font-weight:600; color:var(--text-main);">${u.displayName || u.email}</span>
+                    </div>
+                </td>
+                <td style="font-weight:bold; color:var(--primary);">${u.totalMinutes} dk</td>
+                <td style="color:var(--text-sub); font-size:0.8rem;">${lastDate}</td>
+            `;
+            tbody.appendChild(tr);
+        });
+    }
+
+    function renderAdminChart(users) {
+        const ctx = document.getElementById('adminLeaderboardChart').getContext('2d');
+        const top5 = users.slice(0, 5); // İlk 5 kişi
+        const labels = top5.map(u => (u.displayName || u.email).split(' ')[0]);
+        const data = top5.map(u => u.totalMinutes);
+
+        if(adminChart) adminChart.destroy();
+
+        adminChart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: 'Toplam Dakika',
+                    data: data,
+                    backgroundColor: ['#f59e0b', '#4f46e5', '#10b981', '#f43f5e', '#8b5cf6'],
+                    borderRadius: 8
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { legend: { display: false } },
+                scales: { y: { beginAtZero: true, grid: { display: false } }, x: { grid: { display: false } } }
+            }
+        });
+    }
+
+    // Admin Detay Görüntüleme
+    window.openAdminDetail = (uid, name) => {
+        document.getElementById('detailStudentName').innerText = (name || "Öğrenci") + " - Detay";
+        const list = document.getElementById('adminDetailList');
+        list.innerHTML = "<li style='text-align:center;'>Yükleniyor...</li>";
+        document.getElementById('modalAdminDetail').classList.remove('hidden');
+
+        // O öğrencinin session'larını çek
+        const q = query(collection(db, "users", uid, "sessions")); // Sıralamasız ham veri
+        
+        // Tek seferlik çekelim (Snapshot dinlemeyelim, modal kapanınca sorun olmasın)
+        getDocs(q).then((snapshot) => {
+            list.innerHTML = "";
+            const items = [];
+            snapshot.forEach(doc => items.push(doc.data()));
+            
+            // Sıralama
+            items.sort((a, b) => {
+                const timeA = (a.createdAt && a.createdAt.seconds) ? a.createdAt.seconds : 0;
+                const timeB = (b.createdAt && b.createdAt.seconds) ? b.createdAt.seconds : 0;
+                return timeB - timeA;
+            });
+
+            if(items.length === 0) {
+                list.innerHTML = "<li style='text-align:center; padding:10px;'>Kayıt yok.</li>";
+                return;
+            }
+
+            items.forEach(data => {
+                let badgeColor = data.mood === 'Verimli' ? 'var(--success)' : (data.mood === 'Orta' ? 'var(--warning)' : 'var(--accent)');
+                let questionInfo = (data.questionCount > 0) ? `<span class="badge-score">📚 ${data.correctCount}/${data.questionCount}</span>` : '';
+                
+                const li = document.createElement('li');
+                li.style.cssText = "padding:10px 0; border-bottom:1px solid #eee; display:flex; justify-content:space-between; align-items:center;";
+                li.innerHTML = `
+                    <div>
+                        <div style="font-weight:600; font-size:0.9rem;">${data.subject}</div>
+                        <div style="font-size:0.8rem; color:var(--text-sub);">⏱️ ${data.duration} dk ${questionInfo}</div>
+                        <div style="font-size:0.7rem; color:#aaa;">${data.dateStr}</div>
+                    </div>
+                    <span style="color:${badgeColor}; font-weight:bold;">${data.mood}</span>
+                `;
+                list.appendChild(li);
+            });
+        });
+    };
+
+    window.closeAdminDetail = () => document.getElementById('modalAdminDetail').classList.add('hidden');
+
+
+    // --- STUDENT LOGIC (PROFIL & SAVE) ---
+
     async function loadUserProfile(uid) {
-        // Kullanıcı dökümanını oku: users/{uid}
         const userDocRef = doc(db, "users", uid);
         const docSnap = await getDoc(userDocRef);
 
@@ -359,133 +563,19 @@
             const goal = data.weeklyGoal || 1000;
             document.getElementById('weeklyGoalInput').value = goal;
         } else {
-            // İlk kez giriş yapıyorsa profil oluştur (Varsayılanlarla)
             mySubjects = ['Matematik', 'Türkçe', 'Fen', 'İngilizce', 'Genel', 'Kitap'];
             await setDoc(userDocRef, {
                 email: currentUser.email,
                 displayName: currentUser.displayName,
                 subjects: mySubjects,
                 weeklyGoal: 1000,
+                totalMinutes: 0, // Yeni sayaç
                 createdAt: serverTimestamp()
             });
         }
         renderAllChips();
     }
 
-    // --- DERS YÖNETİMİ (DB ENTEGRELİ) ---
-    window.renderAllChips = () => {
-        renderChips('chipsManual', 'selectedSubject');
-        renderChips('chipsPomo', 'pomoSubject');
-    };
-
-    window.renderChips = (containerId, inputId) => {
-        const container = document.getElementById(containerId);
-        container.innerHTML = "";
-        let currentVal = document.getElementById(inputId).value;
-        
-        // Eğer listede yoksa (silindiyse) ilkini seç
-        if (!mySubjects.includes(currentVal) && mySubjects.length > 0) {
-            currentVal = mySubjects[0];
-            document.getElementById(inputId).value = currentVal;
-        }
-
-        mySubjects.forEach((sub) => {
-            const chip = document.createElement('div');
-            chip.className = 'chip';
-            chip.innerText = sub;
-            if (sub === currentVal) chip.classList.add('active');
-
-            chip.onclick = function() {
-                container.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
-                this.classList.add('active');
-                document.getElementById(inputId).value = sub;
-            };
-            container.appendChild(chip);
-        });
-
-        const editChip = document.createElement('div');
-        editChip.className = 'chip chip-edit';
-        editChip.innerText = "✏️";
-        editChip.onclick = openSubjectModal;
-        container.appendChild(editChip);
-    };
-
-    window.openSubjectModal = () => {
-        const listContainer = document.getElementById('subjectListContainer');
-        listContainer.innerHTML = "";
-        mySubjects.forEach((sub) => {
-            const item = document.createElement('div');
-            item.className = 'subject-list-item';
-            item.innerHTML = `<span>${sub}</span><button class="btn-delete-sub" onclick="removeSubject('${sub}')">🗑️</button>`;
-            listContainer.appendChild(item);
-        });
-        document.getElementById('modalSubjects').classList.remove('hidden');
-    };
-
-    window.closeSubjectModal = () => document.getElementById('modalSubjects').classList.add('hidden');
-
-    window.addSubject = async () => {
-        const name = document.getElementById('newSubjectName').value.trim();
-        if(name && currentUser) {
-            const userDocRef = doc(db, "users", currentUser.uid);
-            await updateDoc(userDocRef, {
-                subjects: arrayUnion(name)
-            });
-            mySubjects.push(name); // UI Hızlı Güncelleme
-            document.getElementById('newSubjectName').value = "";
-            openSubjectModal();
-            renderAllChips();
-        }
-    };
-
-    window.removeSubject = async (subName) => {
-        if(confirm("Dersi silmek istiyor musunuz?") && currentUser) {
-            const userDocRef = doc(db, "users", currentUser.uid);
-            await updateDoc(userDocRef, {
-                subjects: arrayRemove(subName)
-            });
-            mySubjects = mySubjects.filter(s => s !== subName); // UI Hızlı Güncelleme
-            openSubjectModal();
-            renderAllChips();
-        }
-    };
-
-    // --- HEDEF (DB ENTEGRELİ) ---
-    window.updateGoal = async () => {
-        const val = parseInt(document.getElementById('weeklyGoalInput').value);
-        if(currentUser && val) {
-            const userDocRef = doc(db, "users", currentUser.uid);
-            await updateDoc(userDocRef, { weeklyGoal: val });
-            updateChartDisplay(currentWeeklyTotal);
-        }
-    };
-
-    // --- CHART ---
-    function initChart() {
-        const ctx = document.getElementById('weeklyChart').getContext('2d');
-        myChart = new Chart(ctx, {
-            type: 'doughnut',
-            data: {
-                labels: ['Tamamlanan', 'Kalan'],
-                datasets: [{
-                    data: [0, 100],
-                    backgroundColor: ['#4f46e5', '#e5e7eb'],
-                    borderWidth: 0,
-                    hoverOffset: 4
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                cutout: '80%',
-                plugins: { legend: { display: false }, tooltip: { enabled: false } },
-                animation: { animateScale: true, animateRotate: true }
-            }
-        });
-    }
-
-    // --- VERİ İŞLEMLERİ (TABAKALI YAPI: users/{uid}/sessions) ---
-    
     async function saveToFirebase(subject, duration, qCount, qCorrect, mood, btnId = 'saveBtn') {
         if(!currentUser) return;
         const btn = document.getElementById(btnId);
@@ -494,9 +584,8 @@
         btn.disabled = true;
 
         try {
-            // YENİ YAPI: users -> uid -> sessions (Sub-collection)
+            // 1. Session Ekle
             const sessionsRef = collection(db, "users", currentUser.uid, "sessions");
-            
             await addDoc(sessionsRef, {
                 subject: subject,
                 duration: duration,
@@ -505,6 +594,13 @@
                 mood: mood,
                 dateStr: new Date().toLocaleDateString('tr-TR'),
                 createdAt: serverTimestamp()
+            });
+
+            // 2. Kullanıcı Profilini Güncelle (Toplam Dakika ve Son Tarih)
+            const userDocRef = doc(db, "users", currentUser.uid);
+            await updateDoc(userDocRef, {
+                totalMinutes: increment(duration),
+                lastStudyDate: serverTimestamp()
             });
 
             btn.innerText = "KAYDEDİLDİ ✅";
@@ -520,202 +616,59 @@
                 document.getElementById('qCorrect').value = "";
             }
         } catch (e) {
+            console.error(e);
             alert("Hata: " + e.message);
             btn.disabled = false;
             btn.innerText = originalText;
         }
     }
 
-    function listenToData() {
-        if(!currentUser) return;
-        
-        // YENİ YAPI: Sadece o kullanıcının sessions alt koleksiyonunu dinle
-        const q = query(collection(db, "users", currentUser.uid, "sessions"));
-
-        onSnapshot(q, (snapshot) => {
-            const list = document.getElementById('historyList');
-            list.innerHTML = "";
-            let weeklyTotal = 0;
-            const now = new Date();
-            const oneWeekAgo = new Date();
-            oneWeekAgo.setDate(now.getDate() - 7);
-
-            const items = [];
-            snapshot.forEach(doc => items.push(doc.data()));
-
-            // Sıralama (Client-side)
-            items.sort((a, b) => {
-                const timeA = (a.createdAt && a.createdAt.seconds) ? a.createdAt.seconds : 0;
-                const timeB = (b.createdAt && b.createdAt.seconds) ? b.createdAt.seconds : 0;
-                return timeB - timeA;
-            });
-
-            items.forEach((data, index) => {
-                if(index < 5) {
-                    let badgeColor = data.mood === 'Verimli' ? 'var(--success)' : (data.mood === 'Orta' ? 'var(--warning)' : 'var(--accent)');
-                    let moodIcon = data.mood === 'Verimli' ? '🔥' : (data.mood === 'Orta' ? '😐' : '😴');
-                    let questionInfo = (data.questionCount > 0) ? `<span class="badge-score">📚 ${data.correctCount}/${data.questionCount}</span>` : '';
-                    
-                    const li = document.createElement('li');
-                    li.className = 'history-item fade-in';
-                    li.innerHTML = `
-                        <div>
-                            <div style="font-weight:600; color:var(--text-main);">${data.subject}</div>
-                            <div style="font-size:0.8rem; color:var(--text-sub); margin-top:2px;">
-                                ⏱️ ${data.duration} dk ${questionInfo} <span style="margin-left:5px; opacity:0.6;">• ${data.dateStr}</span>
-                            </div>
-                        </div>
-                        <div style="text-align:right">
-                            <span style="font-size:1.5rem;">${moodIcon}</span>
-                        </div>
-                    `;
-                    list.appendChild(li);
-                }
-                
-                let itemSeconds = (data.createdAt && data.createdAt.seconds) ? data.createdAt.seconds : 0;
-                let itemDate = new Date(itemSeconds * 1000);
-                if(itemDate >= oneWeekAgo) weeklyTotal += data.duration;
-            });
-
-            if(items.length === 0) list.innerHTML = "<li style='padding:20px; text-align:center; color:var(--text-sub);'>Henüz kayıt yok. İlk çalışmanı ekle! 🚀</li>";
-            
-            currentWeeklyTotal = weeklyTotal;
-            updateChartDisplay(weeklyTotal);
-            calculateStreak(items);
-        }, (error) => {
-            console.error("Veri Hatası:", error);
+    // --- STANDARD UI FUNCTIONS ---
+    window.renderAllChips = () => { renderChips('chipsManual', 'selectedSubject'); renderChips('chipsPomo', 'pomoSubject'); };
+    window.renderChips = (containerId, inputId) => {
+        const container = document.getElementById(containerId);
+        container.innerHTML = "";
+        let currentVal = document.getElementById(inputId).value;
+        if (!mySubjects.includes(currentVal) && mySubjects.length > 0) { currentVal = mySubjects[0]; document.getElementById(inputId).value = currentVal; }
+        mySubjects.forEach((sub) => {
+            const chip = document.createElement('div'); chip.className = 'chip'; chip.innerText = sub;
+            if (sub === currentVal) chip.classList.add('active');
+            chip.onclick = function() { container.querySelectorAll('.chip').forEach(c => c.classList.remove('active')); this.classList.add('active'); document.getElementById(inputId).value = sub; };
+            container.appendChild(chip);
         });
-    }
-
-    // --- UI HELPERS --- (Login, Timer, etc. unchanged)
-    window.handleLogin = async () => {
-        const email = document.getElementById('email').value;
-        const pass = document.getElementById('password').value;
-        const regName = document.getElementById('regStudentName').value;
-        const btn = document.getElementById('mainAuthBtn');
-        const err = document.getElementById('authError');
-        
-        if(!email || !pass) { err.style.display='block'; err.innerText="Lütfen bilgileri giriniz."; return; }
-        btn.disabled=true; btn.innerText="İşlem Yapılıyor...";
-        try {
-            if(isLoginMode) await signInWithEmailAndPassword(auth, email, pass);
-            else {
-                const cred = await createUserWithEmailAndPassword(auth, email, pass);
-                await updateProfile(cred.user, { displayName: regName });
-            }
-        } catch(e) {
-            err.style.display='block'; 
-            if(e.code === 'auth/wrong-password') err.innerText = "Hatalı şifre.";
-            else if(e.code === 'auth/user-not-found') err.innerText = "Kullanıcı bulunamadı.";
-            else if(e.code === 'auth/email-already-in-use') err.innerText = "Bu e-posta zaten kayıtlı. Giriş yapın.";
-            else err.innerText = "Hata: " + e.message;
-            btn.disabled=false; btn.innerText = isLoginMode ? "GİRİŞ YAP" : "KAYIT OL";
-        }
+        const editChip = document.createElement('div'); editChip.className = 'chip chip-edit'; editChip.innerText = "✏️"; editChip.onclick = openSubjectModal; container.appendChild(editChip);
     };
+    window.openSubjectModal = () => {
+        const listContainer = document.getElementById('subjectListContainer'); listContainer.innerHTML = "";
+        mySubjects.forEach((sub) => { const item = document.createElement('div'); item.className = 'subject-list-item'; item.innerHTML = `<span>${sub}</span><button class="btn-delete-sub" onclick="removeSubject('${sub}')">🗑️</button>`; listContainer.appendChild(item); });
+        document.getElementById('modalSubjects').classList.remove('hidden');
+    };
+    window.closeSubjectModal = () => document.getElementById('modalSubjects').classList.add('hidden');
+    window.addSubject = async () => { const name = document.getElementById('newSubjectName').value.trim(); if(name && currentUser) { const userDocRef = doc(db, "users", currentUser.uid); await updateDoc(userDocRef, { subjects: arrayUnion(name) }); mySubjects.push(name); document.getElementById('newSubjectName').value = ""; openSubjectModal(); renderAllChips(); } };
+    window.removeSubject = async (subName) => { if(confirm("Dersi silmek istiyor musunuz?") && currentUser) { const userDocRef = doc(db, "users", currentUser.uid); await updateDoc(userDocRef, { subjects: arrayRemove(subName) }); mySubjects = mySubjects.filter(s => s !== subName); openSubjectModal(); renderAllChips(); } };
+    window.updateGoal = async () => { const val = parseInt(document.getElementById('weeklyGoalInput').value); if(currentUser && val) { const userDocRef = doc(db, "users", currentUser.uid); await updateDoc(userDocRef, { weeklyGoal: val }); updateChartDisplay(currentWeeklyTotal); } };
+    function initChart() { const ctx = document.getElementById('weeklyChart').getContext('2d'); myChart = new Chart(ctx, { type: 'doughnut', data: { labels: ['Tamamlanan', 'Kalan'], datasets: [{ data: [0, 100], backgroundColor: ['#4f46e5', '#e5e7eb'], borderWidth: 0, hoverOffset: 4 }] }, options: { responsive: true, maintainAspectRatio: false, cutout: '80%', plugins: { legend: { display: false }, tooltip: { enabled: false } }, animation: { animateScale: true, animateRotate: true } } }); }
+    function listenToData() { if(!currentUser) return; const q = query(collection(db, "users", currentUser.uid, "sessions")); onSnapshot(q, (snapshot) => { const list = document.getElementById('historyList'); list.innerHTML = ""; let weeklyTotal = 0; const now = new Date(); const oneWeekAgo = new Date(); oneWeekAgo.setDate(now.getDate() - 7); const items = []; snapshot.forEach(doc => items.push(doc.data())); items.sort((a, b) => { const timeA = (a.createdAt && a.createdAt.seconds) ? a.createdAt.seconds : 0; const timeB = (b.createdAt && b.createdAt.seconds) ? b.createdAt.seconds : 0; return timeB - timeA; }); items.forEach((data, index) => { if(index < 5) { let badgeColor = data.mood === 'Verimli' ? 'var(--success)' : (data.mood === 'Orta' ? 'var(--warning)' : 'var(--accent)'); let moodIcon = data.mood === 'Verimli' ? '🔥' : (data.mood === 'Orta' ? '😐' : '😴'); let questionInfo = (data.questionCount > 0) ? `<span class="badge-score">📚 ${data.correctCount}/${data.questionCount}</span>` : ''; const li = document.createElement('li'); li.className = 'history-item fade-in'; li.innerHTML = `<div><div style="font-weight:600; color:var(--text-main);">${data.subject}</div><div style="font-size:0.8rem; color:var(--text-sub); margin-top:2px;">⏱️ ${data.duration} dk ${questionInfo} <span style="margin-left:5px; opacity:0.6;">• ${data.dateStr}</span></div></div><div style="text-align:right"><span style="font-size:1.5rem;">${moodIcon}</span></div>`; list.appendChild(li); } let itemSeconds = (data.createdAt && data.createdAt.seconds) ? data.createdAt.seconds : 0; let itemDate = new Date(itemSeconds * 1000); if(itemDate >= oneWeekAgo) weeklyTotal += data.duration; }); if(items.length === 0) list.innerHTML = "<li style='padding:20px; text-align:center; color:var(--text-sub);'>Henüz kayıt yok. İlk çalışmanı ekle! 🚀</li>"; currentWeeklyTotal = weeklyTotal; updateChartDisplay(weeklyTotal); calculateStreak(items); }, (error) => { console.error("Veri Hatası:", error); }); }
+    function calculateStreak(items) { const uniqueDates = [...new Set(items.map(i => i.dateStr))]; const parseDate = (str) => { if(!str) return new Date(0); const parts = str.split('.'); if(parts.length < 3) return new Date(0); return new Date(parts[2], parts[1]-1, parts[0]); }; let streak = 0; const sortedDates = uniqueDates.map(d => parseDate(d)).sort((a,b) => b - a); if(sortedDates.length > 0) { const today = new Date(); today.setHours(0,0,0,0); const lastEntry = sortedDates[0]; const isToday = lastEntry.toDateString() === today.toDateString(); const yesterday = new Date(today); yesterday.setDate(yesterday.getDate() - 1); const isYesterday = lastEntry.toDateString() === yesterday.toDateString(); if(isToday || isYesterday) { streak = 1; for(let i = 0; i < sortedDates.length - 1; i++) { const curr = sortedDates[i]; const next = sortedDates[i+1]; const dayDiff = Math.round((curr - next) / (1000 * 60 * 60 * 24)); if(dayDiff === 1) streak++; else break; } } } document.getElementById('streakCount').innerText = streak; }
+    function updateChartDisplay(currentTotal) { if(!myChart) return; const goalInput = document.getElementById('weeklyGoalInput'); const goal = parseInt(goalInput.value) || 1000; document.getElementById('completedMins').innerText = currentTotal; document.getElementById('targetMins').innerText = goal; let remaining = goal - currentTotal; if(remaining < 0) remaining = 0; myChart.data.datasets[0].data = [currentTotal, remaining]; if(currentTotal >= goal) myChart.data.datasets[0].backgroundColor = ['#f59e0b', '#e5e7eb']; else myChart.data.datasets[0].backgroundColor = ['#4f46e5', '#e5e7eb']; myChart.update(); }
     
-    // ... (Diğer fonksiyonlar: toggleAuthMode, logout, timer, calculateStreak, updateChart aynı mantıkla devam eder)
-    // Kod tekrarını önlemek için timer ve streak kısımları öncekiyle aynı mantıktadır, sadece saveToFirebase'in yeni yolu kullanılır.
-
-    function calculateStreak(items) {
-        const uniqueDates = [...new Set(items.map(i => i.dateStr))];
-        const parseDate = (str) => {
-            if(!str) return new Date(0);
-            const parts = str.split('.');
-            if(parts.length < 3) return new Date(0);
-            return new Date(parts[2], parts[1]-1, parts[0]);
-        };
-        let streak = 0;
-        const sortedDates = uniqueDates.map(d => parseDate(d)).sort((a,b) => b - a);
-        if(sortedDates.length > 0) {
-             const today = new Date(); today.setHours(0,0,0,0);
-             const lastEntry = sortedDates[0];
-             const isToday = lastEntry.toDateString() === today.toDateString();
-             const yesterday = new Date(today); yesterday.setDate(yesterday.getDate() - 1);
-             const isYesterday = lastEntry.toDateString() === yesterday.toDateString();
-             if(isToday || isYesterday) {
-                 streak = 1;
-                 for(let i = 0; i < sortedDates.length - 1; i++) {
-                     const curr = sortedDates[i]; const next = sortedDates[i+1];
-                     const dayDiff = Math.round((curr - next) / (1000 * 60 * 60 * 24));
-                     if(dayDiff === 1) streak++; else break;
-                 }
-             }
-        }
-        document.getElementById('streakCount').innerText = streak;
-    }
-
-    function updateChartDisplay(currentTotal) {
-        if(!myChart) return;
-        const goalInput = document.getElementById('weeklyGoalInput');
-        const goal = parseInt(goalInput.value) || 1000;
-        document.getElementById('completedMins').innerText = currentTotal;
-        document.getElementById('targetMins').innerText = goal;
-        let remaining = goal - currentTotal; if(remaining < 0) remaining = 0;
-        myChart.data.datasets[0].data = [currentTotal, remaining];
-        if(currentTotal >= goal) myChart.data.datasets[0].backgroundColor = ['#f59e0b', '#e5e7eb'];
-        else myChart.data.datasets[0].backgroundColor = ['#4f46e5', '#e5e7eb'];
-        myChart.update();
-    }
-
-    window.toggleAuthMode = () => {
-        isLoginMode = !isLoginMode;
-        document.getElementById('authTitle').innerText = isLoginMode ? "Giriş Yap" : "Kayıt Ol";
-        document.getElementById('mainAuthBtn').innerText = isLoginMode ? "GİRİŞ YAP" : "KAYIT OL";
-        document.getElementById('regStudentName').classList.toggle('hidden');
-        document.getElementById('toggleText').innerHTML = isLoginMode ? "Hesabınız yok mu? <b>Kayıt Olun</b>" : "Hesabınız var mı? <b>Giriş Yapın</b>";
-        document.getElementById('authError').style.display='none';
-    };
+    // Auth & UI Handlers
+    window.handleLogin = async () => { const email = document.getElementById('email').value; const pass = document.getElementById('password').value; const regName = document.getElementById('regStudentName').value; const btn = document.getElementById('mainAuthBtn'); const err = document.getElementById('authError'); if(!email || !pass) { err.style.display='block'; err.innerText="Lütfen bilgileri giriniz."; return; } btn.disabled=true; btn.innerText="İşlem Yapılıyor..."; try { if(isLoginMode) await signInWithEmailAndPassword(auth, email, pass); else { const cred = await createUserWithEmailAndPassword(auth, email, pass); await updateProfile(cred.user, { displayName: regName }); } } catch(e) { err.style.display='block'; if(e.code === 'auth/wrong-password') err.innerText = "Hatalı şifre."; else if(e.code === 'auth/user-not-found') err.innerText = "Kullanıcı bulunamadı."; else if(e.code === 'auth/email-already-in-use') err.innerText = "Bu e-posta zaten kayıtlı. Giriş yapın."; else err.innerText = "Hata: " + e.message; btn.disabled=false; btn.innerText = isLoginMode ? "GİRİŞ YAP" : "KAYIT OL"; } };
+    window.toggleAuthMode = () => { isLoginMode = !isLoginMode; document.getElementById('authTitle').innerText = isLoginMode ? "Giriş Yap" : "Kayıt Ol"; document.getElementById('mainAuthBtn').innerText = isLoginMode ? "GİRİŞ YAP" : "KAYIT OL"; document.getElementById('regStudentName').classList.toggle('hidden'); document.getElementById('toggleText').innerHTML = isLoginMode ? "Hesabınız yok mu? <b>Kayıt Olun</b>" : "Hesabınız var mı? <b>Giriş Yapın</b>"; document.getElementById('authError').style.display='none'; };
     window.handleLogout = () => signOut(auth);
-    window.selectMood = (el, val) => {
-        document.querySelectorAll('.mood-btn').forEach(b => b.classList.remove('selected'));
-        el.classList.add('selected');
-        document.getElementById('selectedMood').value = val;
-    };
-    window.adjustTime = (val) => {
-        const el = document.getElementById('duration');
-        el.value = Math.max(0, (parseInt(el.value)||0) + val);
-    };
-    
-    // Timer Logic 
-    window.switchTab = (tabName) => {
-        if(tabName === 'manual') {
-            document.getElementById('panelManual').classList.remove('hidden');
-            document.getElementById('panelPomodoro').classList.add('hidden');
-            document.getElementById('tabManual').classList.add('active');
-            document.getElementById('tabPomodoro').classList.remove('active');
-        } else {
-            document.getElementById('panelManual').classList.add('hidden');
-            document.getElementById('panelPomodoro').classList.remove('hidden');
-            document.getElementById('tabManual').classList.remove('active');
-            document.getElementById('tabPomodoro').classList.add('active');
-        }
-    };
+    window.selectMood = (el, val) => { document.querySelectorAll('.mood-btn').forEach(b => b.classList.remove('selected')); el.classList.add('selected'); document.getElementById('selectedMood').value = val; };
+    window.adjustTime = (val) => { const el = document.getElementById('duration'); el.value = Math.max(0, (parseInt(el.value)||0) + val); };
+    window.switchTab = (tabName) => { if(tabName === 'manual') { document.getElementById('panelManual').classList.remove('hidden'); document.getElementById('panelPomodoro').classList.add('hidden'); document.getElementById('tabManual').classList.add('active'); document.getElementById('tabPomodoro').classList.remove('active'); } else { document.getElementById('panelManual').classList.add('hidden'); document.getElementById('panelPomodoro').classList.remove('hidden'); document.getElementById('tabManual').classList.remove('active'); document.getElementById('tabPomodoro').classList.add('active'); } };
     window.updateTimerDuration = () => { if(!isTimerRunning) { timeLeft = (parseInt(document.getElementById('timerSetDuration').value)||30)*60; updateTimerDisplay(); } };
     window.startTimer = () => { if(isTimerRunning) return; isTimerRunning=true; document.getElementById('btnTimerStart').innerText="⏳"; document.getElementById('timerSetDuration').disabled=true; timerInterval = setInterval(() => { timeLeft--; updateTimerDisplay(); if(timeLeft<=0) { clearInterval(timerInterval); finishPomodoro(); } }, 1000); };
     window.resetTimer = () => { clearInterval(timerInterval); isTimerRunning=false; timeLeft=(parseInt(document.getElementById('timerSetDuration').value)||30)*60; updateTimerDisplay(); document.getElementById('btnTimerStart').innerText="BAŞLAT ▶"; document.getElementById('timerSetDuration').disabled=false; };
     function updateTimerDisplay() { const m=Math.floor(timeLeft/60); const s=timeLeft%60; document.getElementById('timerDisplay').innerText=`${m.toString().padStart(2,'0')}:${s.toString().padStart(2,'0')}`; }
     function finishPomodoro() { const audio=new Audio('https://actions.google.com/sounds/v1/alarms/beep_short.ogg'); audio.play().catch(e=>{}); savePomodoroData(); alert("Süre Doldu! 🎉"); resetTimer(); }
-    window.savePomodoroData = () => {
-        if(isTimerRunning) { if(!confirm("Sayaç çalışıyor. Kaydedilsin mi?")) return; resetTimer(); }
-        const subject = document.getElementById('pomoSubject').value;
-        const duration = parseInt(document.getElementById('timerSetDuration').value) || 30;
-        const qCount = parseInt(document.getElementById('qCount').value) || 0;
-        const qCorrect = parseInt(document.getElementById('qCorrect').value) || 0;
-        saveToFirebase(subject, duration, qCount, qCorrect, 'Verimli', 'savePomoBtn');
-    };
-    window.saveData = () => {
-        const subj = document.getElementById('selectedSubject').value;
-        const dur = parseInt(document.getElementById('duration').value);
-        const mood = document.getElementById('selectedMood').value;
-        saveToFirebase(subj, dur, 0, 0, mood, 'saveBtn');
-    };
+    window.savePomodoroData = () => { if(isTimerRunning) { if(!confirm("Sayaç çalışıyor. Kaydedilsin mi?")) return; resetTimer(); } const subject = document.getElementById('pomoSubject').value; const duration = parseInt(document.getElementById('timerSetDuration').value) || 30; const qCount = parseInt(document.getElementById('qCount').value) || 0; const qCorrect = parseInt(document.getElementById('qCorrect').value) || 0; saveToFirebase(subject, duration, qCount, qCorrect, 'Verimli', 'savePomoBtn'); };
+    window.saveData = () => { const subj = document.getElementById('selectedSubject').value; const dur = parseInt(document.getElementById('duration').value); const mood = document.getElementById('selectedMood').value; saveToFirebase(subj, dur, 0, 0, mood, 'saveBtn'); };
 
-    // Exports
-    window.removeSubject = window.removeSubject;
-    window.addSubject = window.addSubject;
-    window.openSubjectModal = window.openSubjectModal;
-    window.closeSubjectModal = window.closeSubjectModal;
-    window.savePomodoroData = window.savePomodoroData;
+    // Global Functions
+    window.removeSubject = window.removeSubject; window.addSubject = window.addSubject; window.openSubjectModal = window.openSubjectModal; window.closeSubjectModal = window.closeSubjectModal; window.savePomodoroData = window.savePomodoroData; window.openAdminDetail = window.openAdminDetail; window.closeAdminDetail = window.closeAdminDetail;
 
 </script>
 </body>
