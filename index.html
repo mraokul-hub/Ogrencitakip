@@ -410,7 +410,10 @@
 
             snapshot.forEach(doc => {
                 const data = doc.data();
-                // Admin'i listeye katmayalım veya katalım tercihe bağlı. Katalım.
+                
+                // ADMIN (KENDİSİ) LİSTEYE DAHİL OLMASIN
+                if(data.email === ADMIN_EMAIL) return;
+
                 users.push({
                     id: doc.id,
                     ...data,
