@@ -5,133 +5,192 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Öğrenci Takip Sistemi</title>
     
-    <!-- SEKME SİMGESİ (FAVICON) -->
+    <!-- SEKME SİMGESİ -->
     <link rel="icon" href="Designer (1).jpg" type="image/jpeg">
 
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <!-- Modern Fontlar -->
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
     <style>
         :root {
-            --primary: #4f46e5;
-            --primary-light: #818cf8;
-            --accent: #f43f5e;
+            --primary: #6366f1;
+            --primary-dark: #4338ca;
+            --secondary: #ec4899;
             --success: #10b981;
             --warning: #f59e0b;
-            --admin-bg: #1e1b4b;
-            --bg-gradient: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
-            --card-bg: rgba(255, 255, 255, 0.95);
-            --text-main: #1f2937;
-            --text-sub: #6b7280;
-            --radius: 20px;
-            --shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+            --danger: #ef4444;
+            --bg-gradient: linear-gradient(135deg, #e0e7ff 0%, #f3e8ff 100%);
+            --glass-bg: rgba(255, 255, 255, 0.85);
+            --glass-border: rgba(255, 255, 255, 0.6);
+            --text-main: #1e293b;
+            --text-sub: #64748b;
+            --radius: 24px;
+            --shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.01);
         }
 
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
 
         body {
-            font-family: 'Poppins', sans-serif;
+            font-family: 'Outfit', sans-serif;
             background: var(--bg-gradient);
             margin: 0;
-            padding: 15px;
+            padding: 20px 15px;
             min-height: 100vh;
             color: var(--text-main);
             display: flex;
             justify-content: center;
         }
 
-        .container { width: 100%; max-width: 480px; padding-bottom: 80px; }
-        .container.admin-mode { max-width: 800px; }
+        .container { width: 100%; max-width: 460px; padding-bottom: 90px; }
+        .container.admin-mode { max-width: 850px; }
 
+        /* Modern Glassmorphism Kartlar */
         .card {
-            background: var(--card-bg); border-radius: var(--radius); box-shadow: var(--shadow);
-            padding: 24px; margin-bottom: 20px; backdrop-filter: blur(10px);
-            border: 1px solid rgba(255,255,255,0.5); transition: transform 0.2s ease;
+            background: var(--glass-bg);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid var(--glass-border);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            padding: 24px;
+            margin-bottom: 24px;
+            transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1);
         }
         
-        h2, h3 { margin: 0 0 15px 0; color: var(--primary); text-align: center; letter-spacing: -0.5px; }
-        h4 { margin: 0 0 12px 0; font-weight: 600; color: var(--text-sub); font-size: 0.95rem; text-transform: uppercase; letter-spacing: 1px; }
+        h2, h3 { margin: 0 0 10px 0; color: var(--primary-dark); letter-spacing: -0.5px; }
+        h4 { margin: 0; font-weight: 700; color: var(--text-sub); font-size: 0.85rem; text-transform: uppercase; letter-spacing: 1.5px; }
 
+        /* Form Elemanları */
         input, select {
             width: 100%; padding: 16px; margin-bottom: 12px;
-            border: 2px solid #e5e7eb; border-radius: 16px; font-size: 16px;
-            background: #f9fafb; transition: all 0.3s; font-family: inherit;
+            border: 2px solid transparent; border-radius: 16px; font-size: 1rem;
+            background: #f1f5f9; color: var(--text-main); transition: all 0.3s; font-family: inherit; font-weight: 500;
         }
-        input:focus, select:focus { border-color: var(--primary); background: #fff; outline: none; box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.1); }
+        input:focus, select:focus { border-color: var(--primary); background: #fff; outline: none; box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.15); }
 
         button {
             width: 100%; padding: 16px; border: none; border-radius: 16px;
-            font-size: 1rem; font-weight: 600; cursor: pointer;
-            transition: transform 0.1s, box-shadow 0.2s; font-family: inherit;
+            font-size: 1rem; font-weight: 700; cursor: pointer;
+            transition: all 0.2s; font-family: inherit;
         }
-        button:active { transform: scale(0.98); }
+        button:active { transform: scale(0.96); }
 
-        .btn-primary { background: linear-gradient(135deg, var(--primary), var(--primary-light)); color: white; box-shadow: 0 4px 15px rgba(79, 70, 229, 0.4); }
-        .btn-logout { background: #fee2e2; color: var(--accent); padding: 8px 16px; font-size: 0.85rem; width: auto; border-radius: 12px; }
-        .btn-action { width: 32px; height: 32px; padding: 0; border-radius: 8px; font-size: 1rem; margin-left: 5px; display: inline-flex; align-items: center; justify-content: center; }
-        .btn-edit { background: #e0e7ff; color: var(--primary); }
-        .btn-delete { background: #fee2e2; color: var(--accent); }
-        .btn-settings { background: #f3f4f6; color: var(--text-main); font-size: 1.2rem; margin-right: 5px; padding: 8px 12px; width: auto; border-radius: 12px; }
+        .btn-primary { 
+            background: linear-gradient(135deg, var(--primary), var(--secondary)); 
+            color: white; 
+            box-shadow: 0 10px 20px -5px rgba(99, 102, 241, 0.4);
+        }
+        
+        /* Özelleştirilmiş Butonlar */
+        .btn-logout-distinct {
+            background: #fee2e2; color: var(--danger); padding: 8px 16px; 
+            border: 1px solid #fecaca; border-radius: 12px; font-weight: 700;
+            cursor: pointer; display: flex; align-items: center; gap: 6px;
+            transition: all 0.2s; font-size: 0.85rem; width: auto;
+        }
+        .btn-logout-distinct:hover { background: #fecaca; transform: translateY(-2px); }
 
-        .fade-in { animation: fadeIn 0.4s ease-in-out; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .btn-profile-settings {
+            background: #f1f5f9; border: none; cursor: pointer; font-size: 1.2rem; 
+            width: 36px; height: 36px; border-radius: 10px; color: var(--text-sub);
+            display: inline-flex; align-items: center; justify-content: center;
+            transition: all 0.2s ease; margin-left: 8px;
+        }
+        .btn-profile-settings:hover { background: #e2e8f0; color: var(--primary); transform: rotate(45deg); }
 
-        .tabs { display: flex; background: #f3f4f6; padding: 5px; border-radius: 16px; margin-bottom: 24px; position: relative; }
-        .tab { flex: 1; text-align: center; padding: 12px; cursor: pointer; border-radius: 12px; font-weight: 600; color: var(--text-sub); font-size: 0.9rem; z-index: 2; transition: color 0.3s; }
-        .tab.active { background: white; color: var(--primary); box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+        /* Animasyonlar */
+        .fade-in { animation: fadeIn 0.5s cubic-bezier(0.4, 0, 0.2, 1); }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
 
-        .chips { display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; margin-bottom: 20px; }
-        .chip { background: #f3f4f6; padding: 10px 18px; border-radius: 25px; font-size: 0.9rem; font-weight: 500; cursor: pointer; transition: all 0.2s; border: 2px solid transparent; }
-        .chip.active { background: rgba(79, 70, 229, 0.1); color: var(--primary); border-color: var(--primary); font-weight: 700; }
+        /* Sekmeler */
+        .tabs { display: flex; background: #e0e7ff; padding: 5px; border-radius: 18px; margin-bottom: 24px; }
+        .tab { flex: 1; text-align: center; padding: 12px; cursor: pointer; border-radius: 14px; font-weight: 600; color: var(--text-sub); font-size: 0.95rem; transition: all 0.3s; }
+        .tab.active { background: white; color: var(--primary); box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); }
+
+        /* Chips */
+        .chips { display: flex; gap: 8px; flex-wrap: wrap; justify-content: center; margin-bottom: 20px; }
+        .chip { 
+            background: white; padding: 10px 20px; border-radius: 30px; font-size: 0.9rem; font-weight: 600;
+            cursor: pointer; transition: all 0.2s; border: 1px solid #e2e8f0; color: var(--text-sub);
+        }
+        .chip.active { background: var(--primary); color: white; border-color: var(--primary); box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3); }
         .chip-edit { background: #fffbeb; color: var(--warning); border-color: #fcd34d; }
 
-        .question-inputs { display: flex; gap: 12px; margin: 20px 0; }
-        .q-box { flex: 1; text-align: center; }
-        .q-box label { font-size: 0.8rem; color: var(--text-sub); margin-bottom: 6px; display: block; font-weight: 600; }
-        .q-box input { text-align: center; font-weight: 700; margin-bottom: 0; }
+        /* Sayaç */
+        .timer-display { 
+            font-size: 4.5rem; font-weight: 800; text-align: center; 
+            background: linear-gradient(to right, var(--primary), var(--secondary));
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            margin: 10px 0; font-variant-numeric: tabular-nums; letter-spacing: -3px;
+        }
+        .timer-controls { display: flex; gap: 12px; margin-bottom: 20px; }
+        .btn-start { background: var(--success); color: white; box-shadow: 0 8px 15px -3px rgba(16, 185, 129, 0.3); }
+        .btn-stop { background: var(--danger); color: white; box-shadow: 0 8px 15px -3px rgba(239, 68, 68, 0.3); }
+        
+        /* Streak Badge */
+        .streak-badge { 
+            background: linear-gradient(135deg, #fff7ed, #ffedd5); color: #c2410c; 
+            padding: 6px 14px; border-radius: 20px; font-weight: 800; 
+            display: flex; align-items: center; gap: 6px; font-size: 0.85rem; 
+            border: 1px solid #fed7aa;
+        }
 
-        .timer-display { font-size: 4rem; font-weight: 800; text-align: center; background: -webkit-linear-gradient(var(--primary), var(--primary-light)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin: 15px 0; font-variant-numeric: tabular-nums; letter-spacing: -2px; }
-        .timer-controls { display: flex; gap: 12px; margin-bottom: 15px; }
-        .btn-start { background: var(--success); color: white; }
-        .btn-stop { background: var(--accent); color: white; }
-        .timer-setting { display: flex; align-items: center; justify-content: center; gap: 10px; margin-bottom: 15px; background: #f9fafb; padding: 12px; border-radius: 16px; }
-        .timer-setting input { width: 70px; margin: 0; text-align: center; font-weight: bold; background: white; }
-
-        .streak-badge { background: linear-gradient(135deg, #ffedd5, #fed7aa); color: #c2410c; padding: 8px 16px; border-radius: 20px; font-weight: 800; display: flex; align-items: center; gap: 6px; font-size: 0.95rem; box-shadow: 0 4px 6px rgba(251, 146, 60, 0.2); }
-
-        .mood-selector { display: flex; gap: 12px; margin-bottom: 24px; }
-        .mood-btn { flex: 1; padding: 16px 5px; border: 2px solid #e5e7eb; border-radius: 16px; background: white; cursor: pointer; text-align: center; font-size: 1.8rem; transition: all 0.2s; }
-        .mood-btn.selected { border-color: var(--primary); background: #eef2ff; transform: translateY(-3px); box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
-        .mood-text { display: block; font-size: 0.75rem; color: var(--text-sub); font-weight: 700; margin-top: 5px; }
-
+        /* Liste Elemanları */
         .history-list { list-style: none; padding: 0; margin: 0; }
-        .history-item { display: flex; justify-content: space-between; align-items: center; padding: 16px 0; border-bottom: 1px solid #f3f4f6; }
-        .history-item:last-child { border-bottom: none; }
-        .badge-score { background: #ecfdf5; color: var(--success); padding: 4px 8px; border-radius: 8px; font-size: 0.75rem; font-weight: bold; margin-left: 5px; }
+        .history-item { 
+            display: flex; justify-content: space-between; align-items: center; 
+            padding: 16px; border-radius: 16px; margin-bottom: 8px; background: #fff;
+            border: 1px solid #f1f5f9; transition: transform 0.2s;
+        }
+        .history-item:hover { transform: translateX(5px); border-color: var(--primary); }
+        
+        /* Action Buttons (Edit/Delete) */
+        .btn-action { 
+            width: 34px; height: 34px; padding: 0; border-radius: 10px; font-size: 1rem; 
+            margin-left: 6px; display: inline-flex; align-items: center; justify-content: center; 
+            box-shadow: none;
+        }
+        .btn-edit { background: #e0e7ff; color: var(--primary); }
+        .btn-delete { background: #fee2e2; color: var(--danger); }
 
-        .modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); backdrop-filter: blur(4px); display: flex; justify-content: center; align-items: center; z-index: 1000; }
-        .modal-content { background: white; padding: 24px; border-radius: 24px; width: 90%; max-width: 350px; max-height: 80vh; overflow-y: auto; box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1); }
-        .subject-list-item { display: flex; justify-content: space-between; align-items: center; padding: 12px 0; border-bottom: 1px solid #eee; font-weight: 500;}
+        /* Modal */
+        .modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 23, 42, 0.6); backdrop-filter: blur(8px); display: flex; justify-content: center; align-items: center; z-index: 1000; }
+        .modal-content { background: white; padding: 30px; border-radius: 30px; width: 90%; max-width: 380px; max-height: 85vh; overflow-y: auto; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25); border: 1px solid rgba(255,255,255,0.5); }
         
         .hidden { display: none !important; }
-        .chart-wrapper { position: relative; height: 220px; width: 100%; display: flex; justify-content: center; margin-top: 10px; }
-        .error-box { background-color: #fee2e2; color: #b91c1c; padding: 12px; border-radius: 12px; font-size: 0.9rem; margin-top: 15px; display: none; text-align: center; border: 1px solid #fecaca; }
-        .time-btn-group { display: flex; align-items: center; gap: 8px; background: #f9fafb; padding: 8px; border-radius: 16px; margin-bottom: 20px; }
-        .btn-adjust { background: white; border: 1px solid #e5e7eb; color: var(--text-main); font-weight: bold; width: 45px; height: 45px; border-radius: 12px; padding: 0; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; }
+        .chart-wrapper { position: relative; height: 220px; width: 100%; display: flex; justify-content: center; margin-top: 15px; }
+        .error-box { background-color: #fee2e2; color: #b91c1c; padding: 14px; border-radius: 14px; font-size: 0.9rem; margin-top: 15px; display: none; text-align: center; border: 1px solid #fecaca; }
+        
+        /* Süre Ayarlayıcı */
+        .time-btn-group { display: flex; align-items: center; gap: 8px; background: #f8fafc; padding: 8px; border-radius: 20px; margin-bottom: 24px; border: 1px solid #e2e8f0; }
+        .btn-adjust { background: white; border: 1px solid #e2e8f0; color: var(--text-main); font-weight: 800; width: 45px; height: 45px; border-radius: 14px; padding: 0; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
 
-        /* Admin Styles */
-        .admin-header { background: linear-gradient(135deg, #1e1b4b, #312e81); color: white; padding: 20px; border-radius: 20px; margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 10px 30px rgba(30, 27, 75, 0.3); }
-        .stat-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; margin-bottom: 20px; }
-        .stat-card { background: white; padding: 15px; border-radius: 16px; text-align: center; box-shadow: var(--shadow); }
-        .stat-val { font-size: 1.5rem; font-weight: 800; color: var(--primary); }
-        .stat-label { font-size: 0.8rem; color: var(--text-sub); text-transform: uppercase; font-weight: 600; }
-        .student-table { width: 100%; border-collapse: collapse; margin-top: 10px; }
-        .student-table th { text-align: left; padding: 12px; color: var(--text-sub); font-size: 0.8rem; text-transform: uppercase; border-bottom: 2px solid #eee; }
-        .student-table td { padding: 15px 12px; border-bottom: 1px solid #eee; font-size: 0.9rem; }
-        .student-row { cursor: pointer; transition: background 0.2s; }
-        .student-row:hover { background: #f9fafb; }
-        .badge-rank { width: 24px; height: 24px; background: #e5e7eb; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; font-size: 0.8rem; font-weight: bold; margin-right: 10px; }
-        .rank-1 { background: #fef3c7; color: #d97706; }
-        .rank-2 { background: #f3f4f6; color: #4b5563; }
+        /* Emoji Seçimi */
+        .mood-selector { display: flex; gap: 12px; margin-bottom: 24px; }
+        .mood-btn { 
+            flex: 1; padding: 16px 5px; border: 2px solid transparent; border-radius: 18px;
+            background: #fff; cursor: pointer; text-align: center; font-size: 1.8rem; 
+            transition: all 0.2s; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
+        }
+        .mood-btn.selected { border-color: var(--primary); background: #eef2ff; transform: translateY(-3px); box-shadow: 0 10px 15px -3px rgba(99, 102, 241, 0.2); }
+        .mood-text { display: block; font-size: 0.75rem; color: var(--text-sub); font-weight: 700; margin-top: 5px; }
+
+        /* Soru Inputları */
+        .question-inputs { display: flex; gap: 12px; margin: 20px 0; }
+        .q-box { flex: 1; text-align: center; }
+        .q-box label { font-size: 0.8rem; color: var(--text-sub); margin-bottom: 6px; display: block; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; }
+        .q-box input { text-align: center; font-weight: 700; margin-bottom: 0; background: #fff; border: 2px solid #e2e8f0; }
+
+        /* Admin Tablo */
+        .student-table { width: 100%; border-collapse: separate; border-spacing: 0 8px; margin-top: 10px; }
+        .student-table th { text-align: left; padding: 12px; color: var(--text-sub); font-size: 0.75rem; text-transform: uppercase; letter-spacing: 1px; }
+        .student-table td { padding: 16px; background: white; font-size: 0.9rem; border-top: 1px solid #f1f5f9; border-bottom: 1px solid #f1f5f9; }
+        .student-table tr td:first-child { border-top-left-radius: 12px; border-bottom-left-radius: 12px; border-left: 1px solid #f1f5f9; }
+        .student-table tr td:last-child { border-top-right-radius: 12px; border-bottom-right-radius: 12px; border-right: 1px solid #f1f5f9; }
+        .badge-rank { width: 26px; height: 26px; background: #f1f5f9; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; font-size: 0.8rem; font-weight: 800; margin-right: 10px; }
+        .rank-1 { background: #fef3c7; color: #d97706; } 
+        .rank-2 { background: #e2e8f0; color: #475569; } 
         .rank-3 { background: #ffedd5; color: #c2410c; }
     </style>
 </head>
@@ -140,11 +199,11 @@
 <div class="container fade-in" id="mainContainer">
 
     <!-- 1. GİRİŞ EKRANI -->
-    <div id="authScreen" class="card" style="margin-top: 50px;">
-        <div style="font-size: 3rem; text-align: center; margin-bottom: 10px;">🛡️</div>
+    <div id="authScreen" class="card" style="margin-top: 60px;">
+        <div style="font-size: 4rem; text-align: center; margin-bottom: 15px;">🛡️</div>
         <h2 id="authTitle">Öğrenci Takip</h2>
-        <p style="text-align:center; color:var(--text-sub); font-size:0.95rem; margin-bottom:30px;">
-            Başarı zincirini kurmak için giriş yap.
+        <p style="text-align:center; color:var(--text-sub); font-size:0.95rem; margin-bottom:30px; line-height: 1.6;">
+            Başarı zincirini kurmak ve hedeflerine ulaşmak için giriş yap.
         </p>
         <input type="text" id="regStudentName" placeholder="Öğrenci Adı Soyadı" class="hidden">
         <input type="email" id="email" placeholder="E-Posta Adresi" required>
@@ -158,50 +217,61 @@
 
     <!-- 2. ÖĞRENCİ PANELİ -->
     <div id="dashboardScreen" class="hidden fade-in">
-        <div class="card" style="display:flex; justify-content:space-between; align-items:center; padding: 20px; background:white;">
+        
+        <!-- Üst Bar -->
+        <div class="card" style="display:flex; justify-content:space-between; align-items:center; padding: 20px; background: rgba(255,255,255,0.9);">
             <div>
-                <h3 style="margin:0; text-align:left; font-size:1.2rem; color:var(--text-main);">Selam, <span id="studentNameDisplay" style="color:var(--primary);">Öğrenci</span> 👋</h3>
-                <small style="color:var(--text-sub);">Veriler bulut veritabanında güvende.</small>
+                <div style="display:flex; align-items:center;">
+                    <h3 style="margin:0; text-align:left; font-size:1.3rem; color:var(--text-main);">Selam, <span id="studentNameDisplay" style="color:var(--primary);">Öğrenci</span></h3>
+                    <button class="btn-profile-settings" onclick="openProfileModal()" title="Profil Ayarları">⚙️</button>
+                </div>
+                <small style="color:var(--text-sub); font-weight:500;">İyi çalışmalar dileriz.</small>
             </div>
-            <div class="streak-badge">🔥 <span id="streakCount">0</span></div>
+            
+            <button class="btn-logout-distinct" onclick="handleLogout()" title="Oturumu Kapat">🚪 Çıkış</button>
         </div>
 
+        <!-- GRAFİK KARTI -->
         <div class="card">
-            <div style="display:flex; justify-content:space-between; align-items:center;">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 15px;">
                 <h4>HAFTALIK İLERLEME</h4>
-                <div style="display:flex;">
-                    <button class="btn-settings" onclick="openProfileModal()">⚙️</button>
-                    <button class="btn-logout" onclick="handleLogout()">Çıkış</button>
+                <div class="streak-badge" title="Zinciri Kırma!">
+                    🔥 <span id="streakCount">0</span> Gün
                 </div>
             </div>
+            
             <div class="chart-wrapper">
                 <canvas id="weeklyChart"></canvas>
             </div>
-            <div style="text-align:center; font-size:0.9rem; color:var(--text-sub); margin: 20px 0;">
-                Tamamlanan: <strong id="completedMins" style="color:var(--success); font-size:1.1rem;">0</strong> / <span id="targetMins">1000</span> dk
+            <div style="text-align:center; font-size:0.95rem; color:var(--text-sub); margin: 20px 0;">
+                Tamamlanan: <strong id="completedMins" style="color:var(--success); font-size:1.2rem;">0</strong> / <span id="targetMins">1000</span> dk
             </div>
-            <div style="background:#f9fafb; padding:12px; border-radius:16px; display:flex; justify-content:space-between; align-items:center;">
+            <div style="background:#f8fafc; padding:12px; border-radius:16px; display:flex; justify-content:space-between; align-items:center; border: 1px solid #e2e8f0;">
                 <label style="font-size:0.9rem; color:var(--text-main); font-weight:600;">🎯 Haftalık Hedef (dk):</label>
-                <input type="number" id="weeklyGoalInput" value="1000" onchange="updateGoal()" style="width:90px; margin:0; padding:10px; text-align:center; border:2px solid #e5e7eb;">
+                <input type="number" id="weeklyGoalInput" value="1000" onchange="updateGoal()" style="width:90px; margin:0; padding:10px; text-align:center; border:1px solid #cbd5e1; background:white;">
             </div>
         </div>
 
+        <!-- GİRİŞ ALANI -->
         <div class="card">
             <div class="tabs">
                 <div class="tab active" onclick="switchTab('manual')" id="tabManual">⚡ Hızlı Giriş</div>
                 <div class="tab" onclick="switchTab('pomodoro')" id="tabPomodoro">⏱️ Sayaçlı</div>
             </div>
 
+            <!-- MANUEL GİRİŞ -->
             <div id="panelManual" class="fade-in">
-                <label style="margin-bottom:10px; display:block; font-weight:600; font-size:0.9rem; color:var(--text-sub);">DERS SEÇİMİ</label>
+                <label style="margin-bottom:10px; display:block; font-weight:600; font-size:0.85rem; color:var(--text-sub); letter-spacing:1px;">DERS SEÇİMİ</label>
                 <div id="chipsManual" class="chips"></div>
                 <input type="hidden" id="selectedSubject" value="">
-                <label style="margin-bottom:10px; display:block; font-weight:600; font-size:0.9rem; color:var(--text-sub);">SÜRE (DK)</label>
+                
+                <label style="margin-bottom:10px; display:block; font-weight:600; font-size:0.85rem; color:var(--text-sub); letter-spacing:1px;">SÜRE (DK)</label>
                 <div class="time-btn-group">
                     <button class="btn-adjust" onclick="adjustTime(-10)">-</button>
-                    <input type="number" id="duration" value="90" style="text-align:center; margin:0; font-weight:800; font-size:1.2rem; border:none; background:transparent;">
+                    <input type="number" id="duration" value="90" style="text-align:center; margin:0; font-weight:800; font-size:1.3rem; border:none; background:transparent;">
                     <button class="btn-adjust" onclick="adjustTime(10)">+</button>
                 </div>
+                
                 <div class="mood-selector">
                     <div class="mood-btn" onclick="selectMood(this, 'Verimsiz')">😴<span class="mood-text">Az</span></div>
                     <div class="mood-btn" onclick="selectMood(this, 'Orta')">😐<span class="mood-text">Orta</span></div>
@@ -211,19 +281,24 @@
                 <button class="btn-primary" id="saveBtn" onclick="saveData()">KAYDET ✅</button>
             </div>
 
+            <!-- SAYAÇLI GİRİŞ -->
             <div id="panelPomodoro" class="hidden fade-in">
-                <p style="text-align:center; color:var(--text-sub); font-size:0.9rem; margin-bottom:15px;">Odaklan ve süreyi başlat.</p>
+                <p style="text-align:center; color:var(--text-sub); font-size:0.9rem; margin-bottom:20px;">Odaklan ve süreyi başlat.</p>
                 <div id="chipsPomo" class="chips"></div>
                 <input type="hidden" id="pomoSubject" value="">
+                
                 <div class="timer-setting">
-                    <label>Süre (dk):</label>
+                    <label style="font-weight:600; font-size:0.9rem;">Süre (dk):</label>
                     <input type="number" id="timerSetDuration" value="30" onchange="updateTimerDuration()">
                 </div>
+                
                 <div class="timer-display" id="timerDisplay">30:00</div>
+                
                 <div class="timer-controls">
                     <button class="btn-start" onclick="startTimer()" id="btnTimerStart">BAŞLAT ▶</button>
                     <button class="btn-stop" onclick="resetTimer()" id="btnTimerReset">SIFIRLA ↺</button>
                 </div>
+                
                 <div class="question-inputs">
                     <div class="q-box"><label>Soru</label><input type="number" id="qCount" placeholder="0"></div>
                     <div class="q-box"><label>Doğru</label><input type="number" id="qCorrect" placeholder="0"></div>
@@ -234,7 +309,7 @@
 
         <div class="card">
             <h4>SON KAYITLAR</h4>
-            <ul id="historyList" style="list-style:none; padding:0; margin:0;">
+            <ul id="historyList" style="list-style:none; padding:0; margin-top:15px;">
                 <li style="text-align:center; color:var(--text-sub); padding:15px;">Yükleniyor...</li>
             </ul>
         </div>
@@ -242,23 +317,26 @@
 
     <!-- 3. YÖNETİCİ PANELİ -->
     <div id="adminScreen" class="hidden fade-in">
-        <div class="admin-header">
+        <!-- Admin Header -->
+        <div style="background: linear-gradient(135deg, #1e1b4b, #312e81); padding: 24px; border-radius: 24px; margin-bottom: 24px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 10px 30px rgba(30, 27, 75, 0.25); color:white;">
             <div>
-                <h3 style="margin:0; text-align:left; color:white; font-size:1.3rem;">Yönetici Paneli 👑</h3>
+                <h3 style="margin:0; text-align:left; color:white; font-size:1.4rem;">Yönetici Paneli 👑</h3>
                 <small style="opacity:0.8;">Tüm öğrenciler kontrol altında.</small>
             </div>
-            <button class="btn-logout" onclick="handleLogout()" style="background:rgba(255,255,255,0.2); color:white;">Çıkış</button>
+            <button class="btn-logout-distinct" onclick="handleLogout()" style="background:rgba(255,255,255,0.15); color:white; border:none; backdrop-filter:blur(5px);">🚪 Çıkış</button>
         </div>
-        <div class="stat-grid">
-            <div class="stat-card">
-                <div class="stat-val" id="adminTotalStudents">0</div>
-                <div class="stat-label">Öğrenci</div>
+
+        <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; margin-bottom: 24px;">
+            <div class="card" style="margin:0; padding:20px; text-align:center;">
+                <div style="font-size: 2rem; font-weight: 800; color: var(--primary);" id="adminTotalStudents">0</div>
+                <div style="font-size: 0.8rem; color: var(--text-sub); text-transform: uppercase; font-weight: 700;">Öğrenci</div>
             </div>
-            <div class="stat-card">
-                <div class="stat-val" id="adminTotalHours">0s</div>
-                <div class="stat-label">Toplam Süre</div>
+            <div class="card" style="margin:0; padding:20px; text-align:center;">
+                <div style="font-size: 2rem; font-weight: 800; color: var(--success);" id="adminTotalHours">0s</div>
+                <div style="font-size: 0.8rem; color: var(--text-sub); text-transform: uppercase; font-weight: 700;">Toplam Süre</div>
             </div>
         </div>
+
         <div class="card">
             <h4>LİDERLİK TABLOSU</h4>
             <div class="chart-wrapper"><canvas id="adminLeaderboardChart"></canvas></div>
@@ -280,11 +358,11 @@
 <div id="modalSubjects" class="modal hidden fade-in">
     <div class="modal-content">
         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
-            <h3 style="margin:0; text-align:left;">Dersleri Düzenle</h3>
-            <button onclick="closeSubjectModal()" style="width:30px; height:30px; padding:0; border-radius:50%; background:#f3f4f6; color:#333;">✕</button>
+            <h3 style="margin:0;">Dersleri Düzenle</h3>
+            <button onclick="closeSubjectModal()" style="width:32px; height:32px; padding:0; border-radius:50%; background:#f1f5f9; color:#333;">✕</button>
         </div>
         <div id="subjectListContainer"></div>
-        <div class="add-sub-group" style="display:flex; gap:10px; margin-top:20px;">
+        <div style="display:flex; gap:10px; margin-top:20px;">
             <input type="text" id="newSubjectName" placeholder="Yeni Ders Ekle" style="margin:0;">
             <button onclick="addSubject()" style="width:60px; background:var(--success); color:white; padding:0; border-radius:12px;">+</button>
         </div>
@@ -294,11 +372,10 @@
 <div id="modalAdminDetail" class="modal hidden fade-in">
     <div class="modal-content" style="max-width:500px;">
         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
-            <h3 style="margin:0; text-align:left;" id="detailStudentName">Öğrenci Detayı</h3>
-            <button onclick="closeAdminDetail()" style="width:30px; height:30px; padding:0; border-radius:50%; background:#f3f4f6; color:#333;">✕</button>
+            <h3 style="margin:0;" id="detailStudentName">Öğrenci Detayı</h3>
+            <button onclick="closeAdminDetail()" style="width:32px; height:32px; padding:0; border-radius:50%; background:#f1f5f9; color:#333;">✕</button>
         </div>
-        <div class="card" style="margin-bottom:0; box-shadow:none; border:1px solid #eee;">
-            <h4>SON ÇALIŞMALARI</h4>
+        <div style="max-height: 400px; overflow-y: auto;">
             <ul id="adminDetailList" style="list-style:none; padding:0; margin:0;">
                 <li style="text-align:center;">Yükleniyor...</li>
             </ul>
@@ -309,8 +386,8 @@
 <div id="modalEditEntry" class="modal hidden fade-in">
     <div class="modal-content">
         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
-            <h3 style="margin:0; text-align:left;">Kaydı Düzenle</h3>
-            <button onclick="closeEditModal()" style="width:30px; height:30px; padding:0; border-radius:50%; background:#f3f4f6; color:#333;">✕</button>
+            <h3 style="margin:0;">Kaydı Düzenle</h3>
+            <button onclick="closeEditModal()" style="width:32px; height:32px; padding:0; border-radius:50%; background:#f1f5f9; color:#333;">✕</button>
         </div>
         <input type="hidden" id="editEntryId">
         <input type="hidden" id="editOldDuration"> 
@@ -332,12 +409,11 @@
     </div>
 </div>
 
-<!-- PROFİL AYARLARI MODALI (YENİ) -->
 <div id="modalProfile" class="modal hidden fade-in">
     <div class="modal-content">
         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
-            <h3 style="margin:0; text-align:left;">Profil Ayarları</h3>
-            <button onclick="closeProfileModal()" style="width:30px; height:30px; padding:0; border-radius:50%; background:#f3f4f6; color:#333;">✕</button>
+            <h3 style="margin:0;">Profil Ayarları</h3>
+            <button onclick="closeProfileModal()" style="width:32px; height:32px; padding:0; border-radius:50%; background:#f1f5f9; color:#333;">✕</button>
         </div>
         
         <label style="font-size:0.8rem; color:var(--text-sub); margin-bottom:5px; display:block;">Öğrenci Adı Soyadı</label>
@@ -348,7 +424,7 @@
         
         <button class="btn-primary" onclick="saveUserProfile()">KAYDET</button>
         
-        <div style="margin-top:15px; text-align:center;">
+        <div style="margin-top:20px; text-align:center;">
             <button onclick="sendPasswordReset()" style="background:none; border:none; color:var(--primary); text-decoration:underline; font-size:0.85rem; padding:5px;">Şifremi Unuttum / Sıfırla</button>
         </div>
     </div>
@@ -449,7 +525,7 @@
         const labels = top5.map(u => (u.displayName || u.email).split(' ')[0]);
         const data = top5.map(u => u.totalMinutes);
         if(adminChart) adminChart.destroy();
-        adminChart = new Chart(ctx, { type: 'bar', data: { labels: labels, datasets: [{ label: 'Toplam Dakika', data: data, backgroundColor: ['#f59e0b', '#4f46e5', '#10b981', '#f43f5e', '#8b5cf6'], borderRadius: 8 }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, grid: { display: false } }, x: { grid: { display: false } } } } });
+        adminChart = new Chart(ctx, { type: 'bar', data: { labels: labels, datasets: [{ label: 'Toplam Dakika', data: data, backgroundColor: ['#f59e0b', '#6366f1', '#10b981', '#f43f5e', '#8b5cf6'], borderRadius: 8 }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, grid: { display: false } }, x: { grid: { display: false } } } } });
     }
 
     window.openAdminDetail = (uid, name) => {
@@ -461,18 +537,17 @@
             items.sort((a, b) => { const timeA = (a.createdAt?.seconds) || 0; const timeB = (b.createdAt?.seconds) || 0; return timeB - timeA; });
             if(items.length === 0) { list.innerHTML = "<li style='text-align:center; padding:10px;'>Kayıt yok.</li>"; return; }
             items.forEach(data => {
-                let badgeColor = data.mood === 'Verimli' ? 'var(--success)' : (data.mood === 'Orta' ? 'var(--warning)' : 'var(--accent)');
+                let badgeColor = data.mood === 'Verimli' ? 'var(--success)' : (data.mood === 'Orta' ? 'var(--warning)' : 'var(--danger)');
                 let questionInfo = (data.questionCount > 0) ? `<span class="badge-score">📚 ${data.correctCount}/${data.questionCount}</span>` : '';
-                const li = document.createElement('li'); li.style.cssText = "padding:10px 0; border-bottom:1px solid #eee; display:flex; justify-content:space-between; align-items:center;";
-                li.innerHTML = `<div><div style="font-weight:600; font-size:0.9rem;">${data.subject}</div><div style="font-size:0.8rem; color:var(--text-sub);">⏱️ ${data.duration} dk ${questionInfo}</div><div style="font-size:0.7rem; color:#aaa;">${data.dateStr}</div></div><span style="color:${badgeColor}; font-weight:bold;">${data.mood}</span>`;
+                const li = document.createElement('li'); li.style.cssText = "padding:10px 0; border-bottom:1px solid #f1f5f9; display:flex; justify-content:space-between; align-items:center;";
+                li.innerHTML = `<div><div style="font-weight:600; font-size:0.9rem;">${data.subject}</div><div style="font-size:0.8rem; color:var(--text-sub);">⏱️ ${data.duration} dk ${questionInfo}</div><div style="font-size:0.7rem; color:#94a3b8;">${data.dateStr}</div></div><span style="color:${badgeColor}; font-weight:bold;">${data.mood}</span>`;
                 list.appendChild(li);
             });
         });
     };
     window.closeAdminDetail = () => document.getElementById('modalAdminDetail').classList.add('hidden');
 
-    // --- STUDENT & DÜZENLEME MANTIĞI ---
-
+    // --- STUDENT ---
     async function loadUserProfile(uid) {
         const userDocRef = doc(db, "users", uid);
         const docSnap = await getDoc(userDocRef);
@@ -487,35 +562,11 @@
         renderAllChips();
     }
 
-    // --- PROFIL YÖNETİMİ (YENİ) ---
-    window.openProfileModal = () => {
-        document.getElementById('editProfileName').value = currentUser.displayName || "";
-        document.getElementById('editProfileEmail').value = currentUser.email || "";
-        document.getElementById('modalProfile').classList.remove('hidden');
-    };
+    // --- PROFILE ---
+    window.openProfileModal = () => { document.getElementById('editProfileName').value = currentUser.displayName || ""; document.getElementById('editProfileEmail').value = currentUser.email || ""; document.getElementById('modalProfile').classList.remove('hidden'); };
     window.closeProfileModal = () => document.getElementById('modalProfile').classList.add('hidden');
-    
-    window.saveUserProfile = async () => {
-        const newName = document.getElementById('editProfileName').value.trim();
-        if(!newName) { alert("İsim boş olamaz."); return; }
-        
-        try {
-            await updateProfile(currentUser, { displayName: newName }); // Auth güncelleme
-            await updateDoc(doc(db, "users", currentUser.uid), { displayName: newName }); // DB güncelleme
-            document.getElementById('studentNameDisplay').innerText = newName.split(' ')[0]; // UI güncelleme
-            alert("Profil güncellendi ✅");
-            closeProfileModal();
-        } catch(e) { alert("Hata: " + e.message); }
-    };
-
-    window.sendPasswordReset = async () => {
-        if(confirm(currentUser.email + " adresine şifre sıfırlama e-postası gönderilsin mi?")) {
-            try {
-                await sendPasswordResetEmail(auth, currentUser.email);
-                alert("E-posta gönderildi! Lütfen kutunuzu kontrol edin.");
-            } catch(e) { alert("Hata: " + e.message); }
-        }
-    };
+    window.saveUserProfile = async () => { const newName = document.getElementById('editProfileName').value.trim(); if(!newName) { alert("İsim boş olamaz."); return; } try { await updateProfile(currentUser, { displayName: newName }); await updateDoc(doc(db, "users", currentUser.uid), { displayName: newName }); document.getElementById('studentNameDisplay').innerText = newName.split(' ')[0]; alert("Profil güncellendi ✅"); closeProfileModal(); } catch(e) { alert("Hata: " + e.message); } };
+    window.sendPasswordReset = async () => { if(confirm(currentUser.email + " adresine şifre sıfırlama e-postası gönderilsin mi?")) { try { await sendPasswordResetEmail(auth, currentUser.email); alert("E-posta gönderildi! Lütfen kutunuzu kontrol edin."); } catch(e) { alert("Hata: " + e.message); } } };
 
     function listenToData() {
         if(!currentUser) return;
@@ -524,17 +575,16 @@
             const list = document.getElementById('historyList'); list.innerHTML = "";
             let weeklyTotal = 0; const now = new Date(); const oneWeekAgo = new Date(); oneWeekAgo.setDate(now.getDate() - 7);
             const items = [];
-            snapshot.forEach(doc => items.push({ id: doc.id, ...doc.data() })); // ID'yi ekle
+            snapshot.forEach(doc => items.push({ id: doc.id, ...doc.data() })); 
             items.sort((a, b) => { const timeA = (a.createdAt?.seconds) || 0; const timeB = (b.createdAt?.seconds) || 0; return timeB - timeA; });
 
             items.forEach((data, index) => {
-                if(index < 10) { // Son 10 kayıt
-                    let badgeColor = data.mood === 'Verimli' ? 'var(--success)' : (data.mood === 'Orta' ? 'var(--warning)' : 'var(--accent)');
+                if(index < 10) { 
+                    let badgeColor = data.mood === 'Verimli' ? 'var(--success)' : (data.mood === 'Orta' ? 'var(--warning)' : 'var(--danger)');
                     let moodIcon = data.mood === 'Verimli' ? '🔥' : (data.mood === 'Orta' ? '😐' : '😴');
                     let questionInfo = (data.questionCount > 0) ? `<span class="badge-score">📚 ${data.correctCount}/${data.questionCount}</span>` : '';
                     
                     const li = document.createElement('li'); li.className = 'history-item fade-in';
-                    // JSON.stringify ile veriyi fonksiyona gömüyoruz (güvenli tırnak değişimi yaparak)
                     const dataStr = JSON.stringify(data).replace(/"/g, '&quot;');
                     
                     li.innerHTML = `
@@ -561,90 +611,24 @@
     }
 
     // --- SİLME & DÜZENLEME ---
-    window.deleteEntry = async (id, duration) => {
-        if(!confirm("Bu kaydı silmek istediğine emin misin? Toplam sürenden düşülecek.")) return;
-        try {
-            // Kaydı Sil
-            await deleteDoc(doc(db, "users", currentUser.uid, "sessions", id));
-            // Toplam süreden düş
-            await updateDoc(doc(db, "users", currentUser.uid), { totalMinutes: increment(-duration) });
-        } catch(e) { alert("Hata: " + e.message); }
-    };
-
-    window.openEditModal = (data) => {
-        // Dersleri select içine doldur
-        const select = document.getElementById('editSubject');
-        select.innerHTML = "";
-        mySubjects.forEach(s => {
-            const opt = document.createElement('option');
-            opt.value = s; opt.innerText = s;
-            if(s === data.subject) opt.selected = true;
-            select.appendChild(opt);
-        });
-
-        document.getElementById('editEntryId').value = data.id;
-        document.getElementById('editOldDuration').value = data.duration;
-        document.getElementById('editDuration').value = data.duration;
-        document.getElementById('editQCount').value = data.questionCount || 0;
-        document.getElementById('editQCorrect').value = data.correctCount || 0;
-        document.getElementById('editMood').value = data.mood;
-
-        document.getElementById('modalEditEntry').classList.remove('hidden');
-    };
-
+    window.deleteEntry = async (id, duration) => { if(!confirm("Bu kaydı silmek istediğine emin misin?")) return; try { await deleteDoc(doc(db, "users", currentUser.uid, "sessions", id)); await updateDoc(doc(db, "users", currentUser.uid), { totalMinutes: increment(-duration) }); } catch(e) { alert("Hata: " + e.message); } };
+    window.openEditModal = (data) => { const select = document.getElementById('editSubject'); select.innerHTML = ""; mySubjects.forEach(s => { const opt = document.createElement('option'); opt.value = s; opt.innerText = s; if(s === data.subject) opt.selected = true; select.appendChild(opt); }); document.getElementById('editEntryId').value = data.id; document.getElementById('editOldDuration').value = data.duration; document.getElementById('editDuration').value = data.duration; document.getElementById('editQCount').value = data.questionCount || 0; document.getElementById('editQCorrect').value = data.correctCount || 0; document.getElementById('editMood').value = data.mood; document.getElementById('modalEditEntry').classList.remove('hidden'); };
     window.closeEditModal = () => document.getElementById('modalEditEntry').classList.add('hidden');
+    window.saveEditedEntry = async () => { const id = document.getElementById('editEntryId').value; const oldDur = parseInt(document.getElementById('editOldDuration').value); const newDur = parseInt(document.getElementById('editDuration').value); const newData = { subject: document.getElementById('editSubject').value, duration: newDur, questionCount: parseInt(document.getElementById('editQCount').value) || 0, correctCount: parseInt(document.getElementById('editQCorrect').value) || 0, mood: document.getElementById('editMood').value }; try { await updateDoc(doc(db, "users", currentUser.uid, "sessions", id), newData); const diff = newDur - oldDur; if(diff !== 0) { await updateDoc(doc(db, "users", currentUser.uid), { totalMinutes: increment(diff) }); } closeEditModal(); } catch(e) { alert("Hata: " + e.message); } };
 
-    window.saveEditedEntry = async () => {
-        const id = document.getElementById('editEntryId').value;
-        const oldDur = parseInt(document.getElementById('editOldDuration').value);
-        const newDur = parseInt(document.getElementById('editDuration').value);
-        
-        const newData = {
-            subject: document.getElementById('editSubject').value,
-            duration: newDur,
-            questionCount: parseInt(document.getElementById('editQCount').value) || 0,
-            correctCount: parseInt(document.getElementById('editQCorrect').value) || 0,
-            mood: document.getElementById('editMood').value
-        };
-
-        try {
-            // Kaydı Güncelle
-            await updateDoc(doc(db, "users", currentUser.uid, "sessions", id), newData);
-            
-            // Süre farkını profile yansıt (Yeni - Eski)
-            const diff = newDur - oldDur;
-            if(diff !== 0) {
-                await updateDoc(doc(db, "users", currentUser.uid), { totalMinutes: increment(diff) });
-            }
-            
-            closeEditModal();
-        } catch(e) { alert("Hata: " + e.message); }
-    };
-
-    // --- OTHER HELPERS ---
+    // --- HELPERS ---
     window.renderAllChips = () => { renderChips('chipsManual', 'selectedSubject'); renderChips('chipsPomo', 'pomoSubject'); };
-    window.renderChips = (containerId, inputId) => {
-        const container = document.getElementById(containerId); container.innerHTML = "";
-        let currentVal = document.getElementById(inputId).value;
-        if (!mySubjects.includes(currentVal) && mySubjects.length > 0) { currentVal = mySubjects[0]; document.getElementById(inputId).value = currentVal; }
-        mySubjects.forEach((sub) => {
-            const chip = document.createElement('div'); chip.className = 'chip'; chip.innerText = sub;
-            if (sub === currentVal) chip.classList.add('active');
-            chip.onclick = function() { container.querySelectorAll('.chip').forEach(c => c.classList.remove('active')); this.classList.add('active'); document.getElementById(inputId).value = sub; };
-            container.appendChild(chip);
-        });
-        const editChip = document.createElement('div'); editChip.className = 'chip chip-edit'; editChip.innerText = "✏️"; editChip.onclick = openSubjectModal; container.appendChild(editChip);
-    };
+    window.renderChips = (containerId, inputId) => { const container = document.getElementById(containerId); container.innerHTML = ""; let currentVal = document.getElementById(inputId).value; if (!mySubjects.includes(currentVal) && mySubjects.length > 0) { currentVal = mySubjects[0]; document.getElementById(inputId).value = currentVal; } mySubjects.forEach((sub) => { const chip = document.createElement('div'); chip.className = 'chip'; chip.innerText = sub; if (sub === currentVal) chip.classList.add('active'); chip.onclick = function() { container.querySelectorAll('.chip').forEach(c => c.classList.remove('active')); this.classList.add('active'); document.getElementById(inputId).value = sub; }; container.appendChild(chip); }); const editChip = document.createElement('div'); editChip.className = 'chip chip-edit'; editChip.innerText = "✏️"; editChip.onclick = openSubjectModal; container.appendChild(editChip); };
     window.openSubjectModal = () => { const listContainer = document.getElementById('subjectListContainer'); listContainer.innerHTML = ""; mySubjects.forEach((sub) => { const item = document.createElement('div'); item.className = 'subject-list-item'; item.innerHTML = `<span>${sub}</span><button class="btn-delete-sub" onclick="removeSubject('${sub}')">🗑️</button>`; listContainer.appendChild(item); }); document.getElementById('modalSubjects').classList.remove('hidden'); };
     window.closeSubjectModal = () => document.getElementById('modalSubjects').classList.add('hidden');
     window.addSubject = async () => { const name = document.getElementById('newSubjectName').value.trim(); if(name && currentUser) { await updateDoc(doc(db, "users", currentUser.uid), { subjects: arrayUnion(name) }); mySubjects.push(name); document.getElementById('newSubjectName').value = ""; openSubjectModal(); renderAllChips(); } };
     window.removeSubject = async (subName) => { if(confirm("Dersi silmek istiyor musunuz?") && currentUser) { await updateDoc(doc(db, "users", currentUser.uid), { subjects: arrayRemove(subName) }); mySubjects = mySubjects.filter(s => s !== subName); openSubjectModal(); renderAllChips(); } };
     window.updateGoal = async () => { const val = parseInt(document.getElementById('weeklyGoalInput').value); if(currentUser && val) { await updateDoc(doc(db, "users", currentUser.uid), { weeklyGoal: val }); updateChartDisplay(currentWeeklyTotal); } };
-    function initChart() { const ctx = document.getElementById('weeklyChart').getContext('2d'); myChart = new Chart(ctx, { type: 'doughnut', data: { labels: ['Tamamlanan', 'Kalan'], datasets: [{ data: [0, 100], backgroundColor: ['#4f46e5', '#e5e7eb'], borderWidth: 0, hoverOffset: 4 }] }, options: { responsive: true, maintainAspectRatio: false, cutout: '80%', plugins: { legend: { display: false }, tooltip: { enabled: false } }, animation: { animateScale: true, animateRotate: true } } }); }
+    function initChart() { const ctx = document.getElementById('weeklyChart').getContext('2d'); myChart = new Chart(ctx, { type: 'doughnut', data: { labels: ['Tamamlanan', 'Kalan'], datasets: [{ data: [0, 100], backgroundColor: ['#6366f1', '#e2e8f0'], borderWidth: 0, hoverOffset: 4 }] }, options: { responsive: true, maintainAspectRatio: false, cutout: '80%', plugins: { legend: { display: false }, tooltip: { enabled: false } }, animation: { animateScale: true, animateRotate: true } } }); }
     function calculateStreak(items) { const uniqueDates = [...new Set(items.map(i => i.dateStr))]; const parseDate = (str) => { if(!str) return new Date(0); const parts = str.split('.'); if(parts.length < 3) return new Date(0); return new Date(parts[2], parts[1]-1, parts[0]); }; let streak = 0; const sortedDates = uniqueDates.map(d => parseDate(d)).sort((a,b) => b - a); if(sortedDates.length > 0) { const today = new Date(); today.setHours(0,0,0,0); const lastEntry = sortedDates[0]; const isToday = lastEntry.toDateString() === today.toDateString(); const yesterday = new Date(today); yesterday.setDate(yesterday.getDate() - 1); const isYesterday = lastEntry.toDateString() === yesterday.toDateString(); if(isToday || isYesterday) { streak = 1; for(let i = 0; i < sortedDates.length - 1; i++) { const curr = sortedDates[i]; const next = sortedDates[i+1]; const dayDiff = Math.round((curr - next) / (1000 * 60 * 60 * 24)); if(dayDiff === 1) streak++; else break; } } } document.getElementById('streakCount').innerText = streak; }
-    function updateChartDisplay(currentTotal) { if(!myChart) return; const goal = parseInt(document.getElementById('weeklyGoalInput').value) || 1000; document.getElementById('completedMins').innerText = currentTotal; document.getElementById('targetMins').innerText = goal; let remaining = goal - currentTotal; if(remaining < 0) remaining = 0; myChart.data.datasets[0].data = [currentTotal, remaining]; if(currentTotal >= goal) myChart.data.datasets[0].backgroundColor = ['#f59e0b', '#e5e7eb']; else myChart.data.datasets[0].backgroundColor = ['#4f46e5', '#e5e7eb']; myChart.update(); }
+    function updateChartDisplay(currentTotal) { if(!myChart) return; const goal = parseInt(document.getElementById('weeklyGoalInput').value) || 1000; document.getElementById('completedMins').innerText = currentTotal; document.getElementById('targetMins').innerText = goal; let remaining = goal - currentTotal; if(remaining < 0) remaining = 0; myChart.data.datasets[0].data = [currentTotal, remaining]; if(currentTotal >= goal) myChart.data.datasets[0].backgroundColor = ['#f59e0b', '#e2e8f0']; else myChart.data.datasets[0].backgroundColor = ['#6366f1', '#e2e8f0']; myChart.update(); }
     
-    window.handleLogin = async () => { const email = document.getElementById('email').value; const pass = document.getElementById('password').value; const regName = document.getElementById('regStudentName').value; const btn = document.getElementById('mainAuthBtn'); const err = document.getElementById('authError'); if(!email || !pass) { err.style.display='block'; err.innerText="Bilgileri giriniz."; return; } btn.disabled=true; btn.innerText="İşlem Yapılıyor..."; try { if(isLoginMode) await signInWithEmailAndPassword(auth, email, pass); else { const cred = await createUserWithEmailAndPassword(auth, email, pass); await updateProfile(cred.user, { displayName: regName }); } } catch(e) { err.style.display='block'; err.innerText=e.message; btn.disabled=false; btn.innerText = isLoginMode ? "GİRİŞ YAP" : "KAYIT OL"; } };
+    window.handleLogin = async () => { const email = document.getElementById('email').value; const pass = document.getElementById('password').value; const regName = document.getElementById('regStudentName').value; const btn = document.getElementById('mainAuthBtn'); const err = document.getElementById('authError'); if(!email || !pass) { err.style.display='block'; err.innerText="Bilgileri giriniz."; return; } btn.disabled=true; btn.innerText="İşlem Yapılıyor..."; try { if(isLoginMode) await signInWithEmailAndPassword(auth, email, pass); else { const cred = await createUserWithEmailAndPassword(auth, email, pass); await updateProfile(cred.user, { displayName: regName }); } } catch(e) { err.style.display='block'; if(e.code === 'auth/wrong-password') err.innerText = "Hatalı şifre."; else if(e.code === 'auth/user-not-found') err.innerText = "Kullanıcı bulunamadı."; else if(e.code === 'auth/email-already-in-use') err.innerText = "Bu e-posta zaten kayıtlı. Giriş yapın."; else err.innerText = "Hata: " + e.message; btn.disabled=false; btn.innerText = isLoginMode ? "GİRİŞ YAP" : "KAYIT OL"; } };
     window.toggleAuthMode = () => { isLoginMode = !isLoginMode; document.getElementById('authTitle').innerText = isLoginMode ? "Giriş Yap" : "Kayıt Ol"; document.getElementById('mainAuthBtn').innerText = isLoginMode ? "GİRİŞ YAP" : "KAYIT OL"; document.getElementById('regStudentName').classList.toggle('hidden'); document.getElementById('toggleText').innerHTML = isLoginMode ? "Hesabınız yok mu? <b>Kayıt Olun</b>" : "Hesabınız var mı? <b>Giriş Yapın</b>"; document.getElementById('authError').style.display='none'; };
     window.handleLogout = () => signOut(auth);
     window.selectMood = (el, val) => { document.querySelectorAll('.mood-btn').forEach(b => b.classList.remove('selected')); el.classList.add('selected'); document.getElementById('selectedMood').value = val; };
@@ -659,9 +643,10 @@
     window.saveData = () => { const subj = document.getElementById('selectedSubject').value; const dur = parseInt(document.getElementById('duration').value); const mood = document.getElementById('selectedMood').value; saveToFirebase(subj, dur, 0, 0, mood, 'saveBtn'); };
     async function saveToFirebase(subject, duration, qCount, qCorrect, mood, btnId = 'saveBtn') { if(!currentUser) return; const btn = document.getElementById(btnId); btn.disabled=true; try { await addDoc(collection(db, "users", currentUser.uid, "sessions"), { subject, duration, questionCount: qCount, correctCount: qCorrect, mood, dateStr: new Date().toLocaleDateString('tr-TR'), createdAt: serverTimestamp() }); await updateDoc(doc(db, "users", currentUser.uid), { totalMinutes: increment(duration), lastStudyDate: serverTimestamp() }); btn.disabled=false; if(btnId === 'savePomoBtn') { document.getElementById('qCount').value=""; document.getElementById('qCorrect').value=""; } } catch(e) { alert("Hata: "+e.message); btn.disabled=false; } }
 
-    window.openEditModal = window.openEditModal; window.closeEditModal = window.closeEditModal; window.saveEditedEntry = window.saveEditedEntry; window.deleteEntry = window.deleteEntry;
+    // Exports
     window.removeSubject = window.removeSubject; window.addSubject = window.addSubject; window.openSubjectModal = window.openSubjectModal; window.closeSubjectModal = window.closeSubjectModal; window.savePomodoroData = window.savePomodoroData; window.openAdminDetail = window.openAdminDetail; window.closeAdminDetail = window.closeAdminDetail;
     window.openProfileModal = window.openProfileModal; window.closeProfileModal = window.closeProfileModal; window.saveUserProfile = window.saveUserProfile; window.sendPasswordReset = window.sendPasswordReset;
+    window.saveEditedEntry = window.saveEditedEntry; window.openEditModal = window.openEditModal; window.closeEditModal = window.closeEditModal; window.deleteEntry = window.deleteEntry;
 
 </script>
 </body>
