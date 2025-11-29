@@ -66,6 +66,7 @@
         .btn-action { width: 32px; height: 32px; padding: 0; border-radius: 8px; font-size: 1rem; margin-left: 5px; display: inline-flex; align-items: center; justify-content: center; }
         .btn-edit { background: #e0e7ff; color: var(--primary); }
         .btn-delete { background: #fee2e2; color: var(--accent); }
+        .btn-settings { background: #f3f4f6; color: var(--text-main); font-size: 1.2rem; margin-right: 5px; padding: 8px 12px; width: auto; border-radius: 12px; }
 
         .fade-in { animation: fadeIn 0.4s ease-in-out; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
@@ -164,7 +165,10 @@
         <div class="card">
             <div style="display:flex; justify-content:space-between; align-items:center;">
                 <h4>HAFTALIK İLERLEME</h4>
-                <button class="btn-logout" onclick="handleLogout()">Çıkış</button>
+                <div style="display:flex;">
+                    <button class="btn-settings" onclick="openProfileModal()">⚙️</button>
+                    <button class="btn-logout" onclick="handleLogout()">Çıkış</button>
+                </div>
             </div>
             <div class="chart-wrapper">
                 <canvas id="weeklyChart"></canvas>
@@ -298,51 +302,58 @@
     </div>
 </div>
 
-<!-- KAYIT DÜZENLEME MODALI (YENİ) -->
 <div id="modalEditEntry" class="modal hidden fade-in">
     <div class="modal-content">
         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
             <h3 style="margin:0; text-align:left;">Kaydı Düzenle</h3>
             <button onclick="closeEditModal()" style="width:30px; height:30px; padding:0; border-radius:50%; background:#f3f4f6; color:#333;">✕</button>
         </div>
-        
         <input type="hidden" id="editEntryId">
-        <input type="hidden" id="editOldDuration"> <!-- Eski süreyi sakla -->
-
+        <input type="hidden" id="editOldDuration"> 
         <label style="font-size:0.8rem; color:var(--text-sub); margin-bottom:5px; display:block;">Ders</label>
-        <select id="editSubject" style="margin-bottom:15px; padding:12px; border-radius:12px; border:2px solid #e5e7eb;">
-            <!-- JS ile doldurulacak -->
-        </select>
-
+        <select id="editSubject" style="margin-bottom:15px; padding:12px; border-radius:12px; border:2px solid #e5e7eb;"></select>
         <label style="font-size:0.8rem; color:var(--text-sub); margin-bottom:5px; display:block;">Süre (dk)</label>
         <input type="number" id="editDuration" style="margin-bottom:15px;">
-
         <div style="display:flex; gap:10px; margin-bottom:15px;">
-            <div style="flex:1;">
-                <label style="font-size:0.8rem; color:var(--text-sub); margin-bottom:5px; display:block;">Soru</label>
-                <input type="number" id="editQCount">
-            </div>
-            <div style="flex:1;">
-                <label style="font-size:0.8rem; color:var(--text-sub); margin-bottom:5px; display:block;">Doğru</label>
-                <input type="number" id="editQCorrect">
-            </div>
+            <div style="flex:1;"><label style="font-size:0.8rem; color:var(--text-sub); margin-bottom:5px; display:block;">Soru</label><input type="number" id="editQCount"></div>
+            <div style="flex:1;"><label style="font-size:0.8rem; color:var(--text-sub); margin-bottom:5px; display:block;">Doğru</label><input type="number" id="editQCorrect"></div>
         </div>
-
         <label style="font-size:0.8rem; color:var(--text-sub); margin-bottom:5px; display:block;">Verim</label>
         <select id="editMood" style="margin-bottom:20px; padding:12px; border-radius:12px; border:2px solid #e5e7eb;">
             <option value="Verimli">🔥 Verimli (Süper)</option>
             <option value="Orta">😐 Orta (Normal)</option>
             <option value="Verimsiz">😴 Verimsiz (Az)</option>
         </select>
-
         <button class="btn-primary" onclick="saveEditedEntry()">DEĞİŞİKLİKLERİ KAYDET</button>
+    </div>
+</div>
+
+<!-- PROFİL AYARLARI MODALI (YENİ) -->
+<div id="modalProfile" class="modal hidden fade-in">
+    <div class="modal-content">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
+            <h3 style="margin:0; text-align:left;">Profil Ayarları</h3>
+            <button onclick="closeProfileModal()" style="width:30px; height:30px; padding:0; border-radius:50%; background:#f3f4f6; color:#333;">✕</button>
+        </div>
+        
+        <label style="font-size:0.8rem; color:var(--text-sub); margin-bottom:5px; display:block;">Öğrenci Adı Soyadı</label>
+        <input type="text" id="editProfileName" style="margin-bottom:15px;">
+        
+        <label style="font-size:0.8rem; color:var(--text-sub); margin-bottom:5px; display:block;">E-Posta (Değiştirilemez)</label>
+        <input type="text" id="editProfileEmail" disabled style="opacity:0.6; margin-bottom:20px;">
+        
+        <button class="btn-primary" onclick="saveUserProfile()">KAYDET</button>
+        
+        <div style="margin-top:15px; text-align:center;">
+            <button onclick="sendPasswordReset()" style="background:none; border:none; color:var(--primary); text-decoration:underline; font-size:0.85rem; padding:5px;">Şifremi Unuttum / Sıfırla</button>
+        </div>
     </div>
 </div>
 
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js";
     import { getFirestore, collection, doc, setDoc, getDoc, updateDoc, addDoc, deleteDoc, getDocs, query, where, onSnapshot, serverTimestamp, arrayUnion, arrayRemove, increment } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js";
-    import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged, updateProfile } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-auth.js";
+    import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged, updateProfile, sendPasswordResetEmail } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-auth.js";
 
     const firebaseConfig = {
         apiKey: "AIzaSyBkJg6hiMPcgM-bywHjUCKdD8CapA1VDHk",
@@ -471,6 +482,36 @@
         }
         renderAllChips();
     }
+
+    // --- PROFIL YÖNETİMİ (YENİ) ---
+    window.openProfileModal = () => {
+        document.getElementById('editProfileName').value = currentUser.displayName || "";
+        document.getElementById('editProfileEmail').value = currentUser.email || "";
+        document.getElementById('modalProfile').classList.remove('hidden');
+    };
+    window.closeProfileModal = () => document.getElementById('modalProfile').classList.add('hidden');
+    
+    window.saveUserProfile = async () => {
+        const newName = document.getElementById('editProfileName').value.trim();
+        if(!newName) { alert("İsim boş olamaz."); return; }
+        
+        try {
+            await updateProfile(currentUser, { displayName: newName }); // Auth güncelleme
+            await updateDoc(doc(db, "users", currentUser.uid), { displayName: newName }); // DB güncelleme
+            document.getElementById('studentNameDisplay').innerText = newName.split(' ')[0]; // UI güncelleme
+            alert("Profil güncellendi ✅");
+            closeProfileModal();
+        } catch(e) { alert("Hata: " + e.message); }
+    };
+
+    window.sendPasswordReset = async () => {
+        if(confirm(currentUser.email + " adresine şifre sıfırlama e-postası gönderilsin mi?")) {
+            try {
+                await sendPasswordResetEmail(auth, currentUser.email);
+                alert("E-posta gönderildi! Lütfen kutunuzu kontrol edin.");
+            } catch(e) { alert("Hata: " + e.message); }
+        }
+    };
 
     function listenToData() {
         if(!currentUser) return;
@@ -616,6 +657,7 @@
 
     window.openEditModal = window.openEditModal; window.closeEditModal = window.closeEditModal; window.saveEditedEntry = window.saveEditedEntry; window.deleteEntry = window.deleteEntry;
     window.removeSubject = window.removeSubject; window.addSubject = window.addSubject; window.openSubjectModal = window.openSubjectModal; window.closeSubjectModal = window.closeSubjectModal; window.savePomodoroData = window.savePomodoroData; window.openAdminDetail = window.openAdminDetail; window.closeAdminDetail = window.closeAdminDetail;
+    window.openProfileModal = window.openProfileModal; window.closeProfileModal = window.closeProfileModal; window.saveUserProfile = window.saveUserProfile; window.sendPasswordReset = window.sendPasswordReset;
 
 </script>
 </body>
