@@ -299,6 +299,13 @@
                 <label style="margin-bottom:10px; display:block; font-weight:600; font-size:0.85rem; color:var(--text-sub); letter-spacing:1px;">DERS SEÇİMİ</label>
                 <div id="chipsManual" class="chips"></div>
                 <input type="hidden" id="selectedSubject" value="">
+
+                <label style="margin-bottom:10px; display:block; font-weight:600; font-size:0.85rem; color:var(--text-sub); letter-spacing:1px;">TARİH</label>
+                <select id="entryDateSelect" style="margin-bottom:20px;">
+                    <option value="0" selected>📅 Bugün (Şimdi)</option>
+                    <option value="1">⏪ Dün</option>
+                    <option value="2">⏮️ Evvelsi Gün</option>
+                </select>
                 
                 <label style="margin-bottom:10px; display:block; font-weight:600; font-size:0.85rem; color:var(--text-sub); letter-spacing:1px;">SÜRE (DK)</label>
                 <div class="time-btn-group">
@@ -796,9 +803,60 @@
     window.resetTimer = () => { clearInterval(timerInterval); isTimerRunning=false; timeLeft=(parseInt(document.getElementById('timerSetDuration').value)||30)*60; updateTimerDisplay(); document.getElementById('btnTimerStart').innerText="BAŞLAT ▶"; document.getElementById('timerSetDuration').disabled=false; };
     function updateTimerDisplay() { const m=Math.floor(timeLeft/60); const s=timeLeft%60; document.getElementById('timerDisplay').innerText=`${m.toString().padStart(2,'0')}:${s.toString().padStart(2,'0')}`; }
     function finishPomodoro() { const audio=new Audio('https://actions.google.com/sounds/v1/alarms/beep_short.ogg'); audio.play().catch(e=>{}); savePomodoroData(); alert("Süre Doldu! 🎉"); resetTimer(); }
+    
+    // --- GÜNCELLENEN KAYIT FONKSİYONLARI ---
     window.savePomodoroData = () => { if(isTimerRunning) { if(!confirm("Sayaç çalışıyor. Kaydedilsin mi?")) return; resetTimer(); } const subject = document.getElementById('pomoSubject').value; const duration = parseInt(document.getElementById('timerSetDuration').value) || 30; const qCount = parseInt(document.getElementById('qCount').value) || 0; const qCorrect = parseInt(document.getElementById('qCorrect').value) || 0; saveToFirebase(subject, duration, qCount, qCorrect, 'Verimli', 'savePomoBtn'); };
-    window.saveData = () => { const subj = document.getElementById('selectedSubject').value; const dur = parseInt(document.getElementById('duration').value); const mood = document.getElementById('selectedMood').value; saveToFirebase(subj, dur, 0, 0, mood, 'saveBtn'); };
-    async function saveToFirebase(subject, duration, qCount, qCorrect, mood, btnId = 'saveBtn') { if(!currentUser) return; const btn = document.getElementById(btnId); btn.disabled=true; try { await addDoc(collection(db, "users", currentUser.uid, "sessions"), { subject, duration, questionCount: qCount, correctCount: qCorrect, mood, dateStr: new Date().toLocaleDateString('tr-TR'), createdAt: serverTimestamp() }); await updateDoc(doc(db, "users", currentUser.uid), { totalMinutes: increment(duration), lastStudyDate: serverTimestamp() }); btn.disabled=false; if(btnId === 'savePomoBtn') { document.getElementById('qCount').value=""; document.getElementById('qCorrect').value=""; } } catch(e) { alert("Hata: "+e.message); btn.disabled=false; } }
+    
+    window.saveData = () => { 
+        const subj = document.getElementById('selectedSubject').value; 
+        const dur = parseInt(document.getElementById('duration').value); 
+        const mood = document.getElementById('selectedMood').value; 
+        
+        // Tarih Hesaplama
+        const offset = parseInt(document.getElementById('entryDateSelect').value) || 0;
+        const d = new Date();
+        d.setDate(d.getDate() - offset);
+        const dateStr = d.toLocaleDateString('tr-TR');
+        
+        saveToFirebase(subj, dur, 0, 0, mood, 'saveBtn', dateStr); 
+    };
+
+    async function saveToFirebase(subject, duration, qCount, qCorrect, mood, btnId = 'saveBtn', customDateStr = null) { 
+        if(!currentUser) return; 
+        const btn = document.getElementById(btnId); 
+        btn.disabled=true; 
+        
+        // Eğer customDateStr gelmediyse (pomodoro gibi) bugünün tarihini al
+        const finalDateStr = customDateStr || new Date().toLocaleDateString('tr-TR');
+
+        try { 
+            await addDoc(collection(db, "users", currentUser.uid, "sessions"), { 
+                subject, 
+                duration, 
+                questionCount: qCount, 
+                correctCount: qCorrect, 
+                mood, 
+                dateStr: finalDateStr, 
+                createdAt: serverTimestamp() 
+            }); 
+            await updateDoc(doc(db, "users", currentUser.uid), { 
+                totalMinutes: increment(duration), 
+                lastStudyDate: serverTimestamp() 
+            }); 
+            
+            btn.disabled=false; 
+            if(btnId === 'savePomoBtn') { 
+                document.getElementById('qCount').value=""; 
+                document.getElementById('qCorrect').value=""; 
+            } else {
+                // Manuel giriş başarılıysa tarihi tekrar bugüne çekelim (opsiyonel)
+                document.getElementById('entryDateSelect').value = "0";
+            }
+        } catch(e) { 
+            alert("Hata: "+e.message); 
+            btn.disabled=false; 
+        } 
+    }
 
     // Exports
     window.removeSubject = window.removeSubject; window.addSubject = window.addSubject; window.openSubjectModal = window.openSubjectModal; window.closeSubjectModal = window.closeSubjectModal; window.savePomodoroData = window.savePomodoroData; window.openAdminDetail = window.openAdminDetail; window.closeAdminDetail = window.closeAdminDetail;
