@@ -12,7 +12,7 @@
     <style>
         :root {
             --primary: #6366f1; --primary-dark: #4338ca; --secondary: #ec4899;
-            --success: #10b981; --warning: #f59e0b; --danger: #ef4444; --info: #3b82f6;
+            --success: #10b981; --warning: #f59e0b; --danger: #ef4444;
             --bg-gradient: linear-gradient(135deg, #e0e7ff 0%, #f3e8ff 100%);
             --glass-bg: rgba(255, 255, 255, 0.9);
             --glass-border: rgba(255, 255, 255, 0.6);
@@ -24,7 +24,7 @@
         body { font-family: 'Outfit', sans-serif; background: var(--bg-gradient); margin: 0; padding: 20px 15px; min-height: 100vh; color: var(--text-main); display: flex; justify-content: center; }
         
         .container { width: 100%; max-width: 460px; padding-bottom: 90px; }
-        .container.admin-mode { max-width: 1000px; } /* Admin ekranı genişletildi */
+        .container.admin-mode { max-width: 1000px; } 
 
         .card {
             background: var(--glass-bg); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
@@ -35,8 +35,9 @@
         h2, h3 { margin: 0 0 10px 0; color: var(--primary-dark); letter-spacing: -0.5px; }
         h4 { margin: 0 0 15px 0; font-weight: 800; color: var(--text-sub); font-size: 0.8rem; text-transform: uppercase; letter-spacing: 1.5px; border-bottom: 2px solid #f1f5f9; padding-bottom: 10px; }
 
-        input, select { width: 100%; padding: 16px; margin-bottom: 12px; border: 2px solid transparent; border-radius: 16px; font-size: 1rem; background: #f1f5f9; color: var(--text-main); transition: 0.3s; font-family: inherit; font-weight: 500; }
-        input:focus, select:focus { border-color: var(--primary); background: #fff; outline: none; }
+        input, select, textarea { width: 100%; padding: 16px; margin-bottom: 12px; border: 2px solid transparent; border-radius: 16px; font-size: 1rem; background: #f1f5f9; color: var(--text-main); transition: 0.3s; font-family: inherit; font-weight: 500; }
+        input:focus, select:focus, textarea:focus { border-color: var(--primary); background: #fff; outline: none; }
+        
         button { width: 100%; padding: 16px; border: none; border-radius: 16px; font-size: 1rem; font-weight: 700; cursor: pointer; transition: 0.2s; font-family: inherit; }
         button:active { transform: scale(0.96); }
         .btn-primary { background: linear-gradient(135deg, var(--primary), var(--secondary)); color: white; box-shadow: 0 10px 20px -5px rgba(99, 102, 241, 0.4); }
@@ -46,31 +47,33 @@
         .fade-in { animation: fadeIn 0.5s cubic-bezier(0.4, 0, 0.2, 1); }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
 
+        /* Tabs & Chips */
         .tabs { display: flex; background: #e0e7ff; padding: 5px; border-radius: 18px; margin-bottom: 24px; }
         .tab { flex: 1; text-align: center; padding: 12px; cursor: pointer; border-radius: 14px; font-weight: 600; color: var(--text-sub); transition: 0.3s; }
         .tab.active { background: white; color: var(--primary); box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); }
-
         .chips { display: flex; gap: 8px; flex-wrap: wrap; justify-content: center; margin-bottom: 20px; }
         .chip { background: white; padding: 10px 20px; border-radius: 30px; font-size: 0.9rem; font-weight: 600; cursor: pointer; border: 1px solid #e2e8f0; color: var(--text-sub); }
         .chip.active { background: var(--primary); color: white; border-color: var(--primary); }
         .chip-edit { background: #fffbeb; color: var(--warning); border-color: #fcd34d; }
 
+        /* Timer & History */
         .timer-display { font-size: 4.5rem; font-weight: 800; text-align: center; background: linear-gradient(to right, var(--primary), var(--secondary)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin: 10px 0; font-variant-numeric: tabular-nums; letter-spacing: -3px; }
         .timer-controls { display: flex; gap: 12px; margin-bottom: 20px; }
-        .btn-start { background: var(--success); color: white; }
-        .btn-stop { background: var(--danger); color: white; }
-        
+        .btn-start { background: var(--success); color: white; } .btn-stop { background: var(--danger); color: white; }
         .streak-badge { background: linear-gradient(135deg, #fff7ed, #ffedd5); color: #c2410c; padding: 6px 14px; border-radius: 20px; font-weight: 800; display: flex; align-items: center; gap: 6px; font-size: 0.85rem; border: 1px solid #fed7aa; }
         .history-list { list-style: none; padding: 0; margin: 0; }
         .history-item { display: flex; justify-content: space-between; align-items: center; padding: 16px; border-radius: 16px; margin-bottom: 8px; background: #fff; border: 1px solid #f1f5f9; }
         .btn-action { width: 34px; height: 34px; padding: 0; border-radius: 10px; font-size: 1rem; margin-left: 6px; display: inline-flex; align-items: center; justify-content: center; }
         .btn-edit { background: #e0e7ff; color: var(--primary); } .btn-delete { background: #fee2e2; color: var(--danger); }
 
+        /* Modals */
         .modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 23, 42, 0.6); backdrop-filter: blur(8px); display: flex; justify-content: center; align-items: center; z-index: 1000; }
-        .modal-content { background: white; padding: 30px; border-radius: 30px; width: 90%; max-width: 450px; max-height: 85vh; overflow-y: auto; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25); border: 1px solid rgba(255,255,255,0.5); }
+        .modal-content { background: white; padding: 30px; border-radius: 30px; width: 90%; max-width: 450px; max-height: 85vh; overflow-y: auto; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25); }
         .hidden { display: none !important; }
         .chart-wrapper { position: relative; height: 220px; width: 100%; display: flex; justify-content: center; margin-top: 15px; }
         .error-box { background-color: #fee2e2; color: #b91c1c; padding: 14px; border-radius: 14px; font-size: 0.9rem; margin-top: 15px; display: none; text-align: center; border: 1px solid #fecaca; }
+        
+        /* Time & Mood */
         .time-btn-group { display: flex; align-items: center; gap: 8px; background: #f8fafc; padding: 8px; border-radius: 20px; margin-bottom: 24px; border: 1px solid #e2e8f0; }
         .btn-adjust { background: white; border: 1px solid #e2e8f0; color: var(--text-main); font-weight: 800; width: 45px; height: 45px; border-radius: 14px; padding: 0; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; }
         .mood-selector { display: flex; gap: 12px; margin-bottom: 24px; }
@@ -80,19 +83,14 @@
         .question-inputs { display: flex; gap: 12px; margin: 20px 0; }
         .q-box { flex: 1; text-align: center; } .q-box label { font-size: 0.8rem; color: var(--text-sub); margin-bottom: 6px; display: block; font-weight: 600; } .q-box input { text-align: center; font-weight: 700; margin-bottom: 0; background: #fff; border: 2px solid #e2e8f0; }
 
-        /* --- ADMIN GÖRSEL İYİLEŞTİRMELERİ --- */
+        /* Admin Styles */
         .admin-header { background: linear-gradient(135deg, #1e1b4b, #4338ca); padding: 24px; border-radius: 24px; margin-bottom: 24px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 15px 30px rgba(30, 27, 75, 0.3); color:white; }
-        
         .kpi-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 15px; margin-bottom: 24px; }
         .kpi-card { background: white; padding: 20px; border-radius: 20px; text-align: center; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); border: 1px solid #f1f5f9; }
         .kpi-value { font-size: 2.2rem; font-weight: 800; display: block; margin-bottom: 5px; background: linear-gradient(to right, var(--primary), var(--secondary)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
         .kpi-label { font-size: 0.8rem; font-weight: 700; color: var(--text-sub); text-transform: uppercase; letter-spacing: 1px; }
-
-        /* Scrollable Chart Container */
         .chart-scroll-container { width: 100%; overflow-x: auto; padding-bottom: 10px; margin-bottom: 20px; -webkit-overflow-scrolling: touch; }
-        .chart-scroll-inner { height: 350px; min-width: 800px; /* Dinamik artacak */ }
-
-        /* Student Table Enhancements */
+        .chart-scroll-inner { height: 350px; min-width: 800px; }
         .student-table { width: 100%; border-collapse: separate; border-spacing: 0 8px; }
         .student-table th { text-align: left; padding: 15px; color: var(--text-sub); font-size: 0.75rem; text-transform: uppercase; letter-spacing: 1px; font-weight: 800; }
         .student-table td { padding: 15px; background: white; font-size: 0.95rem; border-top: 1px solid #f1f5f9; border-bottom: 1px solid #f1f5f9; vertical-align: middle; }
@@ -100,25 +98,18 @@
         .student-table tr:hover { transform: scale(1.01); box-shadow: 0 10px 15px -3px rgba(0,0,0,0.05); z-index: 10; position: relative; }
         .student-table tr td:first-child { border-top-left-radius: 16px; border-bottom-left-radius: 16px; border-left: 1px solid #f1f5f9; }
         .student-table tr td:last-child { border-top-right-radius: 16px; border-bottom-right-radius: 16px; border-right: 1px solid #f1f5f9; }
-
-        /* Smart Badges */
         .smart-badge { padding: 6px 12px; border-radius: 20px; font-size: 0.75rem; font-weight: 700; display: inline-flex; align-items: center; gap: 5px; }
-        .sb-star { background: #fff7ed; color: #d97706; border: 1px solid #fcd34d; }
-        .sb-good { background: #eff6ff; color: #2563eb; border: 1px solid #bfdbfe; }
-        .sb-risk { background: #fef2f2; color: #dc2626; border: 1px solid #fecaca; }
-        .sb-idle { background: #f8fafc; color: #64748b; border: 1px solid #e2e8f0; }
-
-        /* Rising Stars Section */
+        .sb-star { background: #fff7ed; color: #d97706; border: 1px solid #fcd34d; } .sb-good { background: #eff6ff; color: #2563eb; border: 1px solid #bfdbfe; } .sb-risk { background: #fef2f2; color: #dc2626; border: 1px solid #fecaca; } .sb-idle { background: #f8fafc; color: #64748b; border: 1px solid #e2e8f0; }
         .rising-stars { display: flex; gap: 15px; overflow-x: auto; padding-bottom: 15px; margin-bottom: 20px; }
         .star-card { min-width: 140px; background: linear-gradient(135deg, #fff, #fdfbf7); padding: 15px; border-radius: 18px; border: 1px solid #fef3c7; box-shadow: 0 4px 6px rgba(0,0,0,0.02); text-align: center; }
         .star-icon { font-size: 2rem; margin-bottom: 5px; display: block; animation: float 3s ease-in-out infinite; }
         @keyframes float { 0% { transform: translateY(0px); } 50% { transform: translateY(-5px); } 100% { transform: translateY(0px); } }
 
-        /* Guidance Modal Styling */
-        .guidance-header { text-align: center; border-bottom: 2px solid #f1f5f9; padding-bottom: 15px; margin-bottom: 15px; }
-        .guidance-score { font-size: 3rem; font-weight: 900; color: var(--primary); line-height: 1; }
-        .guidance-label { font-size: 0.8rem; text-transform: uppercase; color: var(--text-sub); font-weight: 700; letter-spacing: 1px; }
-        .ai-comment { background: #f8fafc; border-left: 4px solid var(--primary); padding: 15px; border-radius: 0 12px 12px 0; margin-bottom: 20px; font-style: italic; color: #475569; }
+        /* Mesajlaşma Stilleri */
+        .template-btn { background: #f1f5f9; border: 1px solid #e2e8f0; padding: 10px; border-radius: 12px; font-size: 0.8rem; text-align: left; width: 100%; margin-bottom: 5px; cursor: pointer; transition: 0.2s; color: var(--text-sub); }
+        .template-btn:hover { background: #e0e7ff; color: var(--primary); border-color: var(--primary); }
+        .msg-box { background: #f8fafc; border: 2px solid #e2e8f0; border-radius: 16px; padding: 15px; font-family: inherit; font-size: 0.95rem; resize: vertical; min-height: 100px; color: var(--text-main); }
+        .msg-box:focus { border-color: var(--primary); background: white; outline: none; }
     </style>
 </head>
 <body>
@@ -128,16 +119,12 @@
     <div id="authScreen" class="card" style="margin-top: 60px;">
         <div style="font-size: 4rem; text-align: center; margin-bottom: 15px;">🛡️</div>
         <h2 id="authTitle" style="text-align: center;">Öğrenci Takip</h2>
-        <p style="text-align:center; color:var(--text-sub); font-size:0.95rem; margin-bottom:30px;">
-            Geleceğin lideri, çalışma masana hoş geldin.
-        </p>
+        <p style="text-align:center; color:var(--text-sub); font-size:0.95rem; margin-bottom:30px;">Geleceğin lideri, çalışma masana hoş geldin.</p>
         <input type="text" id="regStudentName" placeholder="Öğrenci Adı Soyadı" class="hidden">
         <input type="email" id="email" placeholder="E-Posta Adresi" required>
         <input type="password" id="password" placeholder="Şifre" required>
         <button class="btn-primary" id="mainAuthBtn" onclick="handleLogin()">GİRİŞ YAP</button>
-        <div style="text-align:center; margin-top:20px; font-size:0.9rem; color:var(--primary); cursor:pointer; font-weight:600;" id="toggleText" onclick="toggleAuthMode()">
-            Hesabınız yok mu? Kayıt Olun
-        </div>
+        <div style="text-align:center; margin-top:20px; font-size:0.9rem; color:var(--primary); cursor:pointer; font-weight:600;" id="toggleText" onclick="toggleAuthMode()">Hesabınız yok mu? Kayıt Olun</div>
         <div id="authError" class="error-box"></div>
     </div>
 
@@ -159,9 +146,7 @@
                 <div class="streak-badge" title="Zinciri Kırma!">🔥 <span id="streakCount">0</span> Gün</div>
             </div>
             <div class="chart-wrapper"><canvas id="weeklyChart"></canvas></div>
-            <div style="text-align:center; font-size:0.95rem; color:var(--text-sub); margin: 20px 0;">
-                Tamamlanan: <strong id="completedMins" style="color:var(--success); font-size:1.2rem;">0</strong> / <span id="targetMins">1000</span> dk
-            </div>
+            <div style="text-align:center; font-size:0.95rem; color:var(--text-sub); margin: 20px 0;">Tamamlanan: <strong id="completedMins" style="color:var(--success); font-size:1.2rem;">0</strong> / <span id="targetMins">1000</span> dk</div>
             <div style="background:#f8fafc; padding:12px; border-radius:16px; display:flex; justify-content:space-between; align-items:center; border: 1px solid #e2e8f0;">
                 <label style="font-size:0.9rem; color:var(--text-main); font-weight:600;">🎯 Haftalık Hedef (dk):</label>
                 <input type="number" id="weeklyGoalInput" value="1000" onchange="updateGoal()" style="width:90px; margin:0; padding:10px; text-align:center; border:1px solid #cbd5e1; background:white;">
@@ -178,22 +163,10 @@
                 <div id="chipsManual" class="chips"></div>
                 <input type="hidden" id="selectedSubject" value="">
                 <label style="margin-bottom:10px; display:block; font-weight:600; font-size:0.85rem; color:var(--text-sub); letter-spacing:1px;">TARİH</label>
-                <select id="entryDateSelect" style="margin-bottom:20px;">
-                    <option value="0" selected>📅 Bugün (Şimdi)</option>
-                    <option value="1">⏪ Dün</option>
-                    <option value="2">⏮️ Evvelsi Gün</option>
-                </select>
+                <select id="entryDateSelect" style="margin-bottom:20px;"><option value="0" selected>📅 Bugün (Şimdi)</option><option value="1">⏪ Dün</option><option value="2">⏮️ Evvelsi Gün</option></select>
                 <label style="margin-bottom:10px; display:block; font-weight:600; font-size:0.85rem; color:var(--text-sub); letter-spacing:1px;">SÜRE (DK)</label>
-                <div class="time-btn-group">
-                    <button class="btn-adjust" onclick="adjustTime(-10)">-</button>
-                    <input type="number" id="duration" value="40" style="text-align:center; margin:0; font-weight:800; font-size:1.3rem; border:none; background:transparent;">
-                    <button class="btn-adjust" onclick="adjustTime(10)">+</button>
-                </div>
-                <div class="mood-selector">
-                    <div class="mood-btn" onclick="selectMood(this, 'Verimsiz')">😴<span class="mood-text">Az</span></div>
-                    <div class="mood-btn" onclick="selectMood(this, 'Orta')">😐<span class="mood-text">Orta</span></div>
-                    <div class="mood-btn selected" onclick="selectMood(this, 'Verimli')">🔥<span class="mood-text">Çok</span></div>
-                </div>
+                <div class="time-btn-group"><button class="btn-adjust" onclick="adjustTime(-10)">-</button><input type="number" id="duration" value="40" style="text-align:center; margin:0; font-weight:800; font-size:1.3rem; border:none; background:transparent;"><button class="btn-adjust" onclick="adjustTime(10)">+</button></div>
+                <div class="mood-selector"><div class="mood-btn" onclick="selectMood(this, 'Verimsiz')">😴<span class="mood-text">Az</span></div><div class="mood-btn" onclick="selectMood(this, 'Orta')">😐<span class="mood-text">Orta</span></div><div class="mood-btn selected" onclick="selectMood(this, 'Verimli')">🔥<span class="mood-text">Çok</span></div></div>
                 <input type="hidden" id="selectedMood" value="Verimli">
                 <button class="btn-primary" id="saveBtn" onclick="saveData()">KAYDET ✅</button>
             </div>
@@ -201,168 +174,80 @@
                 <p style="text-align:center; color:var(--text-sub); font-size:0.9rem; margin-bottom:20px;">Odaklan ve süreyi başlat.</p>
                 <div id="chipsPomo" class="chips"></div>
                 <input type="hidden" id="pomoSubject" value="">
-                <div class="timer-setting">
-                    <label style="font-weight:600; font-size:0.9rem;">Süre (dk):</label>
-                    <input type="number" id="timerSetDuration" value="30" onchange="updateTimerDuration()">
-                </div>
+                <div class="timer-setting"><label style="font-weight:600; font-size:0.9rem;">Süre (dk):</label><input type="number" id="timerSetDuration" value="30" onchange="updateTimerDuration()"></div>
                 <div class="timer-display" id="timerDisplay">30:00</div>
-                <div class="timer-controls">
-                    <button class="btn-start" onclick="startTimer()" id="btnTimerStart">BAŞLAT ▶</button>
-                    <button class="btn-stop" onclick="resetTimer()" id="btnTimerReset">SIFIRLA ↺</button>
-                </div>
-                <div class="question-inputs">
-                    <div class="q-box"><label>Soru</label><input type="number" id="qCount" placeholder="0"></div>
-                    <div class="q-box"><label>Doğru</label><input type="number" id="qCorrect" placeholder="0"></div>
-                </div>
+                <div class="timer-controls"><button class="btn-start" onclick="startTimer()" id="btnTimerStart">BAŞLAT ▶</button><button class="btn-stop" onclick="resetTimer()" id="btnTimerReset">SIFIRLA ↺</button></div>
+                <div class="question-inputs"><div class="q-box"><label>Soru</label><input type="number" id="qCount" placeholder="0"></div><div class="q-box"><label>Doğru</label><input type="number" id="qCorrect" placeholder="0"></div></div>
                 <button class="btn-primary" id="savePomoBtn" onclick="savePomodoroData()">KAYDET ✅</button>
             </div>
         </div>
-        <div class="card">
-            <h4>SON KAYITLAR</h4>
-            <ul id="historyList" class="history-list"><li style="text-align:center; color:var(--text-sub); padding:15px;">Yükleniyor...</li></ul>
-        </div>
+        <div class="card"><h4>SON KAYITLAR</h4><ul id="historyList" class="history-list"><li style="text-align:center; color:var(--text-sub); padding:15px;">Yükleniyor...</li></ul></div>
     </div>
 
     <div id="adminScreen" class="hidden fade-in">
         <div class="admin-header">
-            <div>
-                <h3 style="margin:0; font-size:1.5rem; letter-spacing: -0.5px;">Yönetici Paneli 👑</h3>
-                <small style="opacity:0.8;">Tüm veriler analiz edildi ve birleştirildi.</small>
-            </div>
+            <div><h3 style="margin:0; font-size:1.5rem; letter-spacing: -0.5px;">Yönetici Paneli 👑</h3><small style="opacity:0.8;">Veriler birleştirildi ve analiz edildi.</small></div>
             <button class="btn-logout-distinct" onclick="handleLogout()" style="background:rgba(255,255,255,0.15); color:white; border:none; backdrop-filter:blur(5px);">Çıkış</button>
         </div>
 
-        <div class="kpi-grid">
-            <div class="kpi-card">
-                <span class="kpi-value" id="adminTotalStudents">0</span>
-                <span class="kpi-label">Toplam Öğrenci</span>
-            </div>
-            <div class="kpi-card">
-                <span class="kpi-value" id="adminTotalHours">0</span>
-                <span class="kpi-label">Toplam Saat</span>
-            </div>
-            <div class="kpi-card">
-                <span class="kpi-value" id="adminActiveToday" style="color:var(--success);">0</span>
-                <span class="kpi-label">Bugün Aktif</span>
-            </div>
+        <div class="tabs">
+            <div class="tab active" onclick="switchAdminTab('dashboard')" id="tabAdminDash">📊 Genel Durum</div>
+            <div class="tab" onclick="switchAdminTab('messages')" id="tabAdminMsg">✉️ Mesaj Merkezi</div>
         </div>
 
-        <div class="card">
-            <h4>🚀 YÜKSELEN YILDIZLAR</h4>
-            <div class="rising-stars" id="risingStarsContainer">
-                <div style="width:100%; text-align:center; color:var(--text-sub); font-size:0.9rem;">Analiz ediliyor...</div>
+        <div id="adminPanelDashboard" class="fade-in">
+            <div class="kpi-grid">
+                <div class="kpi-card"><span class="kpi-value" id="adminTotalStudents">0</span><span class="kpi-label">Toplam Öğrenci</span></div>
+                <div class="kpi-card"><span class="kpi-value" id="adminTotalHours">0</span><span class="kpi-label">Toplam Saat</span></div>
+                <div class="kpi-card"><span class="kpi-value" id="adminActiveToday" style="color:var(--success);">0</span><span class="kpi-label">Bugün Aktif</span></div>
             </div>
+            <div class="card"><h4>🚀 YÜKSELEN YILDIZLAR</h4><div class="rising-stars" id="risingStarsContainer"><div style="width:100%; text-align:center; color:var(--text-sub); font-size:0.9rem;">Analiz ediliyor...</div></div></div>
+            <div class="card"><h4>📈 GENEL PERFORMANS</h4><p style="font-size:0.8rem; color:var(--text-sub); margin-bottom:10px;">Tabloyu sağa/sola kaydırarak tüm öğrencileri görebilirsiniz.</p><div class="chart-scroll-container"><div class="chart-scroll-inner" id="chartInner"><canvas id="adminLeaderboardChart"></canvas></div></div></div>
+            <div class="card"><h4>👥 ÖĞRENCİ LİSTESİ & DEĞERLENDİRME</h4><div style="overflow-x:auto;"><table class="student-table" id="studentTable"><thead><tr><th>Sıra</th><th>Öğrenci</th><th>Durum</th><th>Toplam</th></tr></thead><tbody id="studentTableBody"><tr><td colspan="4" style="text-align:center;">Veriler birleştiriliyor...</td></tr></tbody></table></div></div>
         </div>
 
-        <div class="card">
-            <h4>📈 GENEL PERFORMANS GRAFİĞİ</h4>
-            <p style="font-size:0.8rem; color:var(--text-sub); margin-bottom:10px;">Tabloyu sağa/sola kaydırarak tüm öğrencileri görebilirsiniz.</p>
-            <div class="chart-scroll-container">
-                <div class="chart-scroll-inner" id="chartInner">
-                    <canvas id="adminLeaderboardChart"></canvas>
+        <div id="adminPanelMessages" class="hidden fade-in">
+            <div class="card">
+                <h4>✉️ ÖZEL MESAJ GÖNDER</h4>
+                <p style="color:var(--text-sub); font-size:0.9rem;">Öğrenciye motive edici bir mektup gönderin.</p>
+                <label style="font-weight:600; font-size:0.85rem; color:var(--text-sub); display:block; margin-bottom:5px;">Öğrenci Seçin</label>
+                <select id="msgStudentSelect"><option value="">Yükleniyor...</option></select>
+                
+                <label style="font-weight:600; font-size:0.85rem; color:var(--text-sub); display:block; margin-bottom:5px; margin-top:15px;">Akıllı Şablonlar</label>
+                <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px; margin-bottom:15px;">
+                    <button class="template-btn" onclick="useTemplate('welcome')">🏰 Geleceğin Mimarı (Giriş)</button>
+                    <button class="template-btn" onclick="useTemplate('explorer')">🧭 Bilgi Kaşifi (Merak)</button>
+                    <button class="template-btn" onclick="useTemplate('champion')">🏆 Azim ve Zafer (Tebrik)</button>
+                    <button class="template-btn" onclick="useTemplate('focus')">⚓ Potansiyel (Uyarı)</button>
                 </div>
-            </div>
-        </div>
 
-        <div class="card">
-            <h4>👥 ÖĞRENCİ LİSTESİ & DEĞERLENDİRME</h4>
-            <div style="overflow-x:auto;">
-                <table class="student-table" id="studentTable">
-                    <thead><tr><th>Sıra</th><th>Öğrenci</th><th>Durum</th><th>Toplam</th></tr></thead>
-                    <tbody id="studentTableBody"><tr><td colspan="4" style="text-align:center;">Veriler birleştiriliyor...</td></tr></tbody>
-                </table>
+                <label style="font-weight:600; font-size:0.85rem; color:var(--text-sub); display:block; margin-bottom:5px;">Mesajınız</label>
+                <textarea id="msgContent" class="msg-box" placeholder="Mesajınızı buraya yazın..."></textarea>
+                
+                <button class="btn-primary" onclick="sendAdminMessage()">GÖNDER 🚀</button>
             </div>
         </div>
     </div>
-
 </div>
 
 <div id="modalAdminDetail" class="modal hidden fade-in">
     <div class="modal-content" style="max-width:500px;">
-        <div style="text-align:right;">
-            <button onclick="closeAdminDetail()" style="width:32px; height:32px; padding:0; border-radius:50%; background:#f1f5f9; border:none; cursor:pointer;">✕</button>
-        </div>
-        
-        <div class="guidance-header">
-            <h2 id="detailStudentName" style="color:var(--text-main); margin-bottom:5px;">Öğrenci Adı</h2>
-            <div id="smartEvaluationBadge" style="display:inline-block; padding:5px 15px; background:#e0e7ff; border-radius:20px; font-weight:700; color:var(--primary); font-size:0.9rem;">Analiz Ediliyor...</div>
-        </div>
-
+        <div style="text-align:right;"><button onclick="closeAdminDetail()" style="width:32px; height:32px; padding:0; border-radius:50%; background:#f1f5f9; border:none; cursor:pointer;">✕</button></div>
+        <div class="guidance-header"><h2 id="detailStudentName" style="color:var(--text-main); margin-bottom:5px;">Öğrenci Adı</h2><div id="smartEvaluationBadge" style="display:inline-block; padding:5px 15px; background:#e0e7ff; border-radius:20px; font-weight:700; color:var(--primary); font-size:0.9rem;">Analiz Ediliyor...</div></div>
         <div style="display:grid; grid-template-columns: 1fr 1fr; gap:15px; margin-bottom:20px;">
-            <div style="background:#fff; border:1px solid #f1f5f9; padding:15px; border-radius:16px; text-align:center;">
-                <div class="guidance-score" id="statTotalMin">0</div>
-                <div class="guidance-label">Toplam Dakika</div>
-            </div>
-            <div style="background:#fff; border:1px solid #f1f5f9; padding:15px; border-radius:16px; text-align:center;">
-                <div class="guidance-score" id="statAvg">0</div>
-                <div class="guidance-label">Günlük Ort.</div>
-            </div>
+            <div style="background:#fff; border:1px solid #f1f5f9; padding:15px; border-radius:16px; text-align:center;"><div class="guidance-score" id="statTotalMin">0</div><div class="guidance-label">Toplam Dakika</div></div>
+            <div style="background:#fff; border:1px solid #f1f5f9; padding:15px; border-radius:16px; text-align:center;"><div class="guidance-score" id="statAvg">0</div><div class="guidance-label">Günlük Ort.</div></div>
         </div>
-
         <h4>🧠 AKILLI DEĞERLENDİRME</h4>
-        <div class="ai-comment" id="aiComment">
-            Öğrenci verileri inceleniyor...
-        </div>
-
-        <div style="height: 200px; width: 100%; margin-bottom: 20px;">
-            <canvas id="studentDetailChart"></canvas>
-        </div>
-        
+        <div class="ai-comment" id="aiComment">Öğrenci verileri inceleniyor...</div>
+        <div style="height: 200px; width: 100%; margin-bottom: 20px;"><canvas id="studentDetailChart"></canvas></div>
         <button class="btn-primary" onclick="closeAdminDetail()">KAPAT</button>
     </div>
 </div>
 
-<div id="modalSubjects" class="modal hidden fade-in">
-    <div class="modal-content">
-        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
-            <h3 style="margin:0;">Dersleri Düzenle</h3>
-            <button onclick="closeSubjectModal()" style="width:32px; height:32px; padding:0; border-radius:50%; background:#f1f5f9; color:#333;">✕</button>
-        </div>
-        <div id="subjectListContainer"></div>
-        <div style="display:flex; gap:10px; margin-top:20px;">
-            <input type="text" id="newSubjectName" placeholder="Yeni Ders Ekle" style="margin:0;">
-            <button onclick="addSubject()" style="width:60px; background:var(--success); color:white; padding:0; border-radius:12px;">+</button>
-        </div>
-    </div>
-</div>
-<div id="modalEditEntry" class="modal hidden fade-in">
-    <div class="modal-content">
-        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
-            <h3 style="margin:0;">Kaydı Düzenle</h3>
-            <button onclick="closeEditModal()" style="width:32px; height:32px; padding:0; border-radius:50%; background:#f1f5f9; color:#333;">✕</button>
-        </div>
-        <input type="hidden" id="editEntryId"><input type="hidden" id="editOldDuration"> 
-        <label style="font-size:0.8rem; color:var(--text-sub); margin-bottom:5px; display:block;">Ders</label>
-        <select id="editSubject" style="margin-bottom:15px; padding:12px; border-radius:12px; border:2px solid #e5e7eb;"></select>
-        <label style="font-size:0.8rem; color:var(--text-sub); margin-bottom:5px; display:block;">Süre (dk)</label>
-        <input type="number" id="editDuration" style="margin-bottom:15px;">
-        <div style="display:flex; gap:10px; margin-bottom:15px;">
-            <div style="flex:1;"><label style="font-size:0.8rem; color:var(--text-sub); margin-bottom:5px; display:block;">Soru</label><input type="number" id="editQCount"></div>
-            <div style="flex:1;"><label style="font-size:0.8rem; color:var(--text-sub); margin-bottom:5px; display:block;">Doğru</label><input type="number" id="editQCorrect"></div>
-        </div>
-        <label style="font-size:0.8rem; color:var(--text-sub); margin-bottom:5px; display:block;">Verim</label>
-        <select id="editMood" style="margin-bottom:20px; padding:12px; border-radius:12px; border:2px solid #e5e7eb;">
-            <option value="Verimli">🔥 Verimli (Süper)</option>
-            <option value="Orta">😐 Orta (Normal)</option>
-            <option value="Verimsiz">😴 Verimsiz (Az)</option>
-        </select>
-        <button class="btn-primary" onclick="saveEditedEntry()">DEĞİŞİKLİKLERİ KAYDET</button>
-    </div>
-</div>
-<div id="modalProfile" class="modal hidden fade-in">
-    <div class="modal-content">
-        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
-            <h3 style="margin:0;">Profil Ayarları</h3>
-            <button onclick="closeProfileModal()" style="width:32px; height:32px; padding:0; border-radius:50%; background:#f1f5f9; color:#333;">✕</button>
-        </div>
-        <label style="font-size:0.8rem; color:var(--text-sub); margin-bottom:5px; display:block;">Öğrenci Adı Soyadı</label>
-        <input type="text" id="editProfileName" style="margin-bottom:15px;">
-        <label style="font-size:0.8rem; color:var(--text-sub); margin-bottom:5px; display:block;">E-Posta (Değiştirilemez)</label>
-        <input type="text" id="editProfileEmail" disabled style="opacity:0.6; margin-bottom:20px;">
-        <button class="btn-primary" onclick="saveUserProfile()">KAYDET</button>
-        <div style="margin-top:20px; text-align:center;"><button onclick="sendPasswordReset()" style="background:none; border:none; color:var(--primary); text-decoration:underline; font-size:0.85rem; padding:5px;">Şifremi Unuttum / Sıfırla</button></div>
-    </div>
-</div>
+<div id="modalSubjects" class="modal hidden fade-in"><div class="modal-content"><div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;"><h3 style="margin:0;">Dersleri Düzenle</h3><button onclick="closeSubjectModal()" style="width:32px; height:32px; padding:0; border-radius:50%; background:#f1f5f9; color:#333;">✕</button></div><div id="subjectListContainer"></div><div style="display:flex; gap:10px; margin-top:20px;"><input type="text" id="newSubjectName" placeholder="Yeni Ders Ekle" style="margin:0;"><button onclick="addSubject()" style="width:60px; background:var(--success); color:white; padding:0; border-radius:12px;">+</button></div></div></div>
+<div id="modalEditEntry" class="modal hidden fade-in"><div class="modal-content"><div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;"><h3 style="margin:0;">Kaydı Düzenle</h3><button onclick="closeEditModal()" style="width:32px; height:32px; padding:0; border-radius:50%; background:#f1f5f9; color:#333;">✕</button></div><input type="hidden" id="editEntryId"><input type="hidden" id="editOldDuration"> <label style="font-size:0.8rem; color:var(--text-sub); margin-bottom:5px; display:block;">Ders</label><select id="editSubject" style="margin-bottom:15px; padding:12px; border-radius:12px; border:2px solid #e5e7eb;"></select><label style="font-size:0.8rem; color:var(--text-sub); margin-bottom:5px; display:block;">Süre (dk)</label><input type="number" id="editDuration" style="margin-bottom:15px;"><div style="display:flex; gap:10px; margin-bottom:15px;"><div style="flex:1;"><label style="font-size:0.8rem; color:var(--text-sub); margin-bottom:5px; display:block;">Soru</label><input type="number" id="editQCount"></div><div style="flex:1;"><label style="font-size:0.8rem; color:var(--text-sub); margin-bottom:5px; display:block;">Doğru</label><input type="number" id="editQCorrect"></div></div><label style="font-size:0.8rem; color:var(--text-sub); margin-bottom:5px; display:block;">Verim</label><select id="editMood" style="margin-bottom:20px; padding:12px; border-radius:12px; border:2px solid #e5e7eb;"><option value="Verimli">🔥 Verimli (Süper)</option><option value="Orta">😐 Orta (Normal)</option><option value="Verimsiz">😴 Verimsiz (Az)</option></select><button class="btn-primary" onclick="saveEditedEntry()">DEĞİŞİKLİKLERİ KAYDET</button></div></div>
+<div id="modalProfile" class="modal hidden fade-in"><div class="modal-content"><div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;"><h3 style="margin:0;">Profil Ayarları</h3><button onclick="closeProfileModal()" style="width:32px; height:32px; padding:0; border-radius:50%; background:#f1f5f9; color:#333;">✕</button></div><label style="font-size:0.8rem; color:var(--text-sub); margin-bottom:5px; display:block;">Öğrenci Adı Soyadı</label><input type="text" id="editProfileName" style="margin-bottom:15px;"><label style="font-size:0.8rem; color:var(--text-sub); margin-bottom:5px; display:block;">E-Posta (Değiştirilemez)</label><input type="text" id="editProfileEmail" disabled style="opacity:0.6; margin-bottom:20px;"><button class="btn-primary" onclick="saveUserProfile()">KAYDET</button><div style="margin-top:20px; text-align:center;"><button onclick="sendPasswordReset()" style="background:none; border:none; color:var(--primary); text-decoration:underline; font-size:0.85rem; padding:5px;">Şifremi Unuttum / Sıfırla</button></div></div></div>
 
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js";
@@ -370,292 +255,190 @@
     import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged, updateProfile, sendPasswordResetEmail } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-auth.js";
 
     const firebaseConfig = { apiKey: "AIzaSyBkJg6hiMPcgM-bywHjUCKdD8CapA1VDHk", authDomain: "ogrencitakip-bcdbd.firebaseapp.com", projectId: "ogrencitakip-bcdbd", storageBucket: "ogrencitakip-bcdbd.firebasestorage.app", messagingSenderId: "74510222174", appId: "1:74510222174:web:9d379386762064ee0f45cf" };
-    const app = initializeApp(firebaseConfig);
-    const db = getFirestore(app);
-    const auth = getAuth(app);
+    const app = initializeApp(firebaseConfig); const db = getFirestore(app); const auth = getAuth(app);
     const ADMIN_EMAIL = "mremzi@gmail.com";
 
-    let currentUser = null;
-    let isLoginMode = true;
-    let myChart = null, adminChart = null, detailChart = null;
-    let currentWeeklyTotal = 0;
-    let mySubjects = [];
-    let timerInterval = null, timeLeft = 30 * 60, isTimerRunning = false;
+    let currentUser = null; let isLoginMode = true; let myChart = null, adminChart = null, detailChart = null; let currentWeeklyTotal = 0; let mySubjects = []; let timerInterval = null, timeLeft = 30 * 60, isTimerRunning = false;
+    let globalUserList = []; // Admin için birleştirilmiş liste
 
-    // --- AUTH ---
+    // --- TEMPLATES ---
+    const msgTemplates = {
+        'welcome': "Hoş geldin Geleceğin Mimarı. Bugün koyacağın o 'bir tuğla', yarın inşa edeceğin kalenin en sağlam parçası olacak.",
+        'explorer': "Selam Bilgi Kaşifi! Zihnin, henüz haritası çıkarılmamış kıtalar gibi. Bugün nereyi fethedeceğiz?",
+        'champion': "Bu azmin, sadece notlarını değil, şahsiyetini de yüceltiyor. Emeklerine şahidiz ve seninle gurur duyuyoruz.",
+        'focus': "Potansiyelin okyanuslar kadar derin, kıyıda beklemek sana yakışmıyor. Hadi, açılalım mı?"
+    };
+
     onAuthStateChanged(auth, async (user) => {
         if (user) {
-            currentUser = user;
-            document.getElementById('authScreen').classList.add('hidden');
+            currentUser = user; document.getElementById('authScreen').classList.add('hidden');
             if(user.email === ADMIN_EMAIL) {
-                document.getElementById('adminScreen').classList.remove('hidden');
-                document.getElementById('mainContainer').classList.add('admin-mode');
+                document.getElementById('adminScreen').classList.remove('hidden'); document.getElementById('mainContainer').classList.add('admin-mode');
                 loadAdminDashboard();
             } else {
                 document.getElementById('dashboardScreen').classList.remove('hidden');
-                const name = user.displayName || "Öğrenci";
-                document.getElementById('studentNameDisplay').innerText = name.split(' ')[0];
-                await loadUserProfile(user.uid);
-                if(!myChart) initChart();
-                listenToData();
+                const name = user.displayName || "Öğrenci"; document.getElementById('studentNameDisplay').innerText = name.split(' ')[0];
+                await loadUserProfile(user.uid); if(!myChart) initChart(); listenToData();
+                checkMessages(user.uid); // Mesaj kontrolü
             }
         } else {
-            currentUser = null;
-            document.getElementById('authScreen').classList.remove('hidden');
-            document.getElementById('dashboardScreen').classList.add('hidden');
-            document.getElementById('adminScreen').classList.add('hidden');
-            document.getElementById('mainContainer').classList.remove('admin-mode');
+            currentUser = null; document.getElementById('authScreen').classList.remove('hidden'); document.getElementById('dashboardScreen').classList.add('hidden'); document.getElementById('adminScreen').classList.add('hidden'); document.getElementById('mainContainer').classList.remove('admin-mode');
         }
     });
+
+    // --- STUDENT MESSAGE CHECKER ---
+    function checkMessages(uid) {
+        const q = query(collection(db, "messages"), where("toUid", "==", uid), where("read", "==", false));
+        onSnapshot(q, (snapshot) => {
+            snapshot.forEach(async (docSnap) => {
+                const msg = docSnap.data();
+                // SweetAlert ile şık bildirim
+                await Swal.fire({
+                    title: 'Yeni Bir Mektubun Var! 📜',
+                    text: msg.content,
+                    icon: 'info',
+                    confirmButtonText: 'Okudum, Teşekkürler',
+                    confirmButtonColor: '#6366f1',
+                    background: '#f8fafc',
+                    backdrop: `rgba(0,0,123,0.4)`
+                });
+                // Okundu olarak işaretle
+                await updateDoc(doc(db, "messages", docSnap.id), { read: true });
+            });
+        });
+    }
+
+    // --- ADMIN MESSAGING ---
+    window.switchAdminTab = (tab) => {
+        if(tab === 'dashboard') {
+            document.getElementById('adminPanelDashboard').classList.remove('hidden'); document.getElementById('adminPanelMessages').classList.add('hidden');
+            document.getElementById('tabAdminDash').classList.add('active'); document.getElementById('tabAdminMsg').classList.remove('active');
+        } else {
+            document.getElementById('adminPanelDashboard').classList.add('hidden'); document.getElementById('adminPanelMessages').classList.remove('hidden');
+            document.getElementById('tabAdminDash').classList.remove('active'); document.getElementById('tabAdminMsg').classList.add('active');
+            populateStudentSelect();
+        }
+    };
+
+    function populateStudentSelect() {
+        const sel = document.getElementById('msgStudentSelect'); sel.innerHTML = '<option value="">Öğrenci Seçiniz...</option>';
+        globalUserList.forEach(u => {
+            // Ana ID'yi kullanıyoruz
+            const opt = document.createElement('option');
+            opt.value = u.originalDocs[0]; // İlk bulunan doküman ID'si ana ID olsun
+            opt.innerText = u.name;
+            sel.appendChild(opt);
+        });
+    }
+
+    window.useTemplate = (key) => { document.getElementById('msgContent').value = msgTemplates[key]; };
+
+    window.sendAdminMessage = async () => {
+        const targetUid = document.getElementById('msgStudentSelect').value;
+        const content = document.getElementById('msgContent').value;
+        if(!targetUid || !content) return Swal.fire('Eksik Bilgi', 'Lütfen öğrenci seçin ve mesaj yazın.', 'warning');
+        
+        try {
+            await addDoc(collection(db, "messages"), {
+                toUid: targetUid,
+                content: content,
+                read: false,
+                createdAt: serverTimestamp()
+            });
+            Swal.fire('Başarılı', 'Mesajınız iletildi.', 'success');
+            document.getElementById('msgContent').value = "";
+        } catch(e) { Swal.fire('Hata', e.message, 'error'); }
+    };
 
     // --- SMART ADMIN DASHBOARD ---
     async function loadAdminDashboard() {
         const usersRef = collection(db, "users");
         onSnapshot(usersRef, (snapshot) => {
-            // 1. DATA MERGING LOGIC
             const mergedUsers = {}; 
-            
             snapshot.forEach(doc => {
                 const data = doc.data();
-                if(data.email === ADMIN_EMAIL) return; // Admini katma
-
-                // Benzersiz Anahtar: İsim Soyisim (Boşluklar atılıp küçük harf yapılarak)
-                // E-posta ile de birleştirebilirdik ama Firebase Auth zaten e-postayı tekil tutar.
-                // Burada aynı isimle farklı maillerle girenleri birleştiriyoruz.
+                if(data.email === ADMIN_EMAIL) return;
                 const key = (data.displayName || data.email).toLowerCase().trim();
-
                 if (!mergedUsers[key]) {
-                    mergedUsers[key] = {
-                        displayId: doc.id, // Detay için herhangi bir ID yeterli (sorguda kullanılacak)
-                        name: data.displayName || data.email,
-                        totalMinutes: 0,
-                        lastStudyDate: null,
-                        originalDocs: [] // İlerde gerekirse tüm ID'ler burada
-                    };
+                    mergedUsers[key] = { displayId: doc.id, name: data.displayName || data.email, totalMinutes: 0, lastStudyDate: null, originalDocs: [] };
                 }
-                
                 mergedUsers[key].totalMinutes += (data.totalMinutes || 0);
                 mergedUsers[key].originalDocs.push(doc.id);
-                
-                // En son çalışma tarihini bul
                 const docDate = data.lastStudyDate ? (data.lastStudyDate.toDate ? data.lastStudyDate.toDate() : new Date(data.lastStudyDate)) : null;
-                if (docDate) {
-                    if (!mergedUsers[key].lastStudyDate || docDate > mergedUsers[key].lastStudyDate) {
-                        mergedUsers[key].lastStudyDate = docDate;
-                    }
-                }
+                if (docDate) { if (!mergedUsers[key].lastStudyDate || docDate > mergedUsers[key].lastStudyDate) { mergedUsers[key].lastStudyDate = docDate; } }
             });
 
-            // 2. ARRAY CONVERSION & SORTING
-            const userList = Object.values(mergedUsers).sort((a, b) => b.totalMinutes - a.totalMinutes);
+            globalUserList = Object.values(mergedUsers).sort((a, b) => b.totalMinutes - a.totalMinutes);
             
-            // 3. UPDATE UI
-            document.getElementById('adminTotalStudents').innerText = userList.length;
-            
-            let totalSystemMins = 0;
-            let activeTodayCount = 0;
-            const today = new Date().toDateString();
-
-            userList.forEach(u => {
-                totalSystemMins += u.totalMinutes;
-                if(u.lastStudyDate && u.lastStudyDate.toDateString() === today) activeTodayCount++;
-            });
-
+            document.getElementById('adminTotalStudents').innerText = globalUserList.length;
+            let totalSystemMins = 0; let activeTodayCount = 0; const today = new Date().toDateString();
+            globalUserList.forEach(u => { totalSystemMins += u.totalMinutes; if(u.lastStudyDate && u.lastStudyDate.toDateString() === today) activeTodayCount++; });
             document.getElementById('adminTotalHours').innerText = Math.floor(totalSystemMins / 60);
             document.getElementById('adminActiveToday').innerText = activeTodayCount;
 
-            renderAdminTable(userList);
-            renderAdminChart(userList);
-            renderRisingStars(userList);
+            renderAdminTable(globalUserList);
+            renderAdminChart(globalUserList);
+            renderRisingStars(globalUserList);
         });
     }
 
-    // Yükselen Yıldızlar (Son 24 saatte aktif olanlar arasından en çok çalışanlar)
     function renderRisingStars(users) {
-        const container = document.getElementById('risingStarsContainer');
-        container.innerHTML = "";
-        
-        // Basit mantık: Son çalışma tarihi "bugün" veya "dün" olanları al
-        const now = new Date();
-        const oneDay = 24 * 60 * 60 * 1000;
-        
-        const stars = users.filter(u => {
-            if(!u.lastStudyDate) return false;
-            return (now - u.lastStudyDate) < (oneDay * 2); // Son 2 gün
-        }).sort((a,b) => b.totalMinutes - a.totalMinutes).slice(0, 5); // İlk 5
-
-        if (stars.length === 0) {
-            container.innerHTML = "<div style='width:100%; text-align:center; padding:10px; color:#94a3b8;'>Henüz yükselen yıldız yok.</div>";
-            return;
-        }
-
-        stars.forEach(u => {
-            const card = document.createElement('div');
-            card.className = "star-card";
-            card.innerHTML = `
-                <span class="star-icon">🚀</span>
-                <div style="font-weight:700; font-size:0.9rem; color:var(--text-main);">${u.name.split(' ')[0]}</div>
-                <div style="font-size:0.8rem; color:var(--success); font-weight:600;">Aktif</div>
-            `;
-            container.appendChild(card);
-        });
+        const container = document.getElementById('risingStarsContainer'); container.innerHTML = "";
+        const now = new Date(); const oneDay = 24 * 60 * 60 * 1000;
+        const stars = users.filter(u => { if(!u.lastStudyDate) return false; return (now - u.lastStudyDate) < (oneDay * 2); }).sort((a,b) => b.totalMinutes - a.totalMinutes).slice(0, 5);
+        if (stars.length === 0) { container.innerHTML = "<div style='width:100%; text-align:center; padding:10px; color:#94a3b8;'>Henüz yükselen yıldız yok.</div>"; return; }
+        stars.forEach(u => { const card = document.createElement('div'); card.className = "star-card"; card.innerHTML = `<span class="star-icon">🚀</span><div style="font-weight:700; font-size:0.9rem; color:var(--text-main);">${u.name.split(' ')[0]}</div><div style="font-size:0.8rem; color:var(--success); font-weight:600;">Aktif</div>`; container.appendChild(card); });
     }
 
     function renderAdminTable(users) {
-        const tbody = document.getElementById('studentTableBody'); 
-        tbody.innerHTML = "";
-        
+        const tbody = document.getElementById('studentTableBody'); tbody.innerHTML = "";
         users.forEach((u, index) => {
             const tr = document.createElement('tr'); 
-            
-            // Smart Evaluation Logic
             const evaluation = evaluateStudent(u.totalMinutes, u.lastStudyDate);
-            
-            tr.onclick = () => openAdminDetail(u.displayId, u.name, evaluation, u);
-            
-            tr.innerHTML = `
-                <td style="font-weight:700; color:#94a3b8;">#${index+1}</td>
-                <td>
-                    <div style="font-weight:600; color:var(--text-main); font-size:1rem;">${u.name}</div>
-                    <div style="font-size:0.75rem; color:var(--text-sub);">${u.lastStudyDate ? u.lastStudyDate.toLocaleDateString('tr-TR') : 'Giriş Yok'}</div>
-                </td>
-                <td>
-                    <span class="smart-badge ${evaluation.badgeClass}">
-                        ${evaluation.icon} ${evaluation.text}
-                    </span>
-                </td>
-                <td style="font-weight:800; color:var(--primary); font-size:1rem;">
-                    ${Math.floor(u.totalMinutes / 60)}s ${(u.totalMinutes % 60)}dk
-                </td>
-            `;
+            // Birden fazla ID varsa hepsini iletmek gerekir ama şimdilik displayId yeterli
+            tr.onclick = () => openAdminDetail(u.originalDocs[0], u.name, evaluation, u);
+            tr.innerHTML = `<td style="font-weight:700; color:#94a3b8;">#${index+1}</td><td><div style="font-weight:600; color:var(--text-main); font-size:1rem;">${u.name}</div><div style="font-size:0.75rem; color:var(--text-sub);">${u.lastStudyDate ? u.lastStudyDate.toLocaleDateString('tr-TR') : 'Giriş Yok'}</div></td><td><span class="smart-badge ${evaluation.badgeClass}">${evaluation.icon} ${evaluation.text}</span></td><td style="font-weight:800; color:var(--primary); font-size:1rem;">${Math.floor(u.totalMinutes / 60)}s ${(u.totalMinutes % 60)}dk</td>`;
             tbody.appendChild(tr);
         });
     }
 
     function evaluateStudent(minutes, lastDate) {
-        if (!lastDate) return { text: "Veri Yok", badgeClass: "sb-idle", icon: "⚪", comment: "Öğrenci henüz sisteme veri girişi yapmamış." };
-        
-        const now = new Date();
-        const daysDiff = (now - lastDate) / (1000 * 60 * 60 * 24);
-        
-        if (daysDiff > 7) return { text: "Riskli", badgeClass: "sb-risk", icon: "⚠️", comment: "Öğrenci 1 haftadan fazladır çalışma girmiyor. İletişime geçilmeli." };
-        if (daysDiff > 3) return { text: "Kopuk", badgeClass: "sb-idle", icon: "💤", comment: "Çalışma sürekliliği düşük. Motivasyon desteği gerekebilir." };
-        
-        if (minutes > 3000) return { text: "Yıldız", badgeClass: "sb-star", icon: "🌟", comment: "Muazzam performans! Sınıfın liderlerinden." };
-        if (minutes > 1000) return { text: "İyi", badgeClass: "sb-good", icon: "👍", comment: "İstikrarlı ve düzenli çalışıyor. Başarılı." };
-        
-        return { text: "Başlangıç", badgeClass: "sb-good", icon: "🌱", comment: "Çalışmaya yeni başlamış veya süresi henüz düşük." };
+        if (!lastDate) return { text: "Veri Yok", badgeClass: "sb-idle", icon: "⚪", comment: "Henüz veri girişi yapılmamış." };
+        const now = new Date(); const daysDiff = (now - lastDate) / (1000 * 60 * 60 * 24);
+        if (daysDiff > 7) return { text: "Riskli", badgeClass: "sb-risk", icon: "⚠️", comment: "1 haftadan fazladır aktif değil. İletişime geçilmeli." };
+        if (daysDiff > 3) return { text: "Kopuk", badgeClass: "sb-idle", icon: "💤", comment: "Süreklilik düşmüş. Motivasyon lazım." };
+        if (minutes > 3000) return { text: "Yıldız", badgeClass: "sb-star", icon: "🌟", comment: "Muazzam performans! Lider ruhlu." };
+        if (minutes > 1000) return { text: "İyi", badgeClass: "sb-good", icon: "👍", comment: "İstikrarlı ve başarılı." };
+        return { text: "Başlangıç", badgeClass: "sb-good", icon: "🌱", comment: "Gayretli, takibe devam." };
     }
 
     function renderAdminChart(users) {
-        // Dinamik genişlik ayarı
-        const container = document.getElementById('chartInner');
-        const minWidth = Math.max(users.length * 60, 400); // Öğrenci başına 60px veya min 400px
-        container.style.width = minWidth + "px";
-
+        const container = document.getElementById('chartInner'); const minWidth = Math.max(users.length * 60, 400); container.style.width = minWidth + "px";
         const ctx = document.getElementById('adminLeaderboardChart').getContext('2d');
-        const labels = users.map(u => u.name.split(' ')[0]); // Sadece ilk isimler
-        const data = users.map(u => u.totalMinutes);
-        
+        const labels = users.map(u => u.name.split(' ')[0]); const data = users.map(u => u.totalMinutes);
         if(adminChart) adminChart.destroy();
-        
-        adminChart = new Chart(ctx, { 
-            type: 'bar', 
-            data: { 
-                labels: labels, 
-                datasets: [{ 
-                    label: 'Toplam Dakika', 
-                    data: data, 
-                    backgroundColor: '#6366f1',
-                    borderRadius: 8,
-                    barThickness: 40 
-                }] 
-            }, 
-            options: { 
-                responsive: true, 
-                maintainAspectRatio: false, 
-                plugins: { legend: { display: false } }, 
-                scales: { 
-                    y: { beginAtZero: true, grid: { display: false } }, 
-                    x: { grid: { display: false } } 
-                } 
-            } 
-        });
+        adminChart = new Chart(ctx, { type: 'bar', data: { labels: labels, datasets: [{ label: 'Toplam Dakika', data: data, backgroundColor: '#6366f1', borderRadius: 8, barThickness: 40 }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, grid: { display: false } }, x: { grid: { display: false } } } } });
     }
 
-    // --- REHBERLİK DETAYI ---
     window.openAdminDetail = async (uid, name, evaluation, userObj) => {
         document.getElementById('detailStudentName').innerText = name;
-        document.getElementById('smartEvaluationBadge').innerText = evaluation.icon + " " + evaluation.text;
-        document.getElementById('smartEvaluationBadge').className = `smart-badge ${evaluation.badgeClass}`;
-        document.getElementById('smartEvaluationBadge').style.fontSize = "1.2rem";
-        
+        document.getElementById('smartEvaluationBadge').innerText = evaluation.icon + " " + evaluation.text; document.getElementById('smartEvaluationBadge').className = `smart-badge ${evaluation.badgeClass}`;
         document.getElementById('aiComment').innerText = evaluation.comment;
         document.getElementById('modalAdminDetail').classList.remove('hidden');
-
-        // İstatistikler (UserObj içinden direkt alıyoruz)
         document.getElementById('statTotalMin').innerText = userObj.totalMinutes;
-        
-        // Grafik Verisini Çek (Sadece UID'ye ait sessions)
-        const dates = [];
-        for (let i = 0; i < 7; i++) { const d = new Date(); d.setDate(d.getDate() - i); dates.push(d.toLocaleDateString('tr-TR')); }
-        dates.reverse();
-
+        const dates = []; for (let i = 0; i < 7; i++) { const d = new Date(); d.setDate(d.getDate() - i); dates.push(d.toLocaleDateString('tr-TR')); } dates.reverse();
         const snapshot = await getDocs(query(collection(db, "users", uid, "sessions")));
-        const statsByDate = {};
-        dates.forEach(d => statsByDate[d] = 0);
-        
-        let totalWeek = 0;
-        snapshot.forEach(doc => {
-            const s = doc.data();
-            if (statsByDate.hasOwnProperty(s.dateStr)) {
-                statsByDate[s.dateStr] += s.duration;
-                totalWeek += s.duration;
-            }
-        });
-
+        const statsByDate = {}; dates.forEach(d => statsByDate[d] = 0); let totalWeek = 0;
+        snapshot.forEach(doc => { const s = doc.data(); if (statsByDate.hasOwnProperty(s.dateStr)) { statsByDate[s.dateStr] += s.duration; totalWeek += s.duration; } });
         document.getElementById('statAvg').innerText = Math.round(totalWeek / 7);
-
-        // Çizgi Grafik
-        const ctx = document.getElementById('studentDetailChart').getContext('2d');
-        if (detailChart) detailChart.destroy(); 
-        detailChart = new Chart(ctx, {
-            type: 'line',
-            data: {
-                labels: dates,
-                datasets: [{
-                    label: 'Dakika',
-                    data: dates.map(d => statsByDate[d]),
-                    borderColor: '#ec4899',
-                    backgroundColor: 'rgba(236, 72, 153, 0.1)',
-                    tension: 0.4,
-                    fill: true
-                }]
-            },
-            options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } }
-        });
+        const ctx = document.getElementById('studentDetailChart').getContext('2d'); if (detailChart) detailChart.destroy(); 
+        detailChart = new Chart(ctx, { type: 'line', data: { labels: dates, datasets: [{ label: 'Dakika', data: dates.map(d => statsByDate[d]), borderColor: '#ec4899', backgroundColor: 'rgba(236, 72, 153, 0.1)', tension: 0.4, fill: true }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } } });
     };
     
     window.closeAdminDetail = () => { document.getElementById('modalAdminDetail').classList.add('hidden'); };
 
-    // --- STANDARD USER FUNCTIONS (Önceki kodların aynısı) ---
-    async function loadUserProfile(uid) {
-        const userDocRef = doc(db, "users", uid);
-        const docSnap = await getDoc(userDocRef);
-        if (docSnap.exists()) {
-            const data = docSnap.data();
-            mySubjects = data.subjects || ['Matematik', 'Türkçe', 'Fen', 'İngilizce', 'Genel', 'Kitap'];
-            document.getElementById('weeklyGoalInput').value = data.weeklyGoal || 1000;
-        } else {
-            mySubjects = ['Matematik', 'Türkçe', 'Fen', 'İngilizce', 'Genel', 'Kitap'];
-            await setDoc(userDocRef, { email: currentUser.email, displayName: currentUser.displayName, subjects: mySubjects, weeklyGoal: 1000, totalMinutes: 0, createdAt: serverTimestamp() });
-        }
-        renderAllChips();
-    }
-    
-    // ... (Diğer fonksiyonlar: listenToData, deleteEntry, openEditModal vb. aynı kalıyor) ...
-    // Kod tekrarını önlemek için standart fonksiyonları aşağıya sıkıştırılmış olarak ekliyorum.
-    
+    // Standard Functions (Minified for brevity as they are unchanged logic)
+    async function loadUserProfile(uid){const r=doc(db,"users",uid);const s=await getDoc(r);if(s.exists()){const d=s.data();mySubjects=d.subjects||['Matematik','Türkçe','Fen','İngilizce','Genel','Kitap'];document.getElementById('weeklyGoalInput').value=d.weeklyGoal||1000}else{mySubjects=['Matematik','Türkçe','Fen','İngilizce','Genel','Kitap'];await setDoc(r,{email:currentUser.email,displayName:currentUser.displayName,subjects:mySubjects,weeklyGoal:1000,totalMinutes:0,createdAt:serverTimestamp()})}renderAllChips()}
     window.openProfileModal=()=>{document.getElementById('editProfileName').value=currentUser.displayName||"";document.getElementById('editProfileEmail').value=currentUser.email||"";document.getElementById('modalProfile').classList.remove('hidden')};window.closeProfileModal=()=>document.getElementById('modalProfile').classList.add('hidden');window.saveUserProfile=async()=>{const n=document.getElementById('editProfileName').value.trim();if(!n){alert("İsim boş olamaz.");return}try{await updateProfile(currentUser,{displayName:n});await updateDoc(doc(db,"users",currentUser.uid),{displayName:n});document.getElementById('studentNameDisplay').innerText=n.split(' ')[0];alert("Profil güncellendi ✅");closeProfileModal()}catch(e){alert("Hata: "+e.message)}};window.sendPasswordReset=async()=>{if(confirm(currentUser.email+" adresine şifre sıfırlama e-postası gönderilsin mi?")){try{await sendPasswordResetEmail(auth,currentUser.email);alert("E-posta gönderildi!")}catch(e){alert("Hata: "+e.message)}}};
     function listenToData(){if(!currentUser)return;const q=query(collection(db,"users",currentUser.uid,"sessions"));onSnapshot(q,(s)=>{const l=document.getElementById('historyList');l.innerHTML="";let wt=0;const now=new Date();const wa=new Date();wa.setDate(now.getDate()-7);const i=[];s.forEach(d=>i.push({id:d.id,...d.data()}));i.sort((a,b)=>(b.createdAt?.seconds||0)-(a.createdAt?.seconds||0));i.forEach((d,idx)=>{if(idx<10){const li=document.createElement('li');li.className='history-item fade-in';const ds=JSON.stringify(d).replace(/"/g,'&quot;');li.innerHTML=`<div style="flex:1;"><div style="font-weight:600;color:var(--text-main);">${d.subject}</div><div style="font-size:0.8rem;color:var(--text-sub);margin-top:2px;">⏱️ ${d.duration} dk <span style="margin-left:5px;opacity:0.6;">• ${d.dateStr}</span></div></div><div style="display:flex;align-items:center;"><button class="btn-action btn-edit" onclick="openEditModal(${ds})">✏️</button><button class="btn-action btn-delete" onclick="deleteEntry('${d.id}',${d.duration})">🗑️</button></div>`;l.appendChild(li)}let is=(d.createdAt?.seconds)||0;let id=new Date(is*1000);if(id>=wa)wt+=d.duration});if(i.length===0)l.innerHTML="<li style='padding:20px;text-align:center;color:var(--text-sub);'>Henüz kayıt yok.</li>";currentWeeklyTotal=wt;updateChartDisplay(wt);calculateStreak(i)})};
     window.deleteEntry=async(id,dur)=>{if(!confirm("Silinsin mi?"))return;try{await deleteDoc(doc(db,"users",currentUser.uid,"sessions",id));await updateDoc(doc(db,"users",currentUser.uid),{totalMinutes:increment(-dur)})}catch(e){alert(e.message)}};
@@ -671,6 +454,7 @@
 
     // Export Window Functions
     window.removeSubject=window.removeSubject;window.addSubject=window.addSubject;window.openSubjectModal=window.openSubjectModal;window.closeSubjectModal=window.closeSubjectModal;window.savePomodoroData=window.savePomodoroData;window.openAdminDetail=window.openAdminDetail;window.closeAdminDetail=window.closeAdminDetail;window.openProfileModal=window.openProfileModal;window.closeProfileModal=window.closeProfileModal;window.saveUserProfile=window.saveUserProfile;window.sendPasswordReset=window.sendPasswordReset;window.saveEditedEntry=window.saveEditedEntry;window.openEditModal=window.openEditModal;window.closeEditModal=window.closeEditModal;window.deleteEntry=window.deleteEntry;
+    window.switchAdminTab = window.switchAdminTab; window.useTemplate = window.useTemplate; window.sendAdminMessage = window.sendAdminMessage;
 </script>
 </body>
 </html>
