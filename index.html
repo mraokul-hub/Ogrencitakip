@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Bilge Takip Sistemi v9.0 (Final)</title>
+    <title>Bilge Takip Sistemi v9.5 (Günlük Görev & Admin+)</title>
     
     <link rel="icon" href="Designer (1).jpg" type="image/jpeg">
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
@@ -37,7 +37,6 @@
         input, select, textarea { width: 100%; padding: 15px; margin-bottom: 12px; border: 2px solid transparent; border-radius: 16px; font-size: 1rem; background: #f1f9f9; color: var(--text-main); transition: 0.3s; font-family: inherit; font-weight: 600; }
         input:focus, select:focus, textarea:focus { border-color: var(--primary); background: #fff; outline: none; }
         
-        /* BUTON GÜNCELLEMESİ: Disabled stili */
         button { width: 100%; padding: 15px; border: none; border-radius: 16px; font-size: 1rem; font-weight: 700; cursor: pointer; transition: 0.2s; font-family: inherit; }
         button:active { transform: scale(0.96); }
         button:disabled { background: #cbd5e1 !important; color: #64748b !important; cursor: not-allowed; transform: none !important; box-shadow: none !important; }
@@ -71,6 +70,7 @@
         .chip.active { background: var(--primary); color: white; border-color: var(--primary); transform: translateY(-2px); box-shadow: 0 5px 15px rgba(0, 150, 136, 0.3); }
         .timer-display { font-size: 4rem; font-weight: 800; text-align: center; background: linear-gradient(to right, var(--primary), #4db6ac); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin: 15px 0; letter-spacing: -2px; }
         
+        /* MAĞAZA TASARIMI (TILSIM EFEKTİ) */
         .store-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
         .store-item { 
             background: linear-gradient(145deg, #ffffff, #f0f9ff); 
@@ -102,6 +102,27 @@
         .rules-box { background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 16px; padding: 15px; margin-bottom: 20px; }
         .rules-item { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; font-size: 0.9rem; color: #166534; padding-bottom: 8px; border-bottom: 1px dashed #bbf7d0; }
         .rules-item:last-child { margin-bottom: 0; border-bottom: none; }
+
+        /* GÜNLÜK GÖREVLER STİLİ */
+        .quest-box { margin-top: 15px; }
+        .quest-item { 
+            display: flex; align-items: center; justify-content: space-between; 
+            background: #fff; padding: 12px; border-radius: 16px; 
+            border: 1px solid #e2e8f0; margin-bottom: 8px; transition: all 0.3s;
+        }
+        .quest-item.completed { 
+            background: #f0fdf4; border-color: #bbf7d0; 
+            box-shadow: 0 4px 6px -1px rgba(16, 185, 129, 0.1); 
+        }
+        .quest-info { display: flex; align-items: center; gap: 10px; }
+        .quest-checkbox { 
+            width: 24px; height: 24px; border-radius: 50%; border: 2px solid #cbd5e1; 
+            display: flex; align-items: center; justify-content: center; color: transparent; 
+        }
+        .quest-item.completed .quest-checkbox { 
+            background: var(--success); border-color: var(--success); color: white; 
+        }
+        .quest-reward { font-size: 0.75rem; font-weight: 800; color: var(--warning); background: #fffbeb; padding: 4px 8px; border-radius: 8px; }
 
         /* COACH STYLES */
         .wise-coach-container { position: fixed; bottom: 90px; right: 10px; z-index: 999; display: flex; flex-direction: column; align-items: flex-end; }
@@ -283,6 +304,13 @@
                     <input type="number" id="weeklyGoalInput" value="1000" onchange="updateGoal()" style="width:90px; margin:0; padding:10px; text-align:center; border:1px solid #cbd5e1; background:white;">
                 </div>
             </div>
+
+            <div class="card">
+                <h4>📅 GÜNLÜK GÖREVLER</h4>
+                <div class="quest-box" id="dailyQuestContainer">
+                    <div style="text-align:center; color:#999;">Görevler yükleniyor...</div>
+                </div>
+            </div>
         </div>
 
         <div id="viewPomo" class="hidden fade-in">
@@ -398,11 +426,18 @@
             <div class="card"><h4>🚀 YÜKSELEN YILDIZLAR</h4><div class="rising-stars" id="risingStarsContainer"><div style="width:100%; text-align:center; color:var(--text-sub); font-size:0.9rem;">Analiz ediliyor...</div></div></div>
             <div class="card"><h4>📈 GENEL PERFORMANS</h4><div class="chart-scroll-container"><div class="chart-scroll-inner" id="chartInner"><canvas id="adminLeaderboardChart"></canvas></div></div></div>
             <div class="card">
-                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
-                    <h4 style="margin:0;">👥 ÖĞRENCİ LİSTESİ</h4>
-                    <button onclick="exportToExcel()" style="padding:8px 15px; font-size:0.8rem; background:#0f172a; color:white; border-radius:10px;">📥 İndir</button>
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
+                    <h4 style="margin:0;">👥 ÖĞRENCİ YÖNETİMİ</h4>
+                    <button onclick="exportToExcel()" style="padding:8px 15px; font-size:0.8rem; background:#0f172a; color:white; border-radius:10px;">📥 Excel İndir</button>
                 </div>
-                <div style="overflow-x:auto;"><table class="student-table" id="studentTable"><thead><tr><th>Sıra</th><th>Öğrenci</th><th>Durum</th><th>Puan</th><th>Toplam</th></tr></thead><tbody id="studentTableBody"><tr><td colspan="5" style="text-align:center;">Veriler birleştiriliyor...</td></tr></tbody></table></div>
+                <input type="text" id="adminSearchInput" onkeyup="filterAdminTable()" placeholder="🔍 İsim veya E-posta ile öğrenci ara..." style="background:white; border:1px solid #cbd5e1;">
+                
+                <div style="overflow-x:auto;">
+                    <table class="student-table" id="studentTable">
+                        <thead><tr><th>Sıra</th><th>Öğrenci</th><th>Durum</th><th>Puan</th><th>Toplam</th><th>İşlem</th></tr></thead>
+                        <tbody id="studentTableBody"><tr><td colspan="6" style="text-align:center;">Veriler yükleniyor...</td></tr></tbody>
+                    </table>
+                </div>
             </div>
         </div>
         
@@ -466,7 +501,7 @@
 
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js";
-    import { getFirestore, collection, doc, setDoc, getDoc, updateDoc, addDoc, deleteDoc, getDocs, query, where, onSnapshot, serverTimestamp, increment, writeBatch } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js";
+    import { getFirestore, collection, doc, setDoc, getDoc, updateDoc, addDoc, deleteDoc, getDocs, query, where, onSnapshot, serverTimestamp, increment, writeBatch, arrayUnion } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js";
     import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, onAuthStateChanged, updateProfile, sendPasswordResetEmail } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-auth.js";
 
     const firebaseConfig = { apiKey: "AIzaSyBkJg6hiMPcgM-bywHjUCKdD8CapA1VDHk", authDomain: "ogrencitakip-bcdbd.firebaseapp.com", projectId: "ogrencitakip-bcdbd", storageBucket: "ogrencitakip-bcdbd.firebasestorage.app", messagingSenderId: "74510222174", appId: "1:74510222174:web:9d379386762064ee0f45cf" };
@@ -508,6 +543,13 @@
         { name: "Komutan 🛡️", threshold: 3000 },
         { name: "Bilge 📜", threshold: 5000 },
         { name: "Hakan 👑", threshold: 10000 }
+    ];
+
+    // GÜNLÜK GÖREVLER DATA
+    const DAILY_QUESTS = [
+        { id: 'q_login', text: 'Sisteme Giriş Yap', reward: 10, target: 1, type: 'login' },
+        { id: 'q_study', text: '40 Dk Ders Çalış', reward: 50, target: 40, type: 'minutes' },
+        { id: 'q_pomo', text: '1 Kez Sayaç İle En Az 30 dk Ders Çalış', reward: 30, target: 1, type: 'pomodoro_count' }
     ];
 
     let currentUser=null, isLogin=true;
@@ -601,7 +643,6 @@
 
                 // 1. Sadece 'totalMinutes' kesinlikle güncellenir.
                 // 2. 'bilgePoints' SADECE eğer kullanıcıda 0 puan görünüyorsa ama geçmişi varsa güncellenir.
-                // (Bu sayede harcamalar silinmez)
                 if(currentPoints === 0 && totalPointsCalculated > 0) {
                      await updateDoc(userRef, { totalMinutes: totalMins, bilgePoints: Math.floor(totalPointsCalculated) });
                 } else {
@@ -614,10 +655,93 @@
         }
     }
 
+    // --- NEW: DAILY QUEST LOGIC ---
+    async function checkDailyQuests(uid) {
+        if (!uid) return;
+        
+        const todayStr = new Date().toLocaleDateString('tr-TR');
+        const userRef = doc(db, "users", uid);
+        const userSnap = await getDoc(userRef);
+        let userData = userSnap.data();
+        
+        // Bugünün görev verisi var mı? Yoksa oluştur.
+        let dailyData = userData.dailyQuests || { date: todayStr, claimed: [] };
+        
+        // Eğer tarih eskiyse sıfırla
+        if (dailyData.date !== todayStr) {
+            dailyData = { date: todayStr, claimed: [] };
+            await updateDoc(userRef, { dailyQuests: dailyData });
+        }
+
+        // İlerlemeyi Hesapla
+        let todayMinutes = 0;
+        let todayPomoCount = 0;
+
+        const q = query(collection(db, "users", uid, "sessions"), 
+            where("createdAt", ">", new Date(new Date().setHours(0,0,0,0))));
+        
+        const sessions = await getDocs(q);
+        sessions.forEach(s => {
+            const d = s.data();
+            if(d.type !== 'bonus') todayMinutes += (d.duration || 0);
+            if(d.type === 'pomodoro' && d.completed) todayPomoCount++;
+        });
+
+        // UI Render Et
+        const container = document.getElementById('dailyQuestContainer');
+        container.innerHTML = "";
+
+        for (const quest of DAILY_QUESTS) {
+            let isCompleted = false;
+            let currentVal = 0;
+
+            if (quest.type === 'login') { isCompleted = true; currentVal = 1; } 
+            if (quest.type === 'minutes') { currentVal = todayMinutes; isCompleted = todayMinutes >= quest.target; }
+            if (quest.type === 'pomodoro_count') { currentVal = todayPomoCount; isCompleted = todayPomoCount >= quest.target; }
+
+            const isClaimed = dailyData.claimed.includes(quest.id);
+            
+            // Ödülü Otomatik Ver (Eğer tamamlandıysa ve alınmadıysa)
+            if (isCompleted && !isClaimed) {
+                await updateDoc(userRef, { 
+                    bilgePoints: increment(quest.reward),
+                    "dailyQuests.claimed": arrayUnion(quest.id)
+                });
+                Swal.fire({
+                    toast: true, position: 'top-end', icon: 'success', 
+                    title: `Görev Tamamlandı: ${quest.text}`, showConfirmButton: false, timer: 3000
+                });
+                confetti({ particleCount: 50, spread: 40, origin: { y: 0.7 } });
+                dailyData.claimed.push(quest.id); 
+            }
+
+            // HTML Oluştur
+            const statusClass = (isCompleted || isClaimed) ? 'completed' : '';
+            const checkIcon = (isCompleted || isClaimed) ? '✓' : '';
+            const rewardHtml = isClaimed ? '<span style="color:var(--success)">Alındı</span>' : `+${quest.reward} P`;
+
+            container.innerHTML += `
+                <div class="quest-item ${statusClass}">
+                    <div class="quest-info">
+                        <div class="quest-checkbox">${checkIcon}</div>
+                        <div>
+                            <div style="font-weight:700; font-size:0.9rem;">${quest.text}</div>
+                            <div style="font-size:0.75rem; color:#64748b;">${Math.min(currentVal, quest.target)} / ${quest.target}</div>
+                        </div>
+                    </div>
+                    <div class="quest-reward">${rewardHtml}</div>
+                </div>
+            `;
+        }
+    }
+
     // --- STUDENT LOGIC ---
     async function initStudent(uid){
         // GİRİŞTE SENKRONİZASYON YAP (HATA DÜZELTME)
         await syncUserScore(uid);
+        
+        // GÜNLÜK GÖREVLERİ KONTROL ET
+        checkDailyQuests(uid);
 
         const userRef = doc(db,"users",uid);
         const userSnap = await getDoc(userRef);
@@ -946,6 +1070,8 @@
             await updateDoc(doc(db,"users",currentUser.uid), { totalMinutes: increment(dur), bilgePoints: increment(dur), lastStudyDate: serverTimestamp() }); 
             Swal.fire("Harika!", `${dur} dakika eklendi ve ${dur} puan kazandın!`, "success"); 
             confetti(); 
+            // GÖREV KONTROLÜ
+            checkDailyQuests(currentUser.uid);
         } catch(e) { 
             Swal.fire("Hata", e.message, "error"); 
         } finally {
@@ -1042,6 +1168,7 @@
             
             if(completed) {
                 Swal.fire("Tebrikler!", "Süreyi tamamladın!", "success");
+                checkDailyQuests(currentUser.uid); // GÖREV KONTROL
             } else {
                 Swal.fire("Kaydedildi", `${spentMinutes} dakika çalıştın.`, "success");
             }
@@ -1222,30 +1349,102 @@
         });
     }
 
-    function renderAdminDashboard(){
+    // --- YENİ ADMİN FONKSİYONLARI ---
+    function renderAdminDashboard(filteredList = null){
+        const targetList = filteredList || globalUserList;
         let risk=0, stars=0; const now = new Date(); const table = document.getElementById('studentTableBody'); table.innerHTML = "";
-        globalUserList.forEach((u,i) => {
+        
+        targetList.forEach((u,i) => {
             const last = u.lastStudyDate ? (u.lastStudyDate.toDate?u.lastStudyDate.toDate():new Date(u.lastStudyDate)) : null;
             let status = "✅ İyi"; let rowClass = "sb-good"; let icon="👍";
             if(!last || (now-last)/(1000*60*60*24) > 3) { status="Riskli"; risk++; rowClass="sb-risk"; icon="⚠️"; }
             else if((u.totalMinutes||0) > 1000) { status="Lider"; stars++; rowClass="sb-star"; icon="🌟"; }
-            const tr = document.createElement('tr');
-            tr.innerHTML = `<td style="color:#94a3b8;">#${i+1}</td><td style="font-weight:600; font-size:1rem;">${u.displayName||"İsimsiz"}</td><td><span class="smart-badge ${rowClass}">${icon} ${status}</span></td><td style="color:var(--warning); font-weight:bold;">${u.bilgePoints||0}</td><td style="color:var(--primary); font-weight:800;">${Math.floor((u.totalMinutes||0)/60)}s ${(u.totalMinutes||0)%60}dk</td>`;
             
-            // TIKLANDIĞINDA ÖNCE SENKRONİZE ET, SONRA AÇ
-            tr.onclick = async () => {
-                await syncUserScore(u.id); // Yönetici baktığı an güncelle
-                openAdminDetail(u.id, u.displayName||"İsimsiz", u.totalMinutes||0, u.bilgePoints||0);
-            };
+            const tr = document.createElement('tr');
+            // BUTONLAR VE TIKLANABİLİR İSİM EKLENDİ
+            tr.innerHTML = `
+                <td style="color:#94a3b8;">#${i+1}</td>
+                <td style="font-weight:600; font-size:1rem; cursor:pointer;" onclick="openAdminDetail('${u.id}', '${u.displayName||"İsimsiz"}', ${u.totalMinutes||0}, ${u.bilgePoints||0})">${u.displayName||"İsimsiz"}<br><small style="color:#aaa; font-weight:normal;">${u.email}</small></td>
+                <td><span class="smart-badge ${rowClass}">${icon} ${status}</span></td>
+                <td style="color:var(--warning); font-weight:bold;">${u.bilgePoints||0}</td>
+                <td style="color:var(--primary); font-weight:800;">${Math.floor((u.totalMinutes||0)/60)}s ${(u.totalMinutes||0)%60}dk</td>
+                <td>
+                    <button onclick="editStudent('${u.id}', ${u.bilgePoints}, ${u.totalMinutes})" style="padding:5px 10px; font-size:0.8rem; width:auto; background:#3b82f6; color:white; margin-right:5px;">✏️</button>
+                    <button onclick="deleteStudent('${u.id}')" style="padding:5px 10px; font-size:0.8rem; width:auto; background:#ef4444; color:white;">🗑️</button>
+                </td>
+            `;
             table.appendChild(tr);
         });
-        document.getElementById('insightRiskCount').innerText = risk; document.getElementById('insightStarCount').innerText = stars;
-        document.getElementById('adminTotalStudents').innerText = globalUserList.length;
-        let tm=0; let ta=0; const td=new Date().toDateString();
-        globalUserList.forEach(u=>{ tm+=(u.totalMinutes||0); if(u.lastStudyDate && (u.lastStudyDate.toDate?u.lastStudyDate.toDate():new Date(u.lastStudyDate)).toDateString()===td) ta++; });
-        document.getElementById('adminTotalHours').innerText = Math.floor(tm/60); document.getElementById('adminActiveToday').innerText = ta;
-        renderRisingStars(globalUserList); renderAdminChart(globalUserList);
+
+        if(!filteredList) {
+            document.getElementById('insightRiskCount').innerText = risk; document.getElementById('insightStarCount').innerText = stars;
+            document.getElementById('adminTotalStudents').innerText = globalUserList.length;
+            let tm=0; let ta=0; const td=new Date().toDateString();
+            globalUserList.forEach(u=>{ tm+=(u.totalMinutes||0); if(u.lastStudyDate && (u.lastStudyDate.toDate?u.lastStudyDate.toDate():new Date(u.lastStudyDate)).toDateString()===td) ta++; });
+            document.getElementById('adminTotalHours').innerText = Math.floor(tm/60); document.getElementById('adminActiveToday').innerText = ta;
+            renderRisingStars(globalUserList); renderAdminChart(globalUserList);
+        }
     }
+
+    // ARAMA FONKSİYONU
+    window.filterAdminTable = () => {
+        const query = document.getElementById('adminSearchInput').value.toLowerCase();
+        const filtered = globalUserList.filter(u => 
+            (u.displayName && u.displayName.toLowerCase().includes(query)) || 
+            (u.email && u.email.toLowerCase().includes(query))
+        );
+        renderAdminDashboard(filtered);
+    };
+
+    // DÜZENLEME FONKSİYONU
+    window.editStudent = async (uid, currentPoints, currentMins) => {
+        const { value: formValues } = await Swal.fire({
+            title: 'Öğrenci Verisini Düzenle',
+            html:
+                `<label>Bilge Puan:</label><input id="swal-points" class="swal2-input" type="number" value="${currentPoints}">` +
+                `<label>Toplam Dakika:</label><input id="swal-mins" class="swal2-input" type="number" value="${currentMins}">`,
+            focusConfirm: false,
+            showCancelButton: true,
+            confirmButtonText: 'Kaydet',
+            preConfirm: () => {
+                return [
+                    document.getElementById('swal-points').value,
+                    document.getElementById('swal-mins').value
+                ]
+            }
+        });
+
+        if (formValues) {
+            try {
+                await updateDoc(doc(db, "users", uid), {
+                    bilgePoints: parseInt(formValues[0]),
+                    totalMinutes: parseInt(formValues[1])
+                });
+                Swal.fire("Başarılı", "Veriler güncellendi.", "success");
+            } catch(e) { Swal.fire("Hata", e.message, "error"); }
+        }
+    };
+
+    // SİLME FONKSİYONU
+    window.deleteStudent = async (uid) => {
+        const result = await Swal.fire({
+            title: 'Emin misin?',
+            text: "Bu öğrenciyi ve tüm verilerini silmek üzeresin!",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#d33',
+            confirmButtonText: 'Evet, Sil!',
+            cancelButtonText: 'İptal'
+        });
+
+        if (result.isConfirmed) {
+            try {
+                await deleteDoc(doc(db, "users", uid));
+                Swal.fire("Silindi!", "Öğrenci veritabanından kaldırıldı.", "success");
+            } catch(e) { Swal.fire("Hata", e.message, "error"); }
+        }
+    };
+
     function renderRisingStars(users) { 
         const c=document.getElementById('risingStarsContainer');c.innerHTML="";const n=new Date();const od=24*60*60*1000;
         const s=users.filter(u=>{if(!u.lastStudyDate)return false; const d=u.lastStudyDate.toDate?u.lastStudyDate.toDate():new Date(u.lastStudyDate); return(n-d)<(od*2)}).sort((a,b)=>b.totalMinutes-a.totalMinutes).slice(0,5);
@@ -1256,7 +1455,73 @@
             c.appendChild(cd)
         })
     }
-    function renderAdminChart(users) { const c=document.getElementById('chartInner');const mw=Math.max(users.length*60,400);c.style.width=mw+"px";const ctx=document.getElementById('adminLeaderboardChart').getContext('2d');const l=users.map(u=>(u.displayName||"Öğrenci").split(' ')[0]);const d=users.map(u=>u.totalMinutes);if(adminChart)adminChart.destroy();adminChart=new Chart(ctx,{type:'bar',data:{labels:l,datasets:[{label:'Toplam Dakika',data:d,backgroundColor:'#009688',borderRadius:8,barThickness:40}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{y:{beginAtZero:true,grid:{display:false}},x:{grid:{display:false}}}}})}
+
+    // RENKLİ VE TIKLANABİLİR GRAFİK
+    function renderAdminChart(users) { 
+        const c = document.getElementById('chartInner');
+        const mw = Math.max(users.length * 50, 600);
+        c.style.width = mw + "px";
+        
+        const ctx = document.getElementById('adminLeaderboardChart').getContext('2d');
+        const labels = users.map(u => (u.displayName || "Öğrenci").split(' ')[0]);
+        const dataPoints = users.map(u => u.totalMinutes);
+        const userIds = users.map(u => u.id); 
+        const userFullData = users; 
+
+        const backgroundColors = users.map((_, index) => {
+            const hue = (index * 137.508) % 360; 
+            return `hsl(${hue}, 70%, 50%)`;
+        });
+
+        if(adminChart) adminChart.destroy();
+        
+        adminChart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: 'Toplam Dakika',
+                    data: dataPoints,
+                    backgroundColor: backgroundColors,
+                    borderRadius: 8,
+                    barThickness: 40,
+                    borderWidth: 2,
+                    borderColor: 'white'
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { display: false },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                return `⏱️ ${context.raw} Dakika`;
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    y: { beginAtZero: true, grid: { display: false } },
+                    x: { grid: { display: false } }
+                },
+                onClick: (event, elements) => {
+                    if (elements.length > 0) {
+                        const index = elements[0].index;
+                        const uid = userIds[index];
+                        const u = userFullData[index];
+                        // Tıklanınca detay aç
+                        openAdminDetail(uid, u.displayName || "İsimsiz", u.totalMinutes || 0, u.bilgePoints || 0);
+                    }
+                },
+                onHover: (event, chartElement) => {
+                    event.native.target.style.cursor = chartElement[0] ? 'pointer' : 'default';
+                }
+            }
+        });
+    }
+
     window.openAdminDetail = async (uid, name, total, points) => { document.getElementById('modalAdminDetail').classList.remove('hidden'); document.getElementById('detailStudentName').innerText = name; document.getElementById('statTotalMin').innerText = total; document.getElementById('statAvg').innerText = points; const s = await getDocs(query(collection(db,"users",uid,"sessions"))); let days={}; for(let i=0; i<7; i++){ const d=new Date(); d.setDate(d.getDate()-i); days[d.toLocaleDateString('tr-TR')]=0; } s.forEach(doc=>{ const dt=doc.data(); if(days[dt.dateStr]!==undefined) days[dt.dateStr]+=dt.duration; }); const lbl=Object.keys(days).reverse(); const da=Object.values(days).reverse(); const ctx=document.getElementById('studentDetailChart').getContext('2d'); if(detailChart) detailChart.destroy(); detailChart=new Chart(ctx,{type:'line',data:{labels:lbl,datasets:[{label:'Günlük',data:da,borderColor:'#ec4899',tension:0.4,fill:true,backgroundColor:'rgba(236,72,153,0.1)'}]},options:{responsive:true,maintainAspectRatio:false}});}; window.closeAdminDetail=()=>document.getElementById('modalAdminDetail').classList.add('hidden');
 
     window.openBulkSelectModal = (type) => {
@@ -1419,6 +1684,7 @@
     // NEW & UPDATED EXPORTS
     window.startPomoTimer = window.startPomoTimer; window.requestStopPomo = window.requestStopPomo; window.updateTimerSet = window.updateTimerSet;
     window.startArenaSession = window.startArenaSession; window.boostArenaTime = window.boostArenaTime; window.requestStopArena = window.requestStopArena;
+    window.filterAdminTable = window.filterAdminTable; window.editStudent = window.editStudent; window.deleteStudent = window.deleteStudent;
 </script>
 </body>
 </html>
