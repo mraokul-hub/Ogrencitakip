@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Bilge Takip Sistemi v8.0 (Arena Update)</title>
+    <title>Bilge Takip Sistemi(Otopilot 🦉)</title>
     
     <link rel="icon" href="Designer (1).jpg" type="image/jpeg">
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
@@ -21,11 +21,14 @@
             --glass-border: rgba(178, 223, 219, 0.8);
             --text-main: #0f172a; --text-sub: #475569; --radius: 24px;
             --shadow: 0 20px 25px -5px rgba(0, 150, 136, 0.05);
+            --bottom-nav-height: 80px;
         }
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
         body { font-family: 'Outfit', sans-serif; background: var(--bg-gradient); margin: 0; padding: 15px; min-height: 100vh; color: var(--text-main); display: flex; justify-content: center; }
+        
         .container { width: 100%; max-width: 480px; padding-bottom: 120px; transition: max-width 0.3s ease; }
-        .container.admin-mode { max-width: 1000px; }
+        .container.student-view { padding-bottom: var(--bottom-nav-height); }
+        .container.admin-mode { max-width: 1000px; padding-bottom: 50px; }
 
         .card { background: var(--glass-bg); backdrop-filter: blur(12px); border: 1px solid var(--glass-border); border-radius: var(--radius); box-shadow: var(--shadow); padding: 24px; margin-bottom: 24px; position: relative; transition: transform 0.2s; }
         h2, h3 { margin: 0 0 10px 0; color: var(--primary-dark); letter-spacing: -0.5px; }
@@ -46,6 +49,19 @@
         .tab { flex: 0 0 auto; padding: 10px 20px; cursor: pointer; border-radius: 15px; font-weight: 600; color: var(--text-sub); transition: 0.3s; font-size: 0.9rem; border: 1px solid transparent; }
         .tab.active { background: white; color: var(--primary); box-shadow: 0 4px 10px rgba(0,0,0,0.05); border-color: #b2dfdb; }
 
+        /* MOBILE BOTTOM NAV */
+        .mobile-bottom-nav {
+            position: fixed; bottom: 0; left: 0; width: 100%; height: var(--bottom-nav-height);
+            background: rgba(255, 255, 255, 0.98); backdrop-filter: blur(20px);
+            border-top: 1px solid rgba(178, 223, 219, 0.6); display: flex; justify-content: space-around; align-items: center;
+            padding-bottom: 15px; z-index: 1000; box-shadow: 0 -5px 20px rgba(0, 150, 136, 0.08);
+            border-top-left-radius: 20px; border-top-right-radius: 20px;
+        }
+        .nav-item { display: flex; flex-direction: column; align-items: center; justify-content: center; font-size: 0.7rem; color: #94a3b8; background: none; border: none; cursor: pointer; transition: all 0.3s; flex: 1; height: 100%; padding: 5px 0; }
+        .nav-icon { font-size: 1.6rem; margin-bottom: 4px; display: block; transition: transform 0.2s; }
+        .nav-item.active { color: var(--primary); font-weight: 800; }
+        .nav-item.active .nav-icon { transform: translateY(-5px); filter: drop-shadow(0 4px 6px rgba(0,150,136,0.2)); }
+        
         .chips { display: flex; gap: 8px; flex-wrap: wrap; justify-content: center; margin-bottom: 20px; }
         .chip { background: white; padding: 10px 18px; border-radius: 30px; font-size: 0.9rem; font-weight: 600; cursor: pointer; border: 1px solid #b2dfdb; color: var(--text-sub); transition:0.2s; }
         .chip.active { background: var(--primary); color: white; border-color: var(--primary); transform: translateY(-2px); box-shadow: 0 5px 15px rgba(0, 150, 136, 0.3); }
@@ -61,13 +77,14 @@
         .rules-item { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; font-size: 0.9rem; color: #166534; padding-bottom: 8px; border-bottom: 1px dashed #bbf7d0; }
         .rules-item:last-child { margin-bottom: 0; border-bottom: none; }
 
-        .wise-coach-container { position: fixed; bottom: 20px; right: 20px; z-index: 999; display: flex; flex-direction: column; align-items: flex-end; }
-        .wise-avatar { width: 70px; height: 70px; background: linear-gradient(135deg, #4f46e5, #9333ea); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 2.5rem; box-shadow: 0 10px 25px rgba(79, 70, 229, 0.4); cursor: pointer; border: 3px solid #fff; position: relative; transition: transform 0.3s; }
+        /* COACH STYLES - UPDATED */
+        .wise-coach-container { position: fixed; bottom: 90px; right: 10px; z-index: 999; display: flex; flex-direction: column; align-items: flex-end; }
+        .wise-avatar { width: 60px; height: 60px; background: linear-gradient(135deg, #4f46e5, #9333ea); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 2rem; box-shadow: 0 10px 25px rgba(79, 70, 229, 0.4); cursor: pointer; border: 3px solid #fff; position: relative; transition: transform 0.3s; }
         .wise-avatar:hover { transform: scale(1.1); }
         .wise-avatar.idle { animation: floatCoach 4s ease-in-out infinite; } 
         .wise-avatar.excited { animation: wingFlap 0.8s ease-in-out infinite; border-color: #fcd34d; }
         .coach-badge { position: absolute; top: 0; right: 0; background: #ef4444; color: white; font-size: 0.75rem; width: 22px; height: 22px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; border: 2px solid white; animation: pulseBadge 2s infinite; }
-        .coach-bubble { background: white; padding: 12px 20px; border-radius: 20px 20px 4px 20px; box-shadow: 0 5px 20px rgba(0,0,0,0.1); margin-bottom: 10px; max-width: 250px; font-size: 0.9rem; color: var(--text-main); border: 1px solid #e0e7ff; opacity: 0; transform: translateY(20px) scale(0.9); transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); pointer-events: none; position: absolute; bottom: 80px; right: 0; width: max-content; }
+        .coach-bubble { background: white; padding: 15px; border-radius: 20px 20px 4px 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.15); margin-bottom: 10px; max-width: 250px; font-size: 0.9rem; color: var(--text-main); border: 1px solid #e0e7ff; opacity: 0; transform: translateY(20px) scale(0.9); transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); pointer-events: none; position: absolute; bottom: 70px; right: 0; width: max-content; font-weight: 600; }
         .coach-bubble.show { opacity: 1; transform: translateY(0) scale(1); pointer-events: auto; }
 
         @keyframes floatCoach { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
@@ -96,7 +113,6 @@
         .smart-badge { padding: 6px 12px; border-radius: 20px; font-size: 0.75rem; font-weight: 700; display: inline-flex; align-items: center; gap: 5px; }
         .sb-star { background: #fff7ed; color: #d97706; border: 1px solid #fcd34d; } .sb-good { background: #eff6ff; color: #2563eb; border: 1px solid #bfdbfe; } .sb-risk { background: #fef2f2; color: #dc2626; border: 1px solid #fecaca; }
         
-        /* Rising Stars */
         .rising-stars { display: flex; gap: 15px; overflow-x: auto; padding-bottom: 15px; margin-bottom: 20px; }
         .star-card { min-width: 150px; background: linear-gradient(135deg, #fff, #fdfbf7); padding: 15px; border-radius: 18px; border: 1px solid #fef3c7; box-shadow: 0 4px 6px rgba(0,0,0,0.02); text-align: center; }
         .star-icon { font-size: 2rem; margin-bottom: 5px; display: block; animation: float 3s ease-in-out infinite; }
@@ -119,26 +135,27 @@
         .btn-profile-settings { background: #f1f9f9; width: 36px; height: 36px; border-radius: 10px; display: inline-flex; align-items: center; justify-content: center; margin-left: 8px; border:none; color:var(--text-sub); cursor: pointer; }
         .btn-profile-settings:hover { background: #e0f2f1; color:var(--primary); }
         
-        /* Selection List */
         .selection-list { max-height: 300px; overflow-y: auto; border: 1px solid #e2e8f0; border-radius: 12px; padding: 10px; margin-bottom: 15px; }
         .selection-item { display: flex; align-items: center; padding: 8px; border-bottom: 1px solid #f1f5f9; }
         .selection-item:last-child { border-bottom: none; }
         .selection-item input[type="checkbox"] { width: 20px; height: 20px; margin-right: 10px; margin-bottom: 0; }
         .selection-item label { cursor: pointer; flex: 1; font-weight: 500; font-size: 0.9rem; }
         
-        /* ARENA (Competition) Styles */
         .arena-list { max-height: 300px; overflow-y: auto; }
         .arena-item { display: flex; align-items: center; justify-content: space-between; background: #f0fdf4; padding: 15px; border-radius: 16px; border: 1px solid #bbf7d0; margin-bottom: 10px; animation: fadeIn 0.5s; }
         .arena-user { display: flex; align-items: center; gap: 10px; font-weight: 700; color: var(--text-main); }
         .arena-status { font-size: 0.8rem; background: #dcfce7; color: #15803d; padding: 4px 10px; border-radius: 20px; font-weight: 600; }
         .btn-boost { background: linear-gradient(135deg, #f59e0b, #d97706); color: white; padding: 8px 15px; border-radius: 12px; font-size: 0.8rem; font-weight: 700; border: none; cursor: pointer; box-shadow: 0 4px 10px rgba(245, 158, 11, 0.3); transition: 0.2s; }
         .btn-boost:hover { transform: scale(1.05); }
+
+        /* MESSAGE TYPE BADGES */
+        .msg-badge-admin { background: #000; color: #fff; padding: 2px 6px; border-radius: 4px; font-size: 0.7rem; margin-right: 5px; }
+        .msg-badge-auto { background: #6366f1; color: #fff; padding: 2px 6px; border-radius: 4px; font-size: 0.7rem; margin-right: 5px; }
     </style>
 </head>
 <body>
 
 <div class="container fade-in" id="mainContainer">
-    <!-- 1. GİRİŞ EKRANI -->
     <div id="authScreen" class="card" style="margin-top: 60px; text-align: center;">
         <div style="font-size: 4rem; margin-bottom: 15px;">🛡️</div>
         <h2 id="authTitle">Öğrenci Takip</h2>
@@ -151,12 +168,10 @@
         <div id="authError" style="color:var(--danger); margin-top:15px; font-weight:600; display:none;"></div>
     </div>
 
-    <!-- 2. ÖĞRENCİ PANELİ -->
     <div id="dashboardScreen" class="hidden fade-in">
         <div class="card" style="display:flex; justify-content:space-between; align-items:center; padding:15px 20px; position: sticky; top: 10px; z-index: 900;">
             <div style="display:flex; align-items:center;">
                 <div>
-                    <!-- AVATAR VE İSİM -->
                     <h3 style="margin:0; font-size:1.3rem;">
                         <span id="userAvatar" style="margin-right:5px;">🎓</span>
                         Selam, <span id="stName" style="color:var(--primary);">Öğrenci</span>
@@ -178,7 +193,6 @@
                 %<span id="progVal">0</span> Tamamlandı
             </div>
             
-            <!-- HAFTALIK ÖDÜL BUTONU -->
             <button id="btnClaimWeekly" class="hidden" onclick="claimWeeklyBonus()" style="background:linear-gradient(135deg, #f59e0b, #d97706); color:white; width:100%; margin-top:10px; box-shadow: 0 5px 15px rgba(245, 158, 11, 0.4); animation: pulseBadge 2s infinite;">
                 🏆 500 Puanlık Ödülü Al
             </button>
@@ -189,13 +203,31 @@
             </div>
         </div>
 
-        <div class="tabs">
-            <div class="tab active" onclick="switchTab('home', this)">🏠 Giriş</div>
-            <div class="tab" onclick="switchTab('pomo', this)">⏱️ Sayaç</div>
-            <div class="tab" onclick="switchTab('arena', this)">⚔️ Yarışma</div>
-            <div class="tab" onclick="switchTab('store', this)">🛒 Pazar</div>
-            <div class="tab" onclick="switchTab('future', this)">✉️ Gelecek</div>
-            <div class="tab" onclick="switchTab('history', this)">📜 Geçmiş</div>
+        <div class="mobile-bottom-nav">
+            <button class="nav-item active" onclick="switchTab('home', this)">
+                <span class="nav-icon">🏠</span>
+                <span>Giriş</span>
+            </button>
+            <button class="nav-item" onclick="switchTab('pomo', this)">
+                <span class="nav-icon">⏱️</span>
+                <span>Sayaç</span>
+            </button>
+            <button class="nav-item" onclick="switchTab('arena', this)">
+                <span class="nav-icon">⚔️</span>
+                <span>Yarışma</span>
+            </button>
+            <button class="nav-item" onclick="switchTab('store', this)">
+                <span class="nav-icon">🛒</span>
+                <span>Pazar</span>
+            </button>
+            <button class="nav-item" onclick="switchTab('future', this)">
+                <span class="nav-icon">✉️</span>
+                <span>Gelecek</span>
+            </button>
+            <button class="nav-item" onclick="switchTab('history', this)">
+                <span class="nav-icon">📜</span>
+                <span>Geçmiş</span>
+            </button>
         </div>
 
         <div id="viewHome" class="fade-in">
@@ -223,16 +255,14 @@
                 <input type="hidden" id="pomoSubject" value="">
                 <div class="timer-display" id="timerDisplay">30:00</div>
                 <div style="display:flex; gap:10px; justify-content:center; margin-bottom:20px;">
-                    <button style="background:var(--success); color:white; width:auto; padding:15px 30px;" onclick="startTimer()" id="btnStart">BAŞLAT ▶</button>
-                    <button style="background:var(--danger); color:white; width:auto; padding:15px 30px;" onclick="resetTimer()">SIFIRLA ↺</button>
+                    <button style="background:var(--success); color:white; width:auto; padding:15px 30px;" onclick="startPomoTimer()" id="btnStartPomo">BAŞLAT ▶</button>
+                    <button style="background:var(--danger); color:white; width:auto; padding:15px 30px;" onclick="requestStopPomo()">DURDUR ⏹</button>
                 </div>
                 <label style="font-size:0.8rem; color:var(--text-sub); font-weight:bold;">Süre Ayarla (dk):</label>
                 <input type="number" id="timerSet" value="30" onchange="updateTimerSet()" style="text-align:center; width:100px; margin:0 auto; display:block;">
-                <button class="btn-primary" onclick="savePomo()" style="margin-top:20px;">BİTİR VE KAYDET 💾</button>
             </div>
         </div>
 
-        <!-- YENİ YARIŞMA MODÜLÜ -->
         <div id="viewArena" class="hidden fade-in">
             <div class="card">
                 <h4>⚔️ ÇALIŞMA ARENASI</h4>
@@ -242,14 +272,17 @@
                     <div style="text-align:center; padding:20px; color:#999;">Arenaya bağlanılıyor...</div>
                 </div>
                 
-                <!-- SAYAÇLI ÇALIŞMA KONTROLÜ (ARENA İÇİNDE) -->
-                <div style="margin-top:20px; border-top:1px solid #e2e8f0; padding-top:15px;">
-                     <div class="timer-display" id="arenaTimerDisplay" style="font-size: 3rem;">00:00</div>
-                     <button class="btn-primary" id="arenaStartBtn" onclick="startArenaSession()">SAYACI BAŞLAT (ARENA)</button>
+                <div style="margin-top:20px; border-top:1px solid #e2e8f0; padding-top:15px; text-align:center;">
+                     <div class="timer-display" id="arenaTimerDisplay" style="font-size: 3rem; color:var(--warning);">00:00</div>
+                     <button class="btn-primary" id="arenaStartBtn" onclick="startArenaSession()">SAVAŞI BAŞLAT ⚔️</button>
+                     <div id="arenaControls" class="hidden" style="display:flex; gap:10px; justify-content:center; margin-top:10px;">
+                         <button class="btn-boost" onclick="boostArenaTime()">⚡ ZAMAN ARTIR (+5 DK)</button>
+                         <button style="background:#ef4444; color:white;" onclick="requestStopArena()">PES ET 🏳️</button>
+                     </div>
                 </div>
 
                 <div style="background:#fffbeb; border:1px solid #fcd34d; padding:15px; border-radius:16px; margin-top:20px; font-size:0.85rem; color:#b45309;">
-                    🔥 <strong>İpucu:</strong> Yarışma modunda çalışmak <strong>0.5 Puan</strong> daha fazla kazandırır!
+                    🔥 <strong>İpucu:</strong> Yarışma modunda çalışmak <strong>2.0 Puan</strong> kazandırır!
                 </div>
             </div>
         </div>
@@ -263,7 +296,6 @@
                     <div class="rules-item">⚔️ <strong>Yarışma Modu:</strong> 1 Dk = 2.0 Puan (Bonuslu!)</div>
                     <div class="rules-item">✉️ <strong>Zaman Kapsülü:</strong> Mektup Yaz = 50 Puan</div>
                     <div class="rules-item">🏆 <strong>Haftalık Hedef:</strong> Tamamla = 500 Puan</div>
-                    <div class="rules-item">📅 <strong>Geçmişe Dönük:</strong> Puan Geçerli</div>
                 </div>
             </div>
 
@@ -296,7 +328,6 @@
         </div>
     </div>
 
-    <!-- 3. YÖNETİCİ PANELİ -->
     <div id="adminScreen" class="hidden fade-in">
         <div class="admin-header">
             <div><h3 style="margin:0; font-size:1.5rem; letter-spacing: -0.5px; color:white;">Yönetici Paneli 👑</h3><small style="opacity:0.8;">Veriler birleştirildi ve analiz edildi.</small></div>
@@ -369,12 +400,10 @@
 
 </div>
 
-<!-- MODALS -->
 <div id="modalAdminDetail" class="modal hidden fade-in"><div class="modal-content" style="max-width:500px;"><div style="text-align:right;"><button onclick="closeAdminDetail()" style="width:32px; height:32px; padding:0; border-radius:50%; background:#f1f5f9; border:none; cursor:pointer;">✕</button></div><h2 id="detailStudentName" style="color:var(--text-main); margin-bottom:5px;">Öğrenci Adı</h2><div id="smartEvaluationBadge" style="display:inline-block; padding:5px 15px; background:#e0e7ff; border-radius:20px; font-weight:700; color:var(--primary); font-size:0.9rem; margin-bottom:15px;">Analiz Ediliyor...</div><div style="display:grid; grid-template-columns: 1fr 1fr; gap:15px; margin-bottom:20px;"><div style="background:#f8fafc; border:1px solid #f1f5f9; padding:15px; border-radius:16px; text-align:center;"><div style="font-size:1.4rem; font-weight:800; color:var(--primary);" id="statTotalMin">0</div><div style="font-size:0.8rem; text-transform:uppercase; color:var(--text-sub);">Toplam Dakika</div></div><div style="background:#f8fafc; border:1px solid #f1f5f9; padding:15px; border-radius:16px; text-align:center;"><div style="font-size:1.4rem; font-weight:800; color:var(--warning);" id="statAvg">0</div><div class="guidance-label" style="font-size:0.8rem; text-transform:uppercase; color:var(--text-sub);">Bilge Puan</div></div></div><h4>🧠 AKILLI DEĞERLENDİRME</h4><div id="aiComment" style="background:#f0fdf4; border:1px solid #bbf7d0; color:#166534; padding:15px; border-radius:12px; font-size:0.9rem; line-height:1.5; margin-bottom:20px;">Öğrenci verileri inceleniyor...</div><div style="height: 200px; width: 100%; margin-bottom: 20px;"><canvas id="studentDetailChart"></canvas></div><button class="btn-primary" onclick="closeAdminDetail()">KAPAT</button></div></div>
 <div id="modalMsg" class="modal hidden"><div class="modal-content" style="max-width:400px;"><div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;"><h3 style="margin:0;">Posta Kutusu 📬</h3><button onclick="document.getElementById('modalMsg').classList.add('hidden')" style="width:30px; height:30px; padding:0; border-radius:50%; background:#f1f5f9; border:none;">✕</button></div><div id="msgList" class="msg-list-container"><div style="text-align:center; color:#aaa; padding:20px;">Mesajınız yok.</div></div></div></div>
 <div id="modalProfile" class="modal hidden fade-in"><div class="modal-content"><div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;"><h3 style="margin:0;">Profil Ayarları</h3><button onclick="closeProfileModal()" style="width:32px; height:32px; padding:0; border-radius:50%; background:#f1f5f9; color:#333;">✕</button></div><label style="font-size:0.8rem; color:var(--text-sub); margin-bottom:5px; display:block;">Öğrenci Adı Soyadı</label><input type="text" id="editProfileName" style="margin-bottom:15px;"><label style="font-size:0.8rem; color:var(--text-sub); margin-bottom:5px; display:block;">E-Posta (Değiştirilemez)</label><input type="text" id="editProfileEmail" disabled style="opacity:0.6; margin-bottom:20px;"><button class="btn-primary" onclick="saveUserProfile()">KAYDET</button><div style="margin-top:20px; text-align:center;"><button onclick="sendPasswordReset()" style="background:none; border:none; color:var(--primary); text-decoration:underline; font-size:0.85rem; padding:5px;">Şifremi Unuttum / Sıfırla</button></div></div></div>
 
-<!-- BULK MESSAGE SELECTION MODAL -->
 <div id="modalBulkSelect" class="modal hidden fade-in">
     <div class="modal-content">
         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
@@ -407,6 +436,20 @@
     const ADMIN_EMAIL = "mremzi@gmail.com";
     const SUBJECTS = ['Matematik','Türkçe','Fen','Sosyal','İngilizce','Din','Kitap','Diğer'];
     
+    // GREETINGS LIBRARY
+    const GREETINGS = [
+        "Hoş geldin Bilgi Avcısı! 🏹",
+        "Gözlerim yollarda kaldı! 👀",
+        "Çalışkanların kralı burada! 👑",
+        "Bugün rekor kıracak mıyız? 🚀",
+        "Uçuşa hazır mısın? 🦉",
+        "Seni görmek ne güzel! 🌟",
+        "Kitapların seni özledi! 📚",
+        "Sıcak bir kahve ve ders? ☕",
+        "Zamanı bükmeye hazır ol! ⏳",
+        "Sahne senin, göster kendini! 🎤"
+    ];
+
     // AVATAR SHOP DATA
     const AVATAR_SHOP = [
         { icon: '🐺', name: 'Bozkurt', cost: 500 },
@@ -421,11 +464,26 @@
 
     let currentUser=null, isLogin=true;
     let myChart=null, admBar=null, admPie=null, detailChart=null, adminChart=null;
-    let timerInterval=null, timeLeft=0, isTimerRunning=false;
     let globalUserList=[];
     let bulkType = null;
-    let activeArenaListener = null; // Listener temizliği için
-    let arenaStartTime = null;
+    
+    // --- UNSUBSCRIBE VARIABLES (FIX FOR LOGOUT ERROR) ---
+    let unsubStudentData = null;
+    let unsubStudentMessages = null;
+    let unsubAdminUsers = null;
+    let unsubAdminMessages = null;
+    let activeArenaListener = null;
+
+    // --- TIMERS VARIABLES ---
+    let pomoInterval = null;
+    let pomoTimeLeft = 0;
+    let isPomoRunning = false;
+    let pomoTotalDuration = 0;
+
+    let arenaInterval = null;
+    let arenaTimeLeft = 0;
+    let isArenaRunning = false;
+    let arenaTotalDuration = 0;
 
     // --- AUTH & SETUP ---
     onAuthStateChanged(auth, async(user)=>{
@@ -438,6 +496,7 @@
                 listenAllMessagesForAdmin();
             } else {
                 document.getElementById('dashboardScreen').classList.remove('hidden');
+                document.getElementById('mainContainer').classList.add('student-view'); // Alt menü için padding ekle
                 document.getElementById('wiseCoachContainer').style.display = 'flex';
                 document.getElementById('stName').innerText = user.displayName ? user.displayName.split(' ')[0] : 'Öğrenci';
                 await initStudent(user.uid);
@@ -447,6 +506,7 @@
             ['dashboardScreen','adminScreen'].forEach(id => document.getElementById(id).classList.add('hidden'));
             document.getElementById('authScreen').classList.remove('hidden');
             document.getElementById('mainContainer').classList.remove('admin-mode');
+            document.getElementById('mainContainer').classList.remove('student-view');
             document.querySelector('.wise-coach-container').style.display = 'none';
         }
     });
@@ -463,12 +523,76 @@
         document.getElementById('weeklyGoalInput').value = data.weeklyGoal || 1000;
         document.getElementById('userAvatar').innerText = data.avatar || '🎓';
         
-        // Dropdown default
         const entryDateEl = document.getElementById('entryDate');
         if(entryDateEl) entryDateEl.value = "0";
 
         renderChips(); renderAvatarShop();
         listenStudentData(uid); listenMessages(uid);
+        
+        // AUTOMATED FEATURES TRIGGER
+        displayRandomGreeting();
+        checkAutoPilot(uid, data);
+    }
+    
+    // 1. RANDOM GREETING FEATURE
+    function displayRandomGreeting() {
+        const bubble = document.getElementById('coachBubble');
+        const randomMsg = GREETINGS[Math.floor(Math.random() * GREETINGS.length)];
+        bubble.innerText = randomMsg;
+        bubble.classList.add('show');
+        
+        // 5 saniye sonra gizle
+        setTimeout(() => {
+            bubble.classList.remove('show');
+            setTimeout(() => { bubble.innerText = "Mesajın var!"; }, 500); // Reset text
+        }, 5000);
+    }
+
+    // 2. AUTOPILOT LOGIC (Automated Messages)
+    async function checkAutoPilot(uid, userData) {
+        // Spam prevention: Check if we sent an auto-message today
+        const now = new Date();
+        const lastAuto = userData.lastAutoMsgDate ? userData.lastAutoMsgDate.toDate() : new Date(0);
+        const isSameDay = now.getDate() === lastAuto.getDate() && now.getMonth() === lastAuto.getMonth() && now.getFullYear() === lastAuto.getFullYear();
+        
+        if(isSameDay) return; // Bugün zaten otomatik mesaj attık
+
+        let autoMsg = null;
+        let msgType = 'auto'; // 'auto' type for owl messages
+
+        // Kural 1: Risk Analizi (3 Gündür Yoksa)
+        const lastStudy = userData.lastStudyDate ? userData.lastStudyDate.toDate() : new Date(0);
+        const diffDays = (now - lastStudy) / (1000 * 60 * 60 * 24);
+        
+        if (diffDays > 3) {
+            autoMsg = "Nerelerdesin? Tüylerim endişeden dökülüyor! 🦉 Hemen bir sayaç başlat.";
+        } 
+        // Kural 2: Başarı Analizi (Haftalık Hedef Geçildiyse)
+        else if (userData.totalMinutes > (userData.weeklyGoal || 1000)) {
+            autoMsg = "Kanatlarımın altına rüzgar oldun! Haftalık hedefini şimdiden geçtin, muazzamsın! 🏆";
+        }
+
+        if (autoMsg) {
+            try {
+                // Mesajı Gönder
+                await addDoc(collection(db, "messages"), {
+                    toUid: uid,
+                    content: autoMsg,
+                    read: false,
+                    type: 'auto', // AUTOMATED TYPE
+                    target: 'student',
+                    createdAt: serverTimestamp()
+                });
+                
+                // Kullanıcıya "bugün mesaj attım" işareti koy
+                await updateDoc(doc(db, "users", uid), {
+                    lastAutoMsgDate: serverTimestamp()
+                });
+                console.log("Otopilot mesajı gönderildi:", autoMsg);
+            } catch(e) {
+                console.error("Otopilot hatası:", e);
+            }
+        }
     }
 
     function renderAvatarShop() {
@@ -501,7 +625,6 @@
         }
     };
 
-    // HAFTALIK BONUSU AL (GÜNCELLENDİ: 1000 dk KURALI)
     window.claimWeeklyBonus = async () => {
         if(!currentUser) return;
         
@@ -515,13 +638,15 @@
             await updateDoc(doc(db,"users",currentUser.uid), { bilgePoints: increment(500) });
             Swal.fire("Tebrikler!", "Haftalık hedefini tutturdun! +500 Puan hesabına eklendi.", "success");
             confetti();
-            document.getElementById('btnClaimWeekly').classList.add('hidden'); // Butonu gizle
+            document.getElementById('btnClaimWeekly').classList.add('hidden');
         } catch(e) { alert(e.message); }
     };
 
     function listenStudentData(uid){
+        if(unsubStudentData) unsubStudentData(); // Varsa eskisini kapat
         const q = query(collection(db,"users",uid,"sessions"), where("createdAt",">",new Date(Date.now()-7*24*60*60*1000)));
-        onSnapshot(q, (snap)=>{
+        
+        unsubStudentData = onSnapshot(q, (snap)=>{
             let totalWeekly=0; const list=document.getElementById('historyList'); list.innerHTML="";
             const acts=[]; snap.forEach(d=>{ acts.push({id:d.id, ...d.data()}); });
             acts.sort((a,b)=>(b.createdAt?.seconds||0)-(a.createdAt?.seconds||0));
@@ -537,7 +662,7 @@
             if (totalWeekly >= goal) { 
                 progText.innerHTML = "🎉 HEDEFE ULAŞILDI! 🎉"; 
                 progText.style.color = "var(--success)"; 
-                if(claimBtn.classList.contains('hidden')) claimBtn.classList.remove('hidden'); // Hedef tutunca butonu göster
+                if(claimBtn.classList.contains('hidden')) claimBtn.classList.remove('hidden'); 
                 if(!window.confettiFired) { confetti(); window.confettiFired = true; } 
             } else { 
                 progText.innerHTML = `%<span id="progVal">${Math.min(100, Math.round((totalWeekly/goal)*100))}</span> Tamamlandı`; 
@@ -552,18 +677,21 @@
                 document.getElementById('stPoints').innerText = data.bilgePoints || 0; 
                 if(data.avatar) document.getElementById('userAvatar').innerText = data.avatar;
             }});
-        }, (error) => { if(error.code === 'permission-denied') Swal.fire("Hata", "Verilere erişim izni yok.", "error"); });
+        }, (error) => { 
+            // Kullanıcı çıkış yapıyorsa hatayı yut
+            if(!currentUser) return; 
+            if(error.code === 'permission-denied') Swal.fire("Hata", "Verilere erişim izni yok.", "error"); 
+        });
     }
+
     function updateStudentChart(val, goal){ const ctx = document.getElementById('weeklyChart').getContext('2d'); if(myChart) myChart.destroy(); myChart = new Chart(ctx, { type: 'doughnut', data: { labels: ['Yapılan', 'Kalan'], datasets: [{ data: [val, Math.max(0, goal-val)], backgroundColor: ['#009688', '#e2e8f0'], borderWidth: 0 }] }, options: { cutout: '80%', maintainAspectRatio: false, plugins: { legend: { display: false } } } }); }
     window.updateGoal = async () => { const val = parseInt(document.getElementById('weeklyGoalInput').value); if(currentUser && val) { await updateDoc(doc(db,"users",currentUser.uid), { weeklyGoal: val }); Swal.fire("Hedef Güncellendi", `Yeni haftalık hedefin: ${val} dk`, "success"); } };
     
-    // --- POINT SYSTEM UPDATE (GEÇMİŞE DÖNÜK) ---
-    // Normal Entry: 1 min = 1 point
+    // --- MANUAL ENTRY ---
     window.saveEntry = async () => { 
         const sub = document.getElementById('selectedSubject').value; const dur = parseInt(document.getElementById('entryDur').value);
         if(!sub || !dur) return Swal.fire("Eksik Bilgi", "Lütfen ders ve süre seçin.", "warning");
         
-        // DROP DOWN MANTIĞI (0=Bugün, 1=Dün, 2=2 Gün Önce)
         const offset = parseInt(document.getElementById('entryDate').value) || 0;
         const dt = new Date();
         dt.setDate(dt.getDate() - offset);
@@ -575,57 +703,234 @@
             Swal.fire("Harika!", `${dur} dakika eklendi ve ${dur} puan kazandın!`, "success"); confetti(); 
         } catch(e) { Swal.fire("Hata", e.message, "error"); } 
     };
-    
-    // Pomodoro Entry: 1 min = 1.5 points (Arena Bonus +0.5)
-    window.savePomo = async () => { 
-        window.resetTimer(); 
-        const sub = document.getElementById('pomoSubject').value; 
-        const dur = parseInt(document.getElementById('timerSet').value); 
-        if(!sub) return Swal.fire("Ders Seç", "Lütfen bir ders seç.", "warning"); 
-        
-        // ARENA BONUS CHECK
-        const isArenaActive = !document.getElementById('viewArena').classList.contains('hidden') || localStorage.getItem('arenaActive') === 'true';
-        const multiplier = isArenaActive ? 2.0 : 1.5; // Arena: 2.0, Normal: 1.5
-        const points = Math.ceil(dur * multiplier);
 
-        try { 
-            await addDoc(collection(db,"users",currentUser.uid,"sessions"), { subject: sub, duration: dur, createdAt: serverTimestamp(), dateStr: new Date().toLocaleDateString('tr-TR'), type: 'pomodoro' }); 
-            await updateDoc(doc(db,"users",currentUser.uid), { totalMinutes: increment(dur), bilgePoints: increment(points), lastStudyDate: serverTimestamp() }); 
-            if(isArenaActive) {
-                // Arena'dan çıkış yap
-                await updateDoc(doc(db, "arena", currentUser.uid), { isActive: false });
-                localStorage.removeItem('arenaActive');
+    // --- SEPARATED POMODORO LOGIC ---
+    window.updateTimerSet=()=>{ 
+        if(!isPomoRunning){
+            const val = parseInt(document.getElementById('timerSet').value);
+            document.getElementById('timerDisplay').innerText=`${val}:00`;
+        }
+    }; 
+    
+    window.startPomoTimer = () => {
+        if(isPomoRunning) return;
+        
+        const sub = document.getElementById('pomoSubject').value;
+        if(!sub) return Swal.fire("Ders Seç", "Lütfen bir ders seç.", "warning");
+
+        isPomoRunning = true;
+        pomoTotalDuration = parseInt(document.getElementById('timerSet').value) * 60;
+        pomoTimeLeft = pomoTotalDuration;
+        
+        document.getElementById('btnStartPomo').innerText = "⏳";
+        
+        pomoInterval = setInterval(() => {
+            pomoTimeLeft--;
+            const m = Math.floor(pomoTimeLeft / 60);
+            const s = pomoTimeLeft % 60;
+            document.getElementById('timerDisplay').innerText = `${m}:${s.toString().padStart(2,'0')}`;
+            
+            if(pomoTimeLeft <= 0) {
+                // Süre bitti, tam puan
+                clearInterval(pomoInterval);
+                finishPomo(true);
             }
-            Swal.fire("Tebrikler!", `${dur} dk çalışma + ${points} Puan kazandın!`, "success"); confetti(); 
-        } catch(e) { alert(e.message); } 
+        }, 1000);
     };
 
-    // --- ARENA LOGIC ---
-    function startArenaSession() {
+    window.requestStopPomo = () => {
+        if(!isPomoRunning) return;
+        
+        Swal.fire({
+            title: 'Sayacı durdurayım mı?',
+            text: "Durdurursan sadece şimdiye kadar çalıştığın sürenin puanını alırsın.",
+            icon: 'question',
+            showCancelButton: true,
+            confirmButtonColor: '#d33',
+            cancelButtonColor: '#3085d6',
+            confirmButtonText: 'Evet, Durdur',
+            cancelButtonText: 'Devam Et'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                clearInterval(pomoInterval);
+                finishPomo(false); // Erken bitirme
+            }
+        });
+    };
+
+    async function finishPomo(completed) {
+        const sub = document.getElementById('pomoSubject').value;
+        const spentSeconds = pomoTotalDuration - pomoTimeLeft;
+        const spentMinutes = Math.floor(spentSeconds / 60);
+
+        isPomoRunning = false;
+        document.getElementById('btnStartPomo').innerText = "BAŞLAT ▶";
+        
+        // Reset Display
+        const defaultVal = document.getElementById('timerSet').value;
+        document.getElementById('timerDisplay').innerText = `${defaultVal}:00`;
+
+        if(spentMinutes < 1) {
+            return Swal.fire("Çok Kısa", "1 dakikadan az çalıştın, kayıt oluşturulmadı.", "info");
+        }
+
+        const multiplier = 1.5;
+        const points = Math.ceil(spentMinutes * multiplier);
+
+        try {
+            await addDoc(collection(db,"users",currentUser.uid,"sessions"), { 
+                subject: sub, 
+                duration: spentMinutes, 
+                createdAt: serverTimestamp(), 
+                dateStr: new Date().toLocaleDateString('tr-TR'), 
+                type: 'pomodoro',
+                completed: completed
+            }); 
+            await updateDoc(doc(db,"users",currentUser.uid), { 
+                totalMinutes: increment(spentMinutes), 
+                bilgePoints: increment(points), 
+                lastStudyDate: serverTimestamp() 
+            }); 
+            
+            if(completed) {
+                Swal.fire("Tebrikler!", "Süreyi tamamladın!", "success");
+            } else {
+                Swal.fire("Kaydedildi", `${spentMinutes} dakika çalıştın.`, "success");
+            }
+            confetti();
+        } catch(e) {
+            console.error(e);
+        }
+    }
+
+    // --- SEPARATED ARENA LOGIC ---
+    window.startArenaSession = () => {
         if(!currentUser) return;
-        // Arena koleksiyonuna "Aktifim" diye işaret koy
+        
+        // Timer Başlat
+        isArenaRunning = true;
+        arenaTotalDuration = parseInt(document.getElementById('timerSet').value) * 60; // Varsayılanı buradan alalım
+        if(arenaTotalDuration === 0) arenaTotalDuration = 1800; // Default 30 dk
+        arenaTimeLeft = arenaTotalDuration;
+        
+        // UI Güncelle
+        document.getElementById('arenaStartBtn').classList.add('hidden');
+        document.getElementById('arenaControls').classList.remove('hidden');
+        document.getElementById('arenaControls').style.display = 'flex';
+
+        // Firebase'e arena durumunu yaz
         setDoc(doc(db, "arena", currentUser.uid), {
             name: currentUser.displayName,
-            subject: document.getElementById('pomoSubject').value || "Ders",
+            subject: document.getElementById('pomoSubject').value || "Genel Tekrar",
             startTime: serverTimestamp(),
-            duration: parseInt(document.getElementById('timerSet').value),
+            duration: Math.floor(arenaTotalDuration / 60),
             isActive: true,
             avatar: document.getElementById('userAvatar').innerText
         });
         localStorage.setItem('arenaActive', 'true');
+
+        arenaInterval = setInterval(() => {
+            arenaTimeLeft--;
+            const m = Math.floor(arenaTimeLeft / 60);
+            const s = arenaTimeLeft % 60;
+            const display = document.getElementById('arenaTimerDisplay');
+            if(display) display.innerText = `${m}:${s.toString().padStart(2,'0')}`;
+            
+            if(arenaTimeLeft <= 0) {
+                clearInterval(arenaInterval);
+                finishArena(true);
+            }
+        }, 1000);
+    };
+
+    window.boostArenaTime = () => {
+        if(!isArenaRunning) return;
         
-        // Sayacı Arena içinde başlat (Aynı fonksiyonu kullanır ama bağlamı farklı)
-        // Kullanıcıyı Pomo sekmesine değil, Arena içinde sayacı göstererek tutabiliriz
-        // Veya basitçe Pomo sekmesini açıp oradan devam ettiririz.
-        // Emriniz: "Bu bölüme Arttırmalı Sayaç yapalım"
+        arenaTimeLeft += 300; // 5 Dakika ekle
+        arenaTotalDuration += 300; // Toplam süreyi de artır (Hesaplama için)
         
-        startTimer(); // Global timer'ı başlat
-        document.getElementById('arenaStartBtn').innerText = "SAVAŞ BAŞLADI (SAYAÇ AKTİF)";
-        document.getElementById('arenaStartBtn').disabled = true;
+        Swal.fire({
+            title: '+5 Dakika Eklendi!',
+            text: 'Mücadeleye devam et, harikasın!',
+            icon: 'success',
+            timer: 1500,
+            showConfirmButton: false
+        });
+        
+        // Firebase güncelle (Opsiyonel, diğerleri süreni görsün istersen)
+        updateDoc(doc(db, "arena", currentUser.uid), {
+            duration: Math.floor(arenaTotalDuration / 60)
+        });
+    };
+
+    window.requestStopArena = () => {
+        if(!isArenaRunning) return;
+
+        Swal.fire({
+            title: 'Arenadan çıkıyor musun?',
+            text: "Çıkarsan şu ana kadar kazandığın puanları alacaksın.",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#d33',
+            cancelButtonColor: '#3085d6',
+            confirmButtonText: 'Evet, Çık',
+            cancelButtonText: 'Savaşa Devam'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                clearInterval(arenaInterval);
+                finishArena(false);
+            }
+        });
+    };
+
+    async function finishArena(completed) {
+        const spentSeconds = arenaTotalDuration - arenaTimeLeft;
+        const spentMinutes = Math.floor(spentSeconds / 60);
+        const sub = "Arena Yarışması";
+
+        // Temizlik
+        isArenaRunning = false;
+        clearInterval(arenaInterval);
+        document.getElementById('arenaStartBtn').classList.remove('hidden');
+        document.getElementById('arenaControls').classList.add('hidden');
+        document.getElementById('arenaTimerDisplay').innerText = "00:00";
+        localStorage.removeItem('arenaActive');
+
+        // Firebase Temizliği
+        try {
+            await updateDoc(doc(db, "arena", currentUser.uid), { isActive: false });
+        } catch(e) { console.log("Arena reset", e); }
+
+        if(spentMinutes < 1) return Swal.fire("Çok Kısa", "Arenada 1 dakikadan az kaldın.", "info");
+
+        // Arena Çarpanı: 2.0
+        const multiplier = 2.0;
+        const points = Math.ceil(spentMinutes * multiplier);
+
+        try {
+            await addDoc(collection(db,"users",currentUser.uid,"sessions"), { 
+                subject: sub, 
+                duration: spentMinutes, 
+                createdAt: serverTimestamp(), 
+                dateStr: new Date().toLocaleDateString('tr-TR'), 
+                type: 'arena',
+                completed: completed
+            }); 
+            await updateDoc(doc(db,"users",currentUser.uid), { 
+                totalMinutes: increment(spentMinutes), 
+                bilgePoints: increment(points), 
+                lastStudyDate: serverTimestamp() 
+            }); 
+            
+            Swal.fire("Arena Bitti", `${spentMinutes} dakika dayandın ve ${points} Puan kazandın!`, "success");
+            confetti();
+        } catch(e) {
+            console.error(e);
+        }
     }
 
     function listenArena() {
-        if(activeArenaListener) activeArenaListener(); // Öncekini temizle
+        if(activeArenaListener) activeArenaListener(); 
         const q = query(collection(db, "arena"), where("isActive", "==", true));
         activeArenaListener = onSnapshot(q, (snap) => {
             const list = document.getElementById('arenaList'); list.innerHTML = "";
@@ -633,18 +938,15 @@
 
             snap.forEach(d => {
                 const data = d.data();
-                if(d.id === currentUser.uid) return; // Kendini gösterme
+                if(d.id === currentUser.uid) return; 
                 const el = document.createElement('div'); el.className = "arena-item";
-                el.innerHTML = `<div class="arena-user"><span style="font-size:1.5rem;">${data.avatar || '👤'}</span><div><div>${data.name.split(' ')[0]}</div><div style="font-size:0.75rem; color:var(--text-sub);">${data.subject} Çalışıyor</div></div></div><div style="text-align:right;"><div class="arena-status">AKTİF</div><button class="btn-boost" onclick="boostDuration()">+5 Dk Artır</button></div>`;
+                el.innerHTML = `<div class="arena-user"><span style="font-size:1.5rem;">${data.avatar || '👤'}</span><div><div>${data.name.split(' ')[0]}</div><div style="font-size:0.75rem; color:var(--text-sub);">${data.subject}</div></div></div><div style="text-align:right;"><div class="arena-status">AKTİF</div><small>${data.duration} dk hedef</small></div>`;
                 list.appendChild(el);
             });
+        }, (error) => {
+            if(!currentUser) return; // Silent fail on logout
+            console.log("Arena listener error", error);
         });
-    }
-
-    window.boostDuration = () => {
-        if(!isTimerRunning) return Swal.fire("Sayaç Kapalı", "Önce bir çalışma başlatmalısın!", "warning");
-        timeLeft += 5 * 60; // 5 dk ekle
-        Swal.fire("Meydan Okuma Kabul!", "Süreni 5 dakika artırdın. Harikasın!", "success");
     }
 
     window.buyItem = async (itemName, cost) => { const currentPoints = parseInt(document.getElementById('stPoints').innerText); if(currentPoints < cost) return Swal.fire("Yetersiz Puan", "Daha çok çalışmalısın!", "error"); if(confirm(`${itemName} almak için ${cost} puan harcanacak. Onaylıyor musun?`)){ try { await updateDoc(doc(db,"users",currentUser.uid), { bilgePoints: increment(-cost) }); Swal.fire("Hayırlı Olsun!", `${itemName} çantana eklendi.`, "success"); confetti(); } catch(e) { alert(e.message); } } };
@@ -653,7 +955,6 @@
         const msg = document.getElementById('futureMsg').value; if(!msg) return; 
         try { 
             await addDoc(collection(db,"users",currentUser.uid,"timecapsule"), { content: msg, createdAt: serverTimestamp() }); 
-            // Zaman Kapsülü Bonusu: +50 Puan
             await updateDoc(doc(db,"users",currentUser.uid), { bilgePoints: increment(50) });
             Swal.fire("Kapsül Mühürlendi", "Mektubun geleceğe yollandı. +50 Puan kazandın!", "success"); 
             document.getElementById('futureMsg').value = ""; 
@@ -662,7 +963,9 @@
 
     // --- ADMIN LOGIC ---
     function initAdmin(){
-        onSnapshot(collection(db,"users"), (snap)=>{
+        if(unsubAdminUsers) unsubAdminUsers();
+        
+        unsubAdminUsers = onSnapshot(collection(db,"users"), (snap)=>{
             globalUserList=[]; const select = document.getElementById('msgStudentSelect'); select.innerHTML = '<option value="">Öğrenci Seç...</option>';
             snap.forEach(d=>{ 
                 const dt = d.data();
@@ -672,8 +975,12 @@
                 }
             });
             globalUserList.sort((a,b) => (b.totalMinutes||0) - (a.totalMinutes||0)); renderAdminDashboard();
-        }, (error) => { if(error.code === 'permission-denied') Swal.fire("Admin Hatası", "Kullanıcı listesi alınamadı (İzin hatası).", "error"); });
+        }, (error) => { 
+            if(!currentUser) return;
+            if(error.code === 'permission-denied') Swal.fire("Admin Hatası", "Kullanıcı listesi alınamadı (İzin hatası).", "error"); 
+        });
     }
+
     function renderAdminDashboard(){
         let risk=0, stars=0; const now = new Date(); const table = document.getElementById('studentTableBody'); table.innerHTML = "";
         globalUserList.forEach((u,i) => {
@@ -706,7 +1013,6 @@
     function renderAdminChart(users) { const c=document.getElementById('chartInner');const mw=Math.max(users.length*60,400);c.style.width=mw+"px";const ctx=document.getElementById('adminLeaderboardChart').getContext('2d');const l=users.map(u=>(u.displayName||"Öğrenci").split(' ')[0]);const d=users.map(u=>u.totalMinutes);if(adminChart)adminChart.destroy();adminChart=new Chart(ctx,{type:'bar',data:{labels:l,datasets:[{label:'Toplam Dakika',data:d,backgroundColor:'#009688',borderRadius:8,barThickness:40}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{y:{beginAtZero:true,grid:{display:false}},x:{grid:{display:false}}}}})}
     window.openAdminDetail = async (uid, name, total, points) => { document.getElementById('modalAdminDetail').classList.remove('hidden'); document.getElementById('detailStudentName').innerText = name; document.getElementById('statTotalMin').innerText = total; document.getElementById('statAvg').innerText = points; const s = await getDocs(query(collection(db,"users",uid,"sessions"))); let days={}; for(let i=0; i<7; i++){ const d=new Date(); d.setDate(d.getDate()-i); days[d.toLocaleDateString('tr-TR')]=0; } s.forEach(doc=>{ const dt=doc.data(); if(days[dt.dateStr]!==undefined) days[dt.dateStr]+=dt.duration; }); const lbl=Object.keys(days).reverse(); const da=Object.values(days).reverse(); const ctx=document.getElementById('studentDetailChart').getContext('2d'); if(detailChart) detailChart.destroy(); detailChart=new Chart(ctx,{type:'line',data:{labels:lbl,datasets:[{label:'Günlük',data:da,borderColor:'#ec4899',tension:0.4,fill:true,backgroundColor:'rgba(236,72,153,0.1)'}]},options:{responsive:true,maintainAspectRatio:false}});}; window.closeAdminDetail=()=>document.getElementById('modalAdminDetail').classList.add('hidden');
 
-    // --- NEW: BULK MESSAGE SELECT ---
     window.openBulkSelectModal = (type) => {
         bulkType = type;
         const list = document.getElementById('bulkUserList');
@@ -765,26 +1071,87 @@
 
     window.sendAdminMessage = async () => { const uid = document.getElementById('msgStudentSelect').value; const msg = document.getElementById('msgContent').value; const aud = document.querySelector('input[name="targetAudience"]:checked').value; if(!uid || !msg) return Swal.fire("Eksik", "Bilgileri tamamlayın.", "warning"); await addDoc(collection(db,"messages"),{ toUid:uid, content:msg, read:false, type:'admin', target:aud, createdAt:serverTimestamp() }); Swal.fire("Gönderildi", "", "success"); document.getElementById('msgContent').value=""; };
     window.fetchRandomMessage = async (target, type) => { const q = query(collection(db, "message_library"), where("target", "==", target), where("type", "==", type)); const s = await getDocs(q); const m = []; s.forEach(d => m.push(d.data().text)); if(m.length>0) document.getElementById('msgContent').value = m[Math.floor(Math.random()*m.length)]; else document.getElementById('msgContent').value = "Mesaj bulunamadı."; };
-    function listenAllMessagesForAdmin() { onSnapshot(query(collection(db, "messages")), (s) => { const l = document.getElementById('adminMsgHistoryList'); l.innerHTML = ""; const m = []; s.forEach(d => m.push({ id: d.id, ...d.data() })); m.sort((a,b) => (b.createdAt?.seconds || 0) - (a.createdAt?.seconds || 0)); m.forEach(msg => { const u = globalUserList.find(x => x.id === msg.toUid); const n = u ? u.displayName : "Bilinmeyen"; l.innerHTML += `<div class="msg-card"><button class="btn-delete-msg" onclick="deleteMessage('${msg.id}')">🗑️</button><div style="font-weight:bold;">${n} <span style="font-weight:normal; color:#aaa;">(${msg.createdAt?(msg.createdAt.toDate?msg.createdAt.toDate():new Date(msg.createdAt)).toLocaleDateString('tr-TR'):''})</span></div><div>${msg.content}</div><div style="font-size:0.7rem; color:#666; margin-top:5px;">Hedef: ${msg.target==='parent'?'Veli':'Öğrenci'} | ${msg.read?'Okundu':'İletildi'}</div></div>`; }); }, (error) => { if(error.code==='permission-denied') console.error("Msg Listener Error: Permission Denied"); }); }
+    
+    function listenAllMessagesForAdmin() { 
+        if(unsubAdminMessages) unsubAdminMessages();
+
+        unsubAdminMessages = onSnapshot(query(collection(db, "messages")), (s) => { 
+            const l = document.getElementById('adminMsgHistoryList'); l.innerHTML = ""; const m = []; s.forEach(d => m.push({ id: d.id, ...d.data() })); m.sort((a,b) => (b.createdAt?.seconds || 0) - (a.createdAt?.seconds || 0)); m.forEach(msg => { 
+                const u = globalUserList.find(x => x.id === msg.toUid); 
+                const n = u ? u.displayName : "Bilinmeyen"; 
+                // BADGE LOGIC
+                const badge = msg.type === 'auto' ? '<span class="msg-badge-auto">🦉 Otopilot</span>' : '<span class="msg-badge-admin">👑 Hakan</span>';
+                
+                l.innerHTML += `<div class="msg-card"><button class="btn-delete-msg" onclick="deleteMessage('${msg.id}')">🗑️</button><div style="font-weight:bold;">${badge} ${n} <span style="font-weight:normal; color:#aaa;">(${msg.createdAt?(msg.createdAt.toDate?msg.createdAt.toDate():new Date(msg.createdAt)).toLocaleDateString('tr-TR'):''})</span></div><div>${msg.content}</div><div style="font-size:0.7rem; color:#666; margin-top:5px;">Hedef: ${msg.target==='parent'?'Veli':'Öğrenci'} | ${msg.read?'Okundu':'İletildi'}</div></div>`; 
+            }); 
+        }, (error) => { 
+            if(!currentUser) return;
+            if(error.code==='permission-denied') console.error("Msg Listener Error: Permission Denied"); 
+        }); 
+    }
+    
     window.deleteMessage = async (id) => { if(confirm("Silinsin mi?")) await deleteDoc(doc(db,"messages",id)); }; window.deleteAllMessages = async () => { if(confirm("TÜM mesajlar silinecek?")) { const s = await getDocs(collection(db,"messages")); s.forEach(d => deleteDoc(doc(db,"messages",d.id))); } };
-    function listenMessages(uid){ onSnapshot(query(collection(db, "messages"), where("toUid", "==", uid)), s=>{ let ur=0; const list=document.getElementById('msgList'); list.innerHTML=""; const msgs = []; s.forEach(d => msgs.push({id:d.id, ...d.data()})); msgs.sort((a,b)=>(b.createdAt?.seconds||0)-(a.createdAt?.seconds||0)); if (msgs.length === 0) list.innerHTML = "<div style='text-align:center; padding:20px; color:#aaa;'>Posta kutun boş.</div>"; msgs.forEach(m => { if(!m.read) ur++; const st = m.read ? '' : 'unread'; const tg = m.target==='parent'?'type-parent':'type-student'; list.innerHTML += `<div class="msg-card ${st} ${tg}" onclick="readMsg('${m.id}')"><div style="font-weight:bold; color:var(--primary);">${m.type==='auto'?'🦉 Bilge Koç':'👨‍🏫 Yönetici'} ${!m.read?'<span style="color:red; font-size:0.7rem;">YENİ</span>':''}</div><div>${m.content}</div></div>`; }); const bd = document.getElementById('coachBadge'); const av = document.getElementById('wiseAvatar'); bd.innerText = ur; if (ur > 0) { bd.classList.remove('hidden'); av.classList.add('excited'); av.classList.remove('idle'); document.getElementById('coachBubble').classList.add('show'); setTimeout(()=>document.getElementById('coachBubble').classList.remove('show'),5000); } else { bd.classList.add('hidden'); av.classList.remove('excited'); av.classList.add('idle'); } }, (error) => { if(error.code === 'permission-denied') console.error("Öğrenci mesajları yüklenemedi."); }); }
+    
+    function listenMessages(uid){ 
+        if(unsubStudentMessages) unsubStudentMessages();
+
+        const q = query(collection(db, "messages"), where("toUid", "==", uid));
+        unsubStudentMessages = onSnapshot(q, s=>{ 
+            let ur=0; const list=document.getElementById('msgList'); list.innerHTML=""; const msgs = []; s.forEach(d => msgs.push({id:d.id, ...d.data()})); msgs.sort((a,b)=>(b.createdAt?.seconds||0)-(a.createdAt?.seconds||0)); if (msgs.length === 0) list.innerHTML = "<div style='text-align:center; padding:20px; color:#aaa;'>Posta kutun boş.</div>"; msgs.forEach(m => { if(!m.read) ur++; const st = m.read ? '' : 'unread'; const tg = m.target==='parent'?'type-parent':'type-student'; 
+            
+            // Student View Badge
+            const senderName = m.type === 'auto' ? '🦉 Bilge Baykuş' : '👨‍🏫 Hakan Hoca';
+            
+            list.innerHTML += `<div class="msg-card ${st} ${tg}" onclick="readMsg('${m.id}')"><div style="font-weight:bold; color:var(--primary);">${senderName} ${!m.read?'<span style="color:red; font-size:0.7rem;">YENİ</span>':''}</div><div>${m.content}</div></div>`; }); const bd = document.getElementById('coachBadge'); const av = document.getElementById('wiseAvatar'); bd.innerText = ur; if (ur > 0) { bd.classList.remove('hidden'); av.classList.add('excited'); av.classList.remove('idle'); document.getElementById('coachBubble').classList.add('show'); setTimeout(()=>document.getElementById('coachBubble').classList.remove('show'),5000); } else { bd.classList.add('hidden'); av.classList.remove('excited'); av.classList.add('idle'); } 
+        }, (error) => { 
+            if(!currentUser) return;
+            if(error.code === 'permission-denied') console.error("Öğrenci mesajları yüklenemedi."); 
+        }); 
+    }
+
     window.readMsg = async(id) => { await updateDoc(doc(db,"messages",id),{read:true}); }; window.openMsgModal = () => document.getElementById('modalMsg').classList.remove('hidden');
     window.openProfileModal=()=>{document.getElementById('editProfileName').value=currentUser.displayName||"";document.getElementById('editProfileEmail').value=currentUser.email||"";document.getElementById('modalProfile').classList.remove('hidden')};window.closeProfileModal=()=>document.getElementById('modalProfile').classList.add('hidden');window.saveUserProfile=async()=>{const n=document.getElementById('editProfileName').value.trim();if(!n){alert("İsim boş olamaz.");return}try{await updateProfile(currentUser,{displayName:n});await updateDoc(doc(db,"users",currentUser.uid),{displayName:n});document.getElementById('studentNameDisplay').innerText=n.split(' ')[0];alert("Profil güncellendi ✅");closeProfileModal()}catch(e){alert("Hata: "+e.message)}};window.sendPasswordReset=async()=>{if(confirm(currentUser.email+" adresine şifre sıfırlama e-postası gönderilsin mi?")){try{await sendPasswordResetEmail(auth,currentUser.email);alert("E-posta gönderildi!")}catch(e){alert("Hata: "+e.message)}}};
-    window.toggleAuth=()=>{ isLogin=!isLogin; document.getElementById('authBtn').innerText=isLogin?"GİRİŞ YAP":"KAYIT OL"; document.getElementById('regName').classList.toggle('hidden'); document.getElementById('authTitle').innerText=isLogin?"Giriş Yap":"Kayıt Ol"; }; window.handleLogin=async()=>{ const e=document.getElementById('email').value, p=document.getElementById('password').value; try{ if(isLogin) await signInWithEmailAndPassword(auth,e,p); else { const c=await createUserWithEmailAndPassword(auth,e,p); await updateProfile(c.user,{displayName:document.getElementById('regName').value}); } } catch(e){ document.getElementById('authError').style.display='block'; document.getElementById('authError').innerText=e.message; } }; window.handleLogout=()=>signOut(auth); 
+    window.toggleAuth=()=>{ isLogin=!isLogin; document.getElementById('authBtn').innerText=isLogin?"GİRİŞ YAP":"KAYIT OL"; document.getElementById('regName').classList.toggle('hidden'); document.getElementById('authTitle').innerText=isLogin?"Giriş Yap":"Kayıt Ol"; }; window.handleLogin=async()=>{ const e=document.getElementById('email').value, p=document.getElementById('password').value; try{ if(isLogin) await signInWithEmailAndPassword(auth,e,p); else { const c=await createUserWithEmailAndPassword(auth,e,p); await updateProfile(c.user,{displayName:document.getElementById('regName').value}); } } catch(e){ document.getElementById('authError').style.display='block'; document.getElementById('authError').innerText=e.message; } }; 
     
-    // --- TAB SWITCHER (FIXED) ---
+    // --- UPDATED LOGOUT HANDLER (PREVENTS PERMISSION ERROR) ---
+    window.handleLogout = () => {
+        // 1. Tüm dinleyicileri kapat
+        if(unsubStudentData) unsubStudentData();
+        if(unsubStudentMessages) unsubStudentMessages();
+        if(unsubAdminUsers) unsubAdminUsers();
+        if(unsubAdminMessages) unsubAdminMessages();
+        if(activeArenaListener) activeArenaListener();
+
+        // 2. Temizlik
+        currentUser = null;
+        isPomoRunning = false;
+        if(pomoInterval) clearInterval(pomoInterval);
+        if(arenaInterval) clearInterval(arenaInterval);
+
+        // 3. Çıkış Yap
+        signOut(auth).then(() => {
+            console.log("Başarıyla çıkış yapıldı.");
+        }).catch((e) => {
+            console.error("Çıkış hatası:", e);
+        });
+    };
+    
+    // --- TAB SWITCHER ---
     window.switchTab=(t, el)=>{ 
         // Öğrenci Paneli Sekmeleri
-        if(el) { document.querySelectorAll('.tabs .tab').forEach(e=>e.classList.remove('active')); el.classList.add('active'); }
+        if(el) { 
+            // Hem yeni mobile nav hem de (varsa) eski nav butonlarını temizle
+            document.querySelectorAll('.mobile-bottom-nav .nav-item').forEach(e=>e.classList.remove('active')); 
+            el.classList.add('active'); 
+        }
         ['viewHome','viewPomo','viewStore','viewFuture','viewHistory', 'viewArena'].forEach(x=>document.getElementById(x).classList.add('hidden')); 
         document.getElementById('view'+t.charAt(0).toUpperCase()+t.slice(1)).classList.remove('hidden');
         
-        // Arena dinleyicisini sadece arena sekmesi açıkken çalıştır
         if(t === 'arena') listenArena();
-        else if(activeArenaListener) activeArenaListener(); // Kapat
+        else if(activeArenaListener) activeArenaListener(); 
     };
     window.switchAdminTab = (tab, el) => {
-        // Yönetici Paneli Sekmeleri
+        // Yönetici Paneli Sekmeleri (Eski sistem devam)
         if(el) { 
              document.getElementById('tabAdminDash').classList.remove('active'); 
              document.getElementById('tabAdminMsg').classList.remove('active'); 
@@ -799,25 +1166,17 @@
         else if(tab === 'history') document.getElementById('adminPanelHistory').classList.remove('hidden');
     };
 
-    window.updateTimerSet=()=>{ if(!timerInterval) timeLeft=parseInt(document.getElementById('timerSet').value)*60; }; 
-    window.startTimer=()=>{ 
-        if(isTimerRunning) return; isTimerRunning = true;
-        timeLeft=parseInt(document.getElementById('timerSet').value)*60; document.getElementById('btnStart').innerText="⏳"; 
-        timerInterval=setInterval(()=>{ timeLeft--; const m=Math.floor(timeLeft/60), s=timeLeft%60; document.getElementById('timerDisplay').innerText=`${m}:${s.toString().padStart(2,'0')}`; 
-        // Arena Timer Update
-        if(document.getElementById('arenaTimerDisplay')) document.getElementById('arenaTimerDisplay').innerText=`${m}:${s.toString().padStart(2,'0')}`;
-        if(timeLeft<=0){ clearInterval(timerInterval); Swal.fire("Bitti!","Süre doldu, kaydet.","success"); window.savePomo(); } },1000); 
-    }; 
-    window.resetTimer=()=>{ clearInterval(timerInterval); timerInterval=null; isTimerRunning=false; document.getElementById('btnStart').innerText="BAŞLAT ▶"; document.getElementById('timerDisplay').innerText="30:00"; if(document.getElementById('arenaTimerDisplay')) document.getElementById('arenaTimerDisplay').innerText="00:00"; };
     function renderChips(){ const c1=document.getElementById('chipsManual'), c2=document.getElementById('chipsPomo'); c1.innerHTML=""; c2.innerHTML=""; SUBJECTS.forEach(s=>{ const d=document.createElement('div'); d.className='chip'; d.innerText=s; d.onclick=function(){ c1.querySelectorAll('.chip').forEach(x=>x.classList.remove('active')); this.classList.add('active'); document.getElementById('selectedSubject').value=s; }; c1.appendChild(d); const d2=d.cloneNode(true); d2.onclick=function(){ c2.querySelectorAll('.chip').forEach(x=>x.classList.remove('active')); this.classList.add('active'); document.getElementById('pomoSubject').value=s; }; c2.appendChild(d2); }); document.getElementById('selectedSubject').value=SUBJECTS[0]; document.getElementById('pomoSubject').value=SUBJECTS[0]; }
-    window.selectMood=(e,v)=>{document.querySelectorAll('.mood-btn').forEach(b=>b.classList.remove('selected'));e.classList.add('selected');document.getElementById('selectedMood').value=v};window.adjustTime=(v)=>{const e=document.getElementById('duration');e.value=Math.max(0,(parseInt(e.value)||0)+v)};
     window.exportToExcel = () => { if(!globalUserList || globalUserList.length === 0) return Swal.fire("Veri Yok", "Listelenecek öğrenci bulunamadı.", "warning"); let csvContent = "data:text/csv;charset=utf-8,\uFEFF"; csvContent += "Sıra,Öğrenci Adı,E-Posta,Durum,Bilge Puan,Toplam Süre (dk),Son Çalışma Tarihi\n"; const now = new Date(); globalUserList.forEach((u, index) => { const last = u.lastStudyDate ? (u.lastStudyDate.toDate?u.lastStudyDate.toDate():new Date(u.lastStudyDate)) : null; let status = "İyi"; if(!last || (now-last)/(1000*60*60*24) > 3) status = "Riskli"; else if((u.totalMinutes||0) > 1000) status = "Lider"; const dateStr = last ? last.toLocaleDateString('tr-TR') : "Giriş Yok"; const name = u.displayName || "İsimsiz"; const email = u.email || "-"; csvContent += `${index+1},"${name}","${email}",${status},${u.bilgePoints||0},${u.totalMinutes||0},"${dateStr}"\n`; }); const encodedUri = encodeURI(csvContent); const link = document.createElement("a"); link.setAttribute("href", encodedUri); link.setAttribute("download", "ogrenci_listesi_" + new Date().toLocaleDateString('tr-TR') + ".csv"); document.body.appendChild(link); link.click(); document.body.removeChild(link); };
 
-    // Exports
-    window.switchAdminTab=window.switchAdminTab; window.triggerBulkMessage=window.triggerBulkMessage; window.sendAdminMessage=window.sendAdminMessage; window.fetchRandomMessage=window.fetchRandomMessage; window.deleteMessage=window.deleteMessage; window.deleteAllMessages=window.deleteAllMessages; window.readMsg=window.readMsg; window.openMsgModal=window.openMsgModal; window.saveEntry=window.saveEntry; window.buyItem=window.buyItem; window.saveFuture=window.saveFuture; window.savePomo=window.savePomo; window.startTimer=window.startTimer; window.resetTimer=window.resetTimer; window.updateTimerSet=window.updateTimerSet; window.handleLogin=window.handleLogin; window.toggleAuth=window.toggleAuth; window.handleLogout=window.handleLogout; window.switchTab=window.switchTab; window.openAdminDetail=window.openAdminDetail; window.closeAdminDetail=window.closeAdminDetail;
+    // Cleaned Exports
+    window.switchAdminTab=window.switchAdminTab; window.sendAdminMessage=window.sendAdminMessage; window.fetchRandomMessage=window.fetchRandomMessage; window.deleteMessage=window.deleteMessage; window.deleteAllMessages=window.deleteAllMessages; window.readMsg=window.readMsg; window.openMsgModal=window.openMsgModal; window.saveEntry=window.saveEntry; window.buyItem=window.buyItem; window.saveFuture=window.saveFuture; window.handleLogin=window.handleLogin; window.toggleAuth=window.toggleAuth; window.handleLogout=window.handleLogout; window.switchTab=window.switchTab; window.openAdminDetail=window.openAdminDetail; window.closeAdminDetail=window.closeAdminDetail;
     window.openProfileModal=window.openProfileModal; window.closeProfileModal=window.closeProfileModal; window.saveUserProfile=window.saveUserProfile; window.sendPasswordReset=window.sendPasswordReset;
     window.updateGoal=window.updateGoal; window.openBulkSelectModal = window.openBulkSelectModal; window.closeBulkSelectModal = window.closeBulkSelectModal; window.toggleSelectAll = window.toggleSelectAll; window.confirmBulkSend = window.confirmBulkSend; window.buyAvatar = window.buyAvatar; window.exportToExcel = window.exportToExcel; window.claimWeeklyBonus = window.claimWeeklyBonus;
-    window.startArenaSession = startArenaSession; window.boostDuration = window.boostDuration;
+    
+    // NEW & UPDATED EXPORTS
+    window.startPomoTimer = window.startPomoTimer; window.requestStopPomo = window.requestStopPomo; window.updateTimerSet = window.updateTimerSet;
+    window.startArenaSession = window.startArenaSession; window.boostArenaTime = window.boostArenaTime; window.requestStopArena = window.requestStopArena;
 </script>
 </body>
 </html>
