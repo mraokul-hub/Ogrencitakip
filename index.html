@@ -3,458 +3,821 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Öğrenci Takip Sistemi</title>
+    <title>Bilge Takip Sistemi v8.0 (Arena Update)</title>
     
     <link rel="icon" href="Designer (1).jpg" type="image/jpeg">
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <style>
         :root {
-            --primary: #6366f1; --primary-dark: #4338ca; --secondary: #ec4899;
+            --primary: #009688; --primary-dark: #004d40; --secondary: #ec4899;
             --success: #10b981; --warning: #f59e0b; --danger: #ef4444;
-            --bg-gradient: linear-gradient(135deg, #e0e7ff 0%, #f3e8ff 100%);
-            --glass-bg: rgba(255, 255, 255, 0.9);
-            --glass-border: rgba(255, 255, 255, 0.6);
-            --text-main: #1e293b; --text-sub: #64748b; --radius: 24px;
-            --shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.01);
+            --bg-gradient: linear-gradient(135deg, #e0f2f1 0%, #f0fdf4 100%);
+            --glass-bg: rgba(255, 255, 255, 0.95);
+            --glass-border: rgba(178, 223, 219, 0.8);
+            --text-main: #0f172a; --text-sub: #475569; --radius: 24px;
+            --shadow: 0 20px 25px -5px rgba(0, 150, 136, 0.05);
         }
-
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-        body { font-family: 'Outfit', sans-serif; background: var(--bg-gradient); margin: 0; padding: 20px 15px; min-height: 100vh; color: var(--text-main); display: flex; justify-content: center; }
-        
-        .container { width: 100%; max-width: 460px; padding-bottom: 90px; }
-        .container.admin-mode { max-width: 1000px; } 
+        body { font-family: 'Outfit', sans-serif; background: var(--bg-gradient); margin: 0; padding: 15px; min-height: 100vh; color: var(--text-main); display: flex; justify-content: center; }
+        .container { width: 100%; max-width: 480px; padding-bottom: 120px; transition: max-width 0.3s ease; }
+        .container.admin-mode { max-width: 1000px; }
 
-        .card {
-            background: var(--glass-bg); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
-            border: 1px solid var(--glass-border); border-radius: var(--radius); box-shadow: var(--shadow);
-            padding: 24px; margin-bottom: 24px; transition: transform 0.2s;
-        }
-        
+        .card { background: var(--glass-bg); backdrop-filter: blur(12px); border: 1px solid var(--glass-border); border-radius: var(--radius); box-shadow: var(--shadow); padding: 24px; margin-bottom: 24px; position: relative; transition: transform 0.2s; }
         h2, h3 { margin: 0 0 10px 0; color: var(--primary-dark); letter-spacing: -0.5px; }
         h4 { margin: 0 0 15px 0; font-weight: 800; color: var(--text-sub); font-size: 0.8rem; text-transform: uppercase; letter-spacing: 1.5px; border-bottom: 2px solid #f1f5f9; padding-bottom: 10px; }
-
-        input, select, textarea { width: 100%; padding: 16px; margin-bottom: 12px; border: 2px solid transparent; border-radius: 16px; font-size: 1rem; background: #f1f5f9; color: var(--text-main); transition: 0.3s; font-family: inherit; font-weight: 500; }
+        
+        input, select, textarea { width: 100%; padding: 15px; margin-bottom: 12px; border: 2px solid transparent; border-radius: 16px; font-size: 1rem; background: #f1f9f9; color: var(--text-main); transition: 0.3s; font-family: inherit; font-weight: 600; }
         input:focus, select:focus, textarea:focus { border-color: var(--primary); background: #fff; outline: none; }
-        
-        button { width: 100%; padding: 16px; border: none; border-radius: 16px; font-size: 1rem; font-weight: 700; cursor: pointer; transition: 0.2s; font-family: inherit; }
+        button { width: 100%; padding: 15px; border: none; border-radius: 16px; font-size: 1rem; font-weight: 700; cursor: pointer; transition: 0.2s; font-family: inherit; }
         button:active { transform: scale(0.96); }
-        .btn-primary { background: linear-gradient(135deg, var(--primary), var(--secondary)); color: white; box-shadow: 0 10px 20px -5px rgba(99, 102, 241, 0.4); }
-        .btn-logout-distinct { background: #fee2e2; color: var(--danger); padding: 8px 16px; border-radius: 12px; font-weight: 700; cursor: pointer; display: flex; align-items: center; gap: 6px; font-size: 0.85rem; width: auto; border: 1px solid #fca5a5; }
-        .btn-profile-settings { background: #f1f5f9; width: 36px; height: 36px; border-radius: 10px; display: inline-flex; align-items: center; justify-content: center; margin-left: 8px; border:none; color:var(--text-sub); }
+        .btn-primary { background: linear-gradient(135deg, var(--primary), #26a69a); color: white; box-shadow: 0 10px 20px -5px rgba(0, 150, 136, 0.4); }
+        .btn-logout { background: #fee2e2; color: var(--danger); padding: 8px 16px; border-radius: 12px; font-weight: 700; font-size: 0.85rem; width: auto; border: 1px solid #fca5a5; display:inline-block;}
+        .btn-logout-distinct { background: rgba(255,255,255,0.2); color: white; padding: 8px 16px; border-radius: 12px; font-weight: 700; cursor: pointer; display: flex; align-items: center; gap: 6px; font-size: 0.85rem; width: auto; border: 1px solid rgba(255,255,255,0.3); backdrop-filter: blur(4px); }
+        .btn-profile-settings { background: #f1f9f9; width: 36px; height: 36px; border-radius: 10px; display: inline-flex; align-items: center; justify-content: center; margin-left: 8px; border:none; color:var(--text-sub); cursor: pointer; }
+        .btn-profile-settings:hover { background: #e0f2f1; color:var(--primary); }
 
-        .fade-in { animation: fadeIn 0.5s cubic-bezier(0.4, 0, 0.2, 1); }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
+        .tabs { display: flex; gap: 10px; overflow-x: auto; padding: 5px; margin-bottom: 20px; -webkit-overflow-scrolling: touch; background: rgba(255,255,255,0.5); border-radius: 20px; }
+        .tabs::-webkit-scrollbar { display: none; }
+        .tab { flex: 0 0 auto; padding: 10px 20px; cursor: pointer; border-radius: 15px; font-weight: 600; color: var(--text-sub); transition: 0.3s; font-size: 0.9rem; border: 1px solid transparent; }
+        .tab.active { background: white; color: var(--primary); box-shadow: 0 4px 10px rgba(0,0,0,0.05); border-color: #b2dfdb; }
 
-        /* Tabs & Chips */
-        .tabs { display: flex; background: #e0e7ff; padding: 5px; border-radius: 18px; margin-bottom: 24px; }
-        .tab { flex: 1; text-align: center; padding: 12px; cursor: pointer; border-radius: 14px; font-weight: 600; color: var(--text-sub); transition: 0.3s; }
-        .tab.active { background: white; color: var(--primary); box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); }
         .chips { display: flex; gap: 8px; flex-wrap: wrap; justify-content: center; margin-bottom: 20px; }
-        .chip { background: white; padding: 10px 20px; border-radius: 30px; font-size: 0.9rem; font-weight: 600; cursor: pointer; border: 1px solid #e2e8f0; color: var(--text-sub); }
-        .chip.active { background: var(--primary); color: white; border-color: var(--primary); }
-        .chip-edit { background: #fffbeb; color: var(--warning); border-color: #fcd34d; }
-
-        /* Timer & History */
-        .timer-display { font-size: 4.5rem; font-weight: 800; text-align: center; background: linear-gradient(to right, var(--primary), var(--secondary)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin: 10px 0; font-variant-numeric: tabular-nums; letter-spacing: -3px; }
-        .timer-controls { display: flex; gap: 12px; margin-bottom: 20px; }
-        .btn-start { background: var(--success); color: white; } .btn-stop { background: var(--danger); color: white; }
-        .streak-badge { background: linear-gradient(135deg, #fff7ed, #ffedd5); color: #c2410c; padding: 6px 14px; border-radius: 20px; font-weight: 800; display: flex; align-items: center; gap: 6px; font-size: 0.85rem; border: 1px solid #fed7aa; }
-        .history-list { list-style: none; padding: 0; margin: 0; }
-        .history-item { display: flex; justify-content: space-between; align-items: center; padding: 16px; border-radius: 16px; margin-bottom: 8px; background: #fff; border: 1px solid #f1f5f9; }
-        .btn-action { width: 34px; height: 34px; padding: 0; border-radius: 10px; font-size: 1rem; margin-left: 6px; display: inline-flex; align-items: center; justify-content: center; }
-        .btn-edit { background: #e0e7ff; color: var(--primary); } .btn-delete { background: #fee2e2; color: var(--danger); }
-
-        /* Modals */
-        .modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 23, 42, 0.6); backdrop-filter: blur(8px); display: flex; justify-content: center; align-items: center; z-index: 1000; }
-        .modal-content { background: white; padding: 30px; border-radius: 30px; width: 90%; max-width: 450px; max-height: 85vh; overflow-y: auto; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25); }
-        .hidden { display: none !important; }
-        .chart-wrapper { position: relative; height: 220px; width: 100%; display: flex; justify-content: center; margin-top: 15px; }
-        .error-box { background-color: #fee2e2; color: #b91c1c; padding: 14px; border-radius: 14px; font-size: 0.9rem; margin-top: 15px; display: none; text-align: center; border: 1px solid #fecaca; }
+        .chip { background: white; padding: 10px 18px; border-radius: 30px; font-size: 0.9rem; font-weight: 600; cursor: pointer; border: 1px solid #b2dfdb; color: var(--text-sub); transition:0.2s; }
+        .chip.active { background: var(--primary); color: white; border-color: var(--primary); transform: translateY(-2px); box-shadow: 0 5px 15px rgba(0, 150, 136, 0.3); }
+        .timer-display { font-size: 4rem; font-weight: 800; text-align: center; background: linear-gradient(to right, var(--primary), #4db6ac); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin: 15px 0; letter-spacing: -2px; }
         
-        /* Time & Mood */
-        .time-btn-group { display: flex; align-items: center; gap: 8px; background: #f8fafc; padding: 8px; border-radius: 20px; margin-bottom: 24px; border: 1px solid #e2e8f0; }
-        .btn-adjust { background: white; border: 1px solid #e2e8f0; color: var(--text-main); font-weight: 800; width: 45px; height: 45px; border-radius: 14px; padding: 0; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; }
-        .mood-selector { display: flex; gap: 12px; margin-bottom: 24px; }
-        .mood-btn { flex: 1; padding: 16px 5px; border: 2px solid transparent; border-radius: 18px; background: #fff; cursor: pointer; text-align: center; font-size: 1.8rem; transition: 0.2s; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); }
-        .mood-btn.selected { border-color: var(--primary); background: #eef2ff; transform: translateY(-3px); }
-        .mood-text { display: block; font-size: 0.75rem; color: var(--text-sub); font-weight: 700; margin-top: 5px; }
-        .question-inputs { display: flex; gap: 12px; margin: 20px 0; }
-        .q-box { flex: 1; text-align: center; } .q-box label { font-size: 0.8rem; color: var(--text-sub); margin-bottom: 6px; display: block; font-weight: 600; } .q-box input { text-align: center; font-weight: 700; margin-bottom: 0; background: #fff; border: 2px solid #e2e8f0; }
+        .store-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+        .store-item { background: #fff; padding: 15px; border-radius: 20px; text-align: center; border: 1px solid #e2e8f0; transition: transform 0.2s; position: relative; }
+        .store-item:active { transform: scale(0.95); }
+        .store-price { color:var(--warning); font-weight:800; margin: 5px 0; font-size: 0.9rem; }
+        .store-icon { font-size: 2.5rem; margin-bottom: 5px; display: block; }
+        
+        .rules-box { background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 16px; padding: 15px; margin-bottom: 20px; }
+        .rules-item { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; font-size: 0.9rem; color: #166534; padding-bottom: 8px; border-bottom: 1px dashed #bbf7d0; }
+        .rules-item:last-child { margin-bottom: 0; border-bottom: none; }
 
-        /* Admin Styles */
-        .admin-header { background: linear-gradient(135deg, #1e1b4b, #4338ca); padding: 24px; border-radius: 24px; margin-bottom: 24px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 15px 30px rgba(30, 27, 75, 0.3); color:white; }
+        .wise-coach-container { position: fixed; bottom: 20px; right: 20px; z-index: 999; display: flex; flex-direction: column; align-items: flex-end; }
+        .wise-avatar { width: 70px; height: 70px; background: linear-gradient(135deg, #4f46e5, #9333ea); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 2.5rem; box-shadow: 0 10px 25px rgba(79, 70, 229, 0.4); cursor: pointer; border: 3px solid #fff; position: relative; transition: transform 0.3s; }
+        .wise-avatar:hover { transform: scale(1.1); }
+        .wise-avatar.idle { animation: floatCoach 4s ease-in-out infinite; } 
+        .wise-avatar.excited { animation: wingFlap 0.8s ease-in-out infinite; border-color: #fcd34d; }
+        .coach-badge { position: absolute; top: 0; right: 0; background: #ef4444; color: white; font-size: 0.75rem; width: 22px; height: 22px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; border: 2px solid white; animation: pulseBadge 2s infinite; }
+        .coach-bubble { background: white; padding: 12px 20px; border-radius: 20px 20px 4px 20px; box-shadow: 0 5px 20px rgba(0,0,0,0.1); margin-bottom: 10px; max-width: 250px; font-size: 0.9rem; color: var(--text-main); border: 1px solid #e0e7ff; opacity: 0; transform: translateY(20px) scale(0.9); transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); pointer-events: none; position: absolute; bottom: 80px; right: 0; width: max-content; }
+        .coach-bubble.show { opacity: 1; transform: translateY(0) scale(1); pointer-events: auto; }
+
+        @keyframes floatCoach { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
+        @keyframes wingFlap { 0% { transform: rotate(0deg) scale(1); } 25% { transform: rotate(-15deg) scale(1.1); } 50% { transform: rotate(0deg) scale(1); } 75% { transform: rotate(15deg) scale(1.1); } 100% { transform: rotate(0deg) scale(1); } }
+        @keyframes pulseBadge { 0% { transform: scale(1); } 50% { transform: scale(1.2); } 100% { transform: scale(1); } }
+
+        .admin-header { background: linear-gradient(135deg, #004d40, #00695c); padding: 24px; border-radius: 24px; margin-bottom: 24px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 15px 30px rgba(0, 77, 64, 0.3); color:white; }
         .kpi-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 15px; margin-bottom: 24px; }
-        .kpi-card { background: white; padding: 20px; border-radius: 20px; text-align: center; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); border: 1px solid #f1f5f9; }
-        .kpi-value { font-size: 2.2rem; font-weight: 800; display: block; margin-bottom: 5px; background: linear-gradient(to right, var(--primary), var(--secondary)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .kpi-card { background: white; padding: 20px; border-radius: 20px; text-align: center; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); border: 1px solid #f1f9f9; }
+        .kpi-value { font-size: 2.2rem; font-weight: 800; display: block; margin-bottom: 5px; background: linear-gradient(to right, var(--primary), #26a69a); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
         .kpi-label { font-size: 0.8rem; font-weight: 700; color: var(--text-sub); text-transform: uppercase; letter-spacing: 1px; }
+        .coach-insight-box { background: linear-gradient(135deg, #fff, #f0fdf4); border: 2px solid #b2dfdb; border-radius: 20px; padding: 20px; margin-bottom: 20px; display: flex; gap: 15px; align-items: flex-start; }
+        .insight-avatar { font-size: 3rem; animation: floatCoach 3s infinite; }
+        .insight-content h5 { margin: 0 0 5px 0; color: var(--primary-dark); font-size: 1.1rem; }
+        .insight-actions { margin-top: 10px; display: flex; gap: 10px; flex-wrap: wrap; }
+        .btn-insight { padding: 8px 15px; border-radius: 12px; font-size: 0.8rem; font-weight: 700; border: none; cursor: pointer; transition: 0.2s; }
+        .btn-insight-warn { background: #fee2e2; color: #b91c1c; } .btn-insight-praise { background: #dcfce7; color: #15803d; }
         .chart-scroll-container { width: 100%; overflow-x: auto; padding-bottom: 10px; margin-bottom: 20px; -webkit-overflow-scrolling: touch; }
         .chart-scroll-inner { height: 350px; min-width: 800px; }
         .student-table { width: 100%; border-collapse: separate; border-spacing: 0 8px; }
-        .student-table th { text-align: left; padding: 15px; color: var(--text-sub); font-size: 0.75rem; text-transform: uppercase; letter-spacing: 1px; font-weight: 800; }
-        .student-table td { padding: 15px; background: white; font-size: 0.95rem; border-top: 1px solid #f1f5f9; border-bottom: 1px solid #f1f5f9; vertical-align: middle; }
-        .student-table tr { cursor: pointer; transition: transform 0.2s; }
-        .student-table tr:hover { transform: scale(1.01); box-shadow: 0 10px 15px -3px rgba(0,0,0,0.05); z-index: 10; position: relative; }
-        .student-table tr td:first-child { border-top-left-radius: 16px; border-bottom-left-radius: 16px; border-left: 1px solid #f1f5f9; }
-        .student-table tr td:last-child { border-top-right-radius: 16px; border-bottom-right-radius: 16px; border-right: 1px solid #f1f5f9; }
+        .student-table th { text-align: left; padding: 15px; color: var(--text-sub); font-size: 0.75rem; text-transform: uppercase; font-weight: 800; }
+        .student-table td { padding: 15px; background: white; font-size: 0.95rem; border-top: 1px solid #f1f9f9; border-bottom: 1px solid #f1f9f9; vertical-align: middle; }
+        .student-table tr:hover { transform: scale(1.01); transition: 0.2s; cursor: pointer; z-index: 10; position: relative; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.05); }
+        .student-table tr td:first-child { border-top-left-radius: 16px; border-bottom-left-radius: 16px; }
+        .student-table tr td:last-child { border-top-right-radius: 16px; border-bottom-right-radius: 16px; }
         .smart-badge { padding: 6px 12px; border-radius: 20px; font-size: 0.75rem; font-weight: 700; display: inline-flex; align-items: center; gap: 5px; }
-        .sb-star { background: #fff7ed; color: #d97706; border: 1px solid #fcd34d; } .sb-good { background: #eff6ff; color: #2563eb; border: 1px solid #bfdbfe; } .sb-risk { background: #fef2f2; color: #dc2626; border: 1px solid #fecaca; } .sb-idle { background: #f8fafc; color: #64748b; border: 1px solid #e2e8f0; }
+        .sb-star { background: #fff7ed; color: #d97706; border: 1px solid #fcd34d; } .sb-good { background: #eff6ff; color: #2563eb; border: 1px solid #bfdbfe; } .sb-risk { background: #fef2f2; color: #dc2626; border: 1px solid #fecaca; }
+        
+        /* Rising Stars */
         .rising-stars { display: flex; gap: 15px; overflow-x: auto; padding-bottom: 15px; margin-bottom: 20px; }
-        .star-card { min-width: 140px; background: linear-gradient(135deg, #fff, #fdfbf7); padding: 15px; border-radius: 18px; border: 1px solid #fef3c7; box-shadow: 0 4px 6px rgba(0,0,0,0.02); text-align: center; }
+        .star-card { min-width: 150px; background: linear-gradient(135deg, #fff, #fdfbf7); padding: 15px; border-radius: 18px; border: 1px solid #fef3c7; box-shadow: 0 4px 6px rgba(0,0,0,0.02); text-align: center; }
         .star-icon { font-size: 2rem; margin-bottom: 5px; display: block; animation: float 3s ease-in-out infinite; }
-        @keyframes float { 0% { transform: translateY(0px); } 50% { transform: translateY(-5px); } 100% { transform: translateY(0px); } }
+        .star-name { font-weight: 700; font-size: 0.9rem; color: var(--text-main); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 120px; margin: 0 auto; }
 
-        /* Mesajlaşma Stilleri */
-        .template-btn { background: #f1f5f9; border: 1px solid #e2e8f0; padding: 10px; border-radius: 12px; font-size: 0.8rem; text-align: left; width: 100%; margin-bottom: 5px; cursor: pointer; transition: 0.2s; color: var(--text-sub); }
-        .template-btn:hover { background: #e0e7ff; color: var(--primary); border-color: var(--primary); }
-        .msg-box { background: #f8fafc; border: 2px solid #e2e8f0; border-radius: 16px; padding: 15px; font-family: inherit; font-size: 0.95rem; resize: vertical; min-height: 100px; color: var(--text-main); }
+        .template-btn { background: #f1f9f9; border: 1px solid #e2e8f0; padding: 10px; border-radius: 12px; font-size: 0.8rem; text-align: left; width: 100%; margin-bottom: 5px; cursor: pointer; transition: 0.2s; color: var(--text-sub); }
+        .template-btn:hover { background: #e0f2f1; color: var(--primary); border-color: var(--primary); }
+        .msg-box { background: #f8fafc; border: 2px solid #e2e8f0; border-radius: 16px; padding: 15px; font-family: inherit; font-size: 0.95rem; resize: vertical; min-height: 100px; color: var(--text-main); width: 100%; }
         .msg-box:focus { border-color: var(--primary); background: white; outline: none; }
+        .msg-list-container { max-height: 400px; overflow-y: auto; padding-right: 5px; }
+        .msg-card { background: #fff; border: 1px solid #f1f9f9; padding: 15px; border-radius: 16px; margin-bottom: 12px; position: relative; transition: all 0.2s; }
+        .msg-card.unread { border-left: 4px solid var(--primary); background: #f0fdfa; }
+        .btn-delete-msg { position: absolute; top: 10px; right: 10px; background: none; border: none; color: #cbd5e1; cursor: pointer; transition: 0.2s; font-size: 1.1rem; }
+        .btn-delete-msg:hover { color: var(--danger); }
+        .fade-in { animation: fadeIn 0.5s cubic-bezier(0.4, 0, 0.2, 1); }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
+        .hidden { display: none !important; }
+        .modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 77, 64, 0.6); backdrop-filter: blur(8px); display: flex; justify-content: center; align-items: center; z-index: 2000; padding: 20px; }
+        .modal-content { background: white; padding: 30px; border-radius: 30px; width: 100%; max-width: 500px; max-height: 85vh; overflow-y: auto; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25); }
+        .btn-profile-settings { background: #f1f9f9; width: 36px; height: 36px; border-radius: 10px; display: inline-flex; align-items: center; justify-content: center; margin-left: 8px; border:none; color:var(--text-sub); cursor: pointer; }
+        .btn-profile-settings:hover { background: #e0f2f1; color:var(--primary); }
+        
+        /* Selection List */
+        .selection-list { max-height: 300px; overflow-y: auto; border: 1px solid #e2e8f0; border-radius: 12px; padding: 10px; margin-bottom: 15px; }
+        .selection-item { display: flex; align-items: center; padding: 8px; border-bottom: 1px solid #f1f5f9; }
+        .selection-item:last-child { border-bottom: none; }
+        .selection-item input[type="checkbox"] { width: 20px; height: 20px; margin-right: 10px; margin-bottom: 0; }
+        .selection-item label { cursor: pointer; flex: 1; font-weight: 500; font-size: 0.9rem; }
+        
+        /* ARENA (Competition) Styles */
+        .arena-list { max-height: 300px; overflow-y: auto; }
+        .arena-item { display: flex; align-items: center; justify-content: space-between; background: #f0fdf4; padding: 15px; border-radius: 16px; border: 1px solid #bbf7d0; margin-bottom: 10px; animation: fadeIn 0.5s; }
+        .arena-user { display: flex; align-items: center; gap: 10px; font-weight: 700; color: var(--text-main); }
+        .arena-status { font-size: 0.8rem; background: #dcfce7; color: #15803d; padding: 4px 10px; border-radius: 20px; font-weight: 600; }
+        .btn-boost { background: linear-gradient(135deg, #f59e0b, #d97706); color: white; padding: 8px 15px; border-radius: 12px; font-size: 0.8rem; font-weight: 700; border: none; cursor: pointer; box-shadow: 0 4px 10px rgba(245, 158, 11, 0.3); transition: 0.2s; }
+        .btn-boost:hover { transform: scale(1.05); }
     </style>
 </head>
 <body>
 
 <div class="container fade-in" id="mainContainer">
-
-    <div id="authScreen" class="card" style="margin-top: 60px;">
-        <div style="font-size: 4rem; text-align: center; margin-bottom: 15px;">🛡️</div>
-        <h2 id="authTitle" style="text-align: center;">Öğrenci Takip</h2>
-        <p style="text-align:center; color:var(--text-sub); font-size:0.95rem; margin-bottom:30px;">Geleceğin lideri, çalışma masana hoş geldin.</p>
-        <input type="text" id="regStudentName" placeholder="Öğrenci Adı Soyadı" class="hidden">
-        <input type="email" id="email" placeholder="E-Posta Adresi" required>
-        <input type="password" id="password" placeholder="Şifre" required>
-        <button class="btn-primary" id="mainAuthBtn" onclick="handleLogin()">GİRİŞ YAP</button>
-        <div style="text-align:center; margin-top:20px; font-size:0.9rem; color:var(--primary); cursor:pointer; font-weight:600;" id="toggleText" onclick="toggleAuthMode()">Hesabınız yok mu? Kayıt Olun</div>
-        <div id="authError" class="error-box"></div>
+    <!-- 1. GİRİŞ EKRANI -->
+    <div id="authScreen" class="card" style="margin-top: 60px; text-align: center;">
+        <div style="font-size: 4rem; margin-bottom: 15px;">🛡️</div>
+        <h2 id="authTitle">Öğrenci Takip</h2>
+        <p style="color:var(--text-sub); margin-bottom:30px;">Giriş yaparak maceraya devam et.</p>
+        <input type="text" id="regName" placeholder="Ad Soyad" class="hidden">
+        <input type="email" id="email" placeholder="E-Posta Adresi">
+        <input type="password" id="password" placeholder="Şifre">
+        <button class="btn-primary" onclick="handleLogin()" id="authBtn">GİRİŞ YAP</button>
+        <div style="margin-top:20px; color:var(--primary); font-weight:700; cursor:pointer;" onclick="toggleAuth()">Hesabın yok mu? Kayıt Ol</div>
+        <div id="authError" style="color:var(--danger); margin-top:15px; font-weight:600; display:none;"></div>
     </div>
 
+    <!-- 2. ÖĞRENCİ PANELİ -->
     <div id="dashboardScreen" class="hidden fade-in">
-        <div class="card" style="display:flex; justify-content:space-between; align-items:center; padding: 20px; background: rgba(255,255,255,0.9);">
-            <div>
-                <div style="display:flex; align-items:center;">
-                    <h3 style="margin:0; text-align:left; font-size:1.3rem; color:var(--text-main);">Selam, <span id="studentNameDisplay" style="color:var(--primary);">Öğrenci</span></h3>
-                    <button class="btn-profile-settings" onclick="openProfileModal()" title="Profil Ayarları">⚙️</button>
+        <div class="card" style="display:flex; justify-content:space-between; align-items:center; padding:15px 20px; position: sticky; top: 10px; z-index: 900;">
+            <div style="display:flex; align-items:center;">
+                <div>
+                    <!-- AVATAR VE İSİM -->
+                    <h3 style="margin:0; font-size:1.3rem;">
+                        <span id="userAvatar" style="margin-right:5px;">🎓</span>
+                        Selam, <span id="stName" style="color:var(--primary);">Öğrenci</span>
+                    </h3>
+                    <div style="font-size:0.9rem; color:var(--warning); font-weight:800; margin-top:5px;">💎 <span id="stPoints">0</span> Bilge Puan</div>
                 </div>
-                <small style="color:var(--text-sub); font-weight:500;">İyi çalışmalar dileriz.</small>
+                 <button class="btn-profile-settings" onclick="openProfileModal()" title="Ayarlar">⚙️</button>
             </div>
-            <button class="btn-logout-distinct" onclick="handleLogout()" title="Oturumu Kapat">🚪 Çıkış</button>
+            <button class="btn-logout" onclick="handleLogout()">Çıkış</button>
         </div>
 
-        <div class="card">
-            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 15px;">
-                <h4>HAFTALIK İLERLEME</h4>
-                <div class="streak-badge" title="Zinciri Kırma!">🔥 <span id="streakCount">0</span> Gün</div>
+        <div class="card" style="text-align:center;">
+            <div style="display:flex; justify-content:space-between; margin-bottom:10px;">
+                <h4 style="border:none; margin:0;">HAFTALIK HEDEF</h4>
+                <small style="color:var(--text-sub);">Haftalık Hedef: <span id="targetMins">1000</span>dk</small>
             </div>
-            <div class="chart-wrapper"><canvas id="weeklyChart"></canvas></div>
-            <div style="text-align:center; font-size:0.95rem; color:var(--text-sub); margin: 20px 0;">Tamamlanan: <strong id="completedMins" style="color:var(--success); font-size:1.2rem;">0</strong> / <span id="targetMins">1000</span> dk</div>
-            <div style="background:#f8fafc; padding:12px; border-radius:16px; display:flex; justify-content:space-between; align-items:center; border: 1px solid #e2e8f0;">
+            <div style="position:relative; height:200px; width:100%;"><canvas id="weeklyChart"></canvas></div>
+            <div style="margin-top:15px; font-weight:800; font-size:1.1rem; color:var(--primary);" id="progText">
+                %<span id="progVal">0</span> Tamamlandı
+            </div>
+            
+            <!-- HAFTALIK ÖDÜL BUTONU -->
+            <button id="btnClaimWeekly" class="hidden" onclick="claimWeeklyBonus()" style="background:linear-gradient(135deg, #f59e0b, #d97706); color:white; width:100%; margin-top:10px; box-shadow: 0 5px 15px rgba(245, 158, 11, 0.4); animation: pulseBadge 2s infinite;">
+                🏆 500 Puanlık Ödülü Al
+            </button>
+            
+            <div style="background:#f8fafc; padding:12px; border-radius:16px; display:flex; justify-content:space-between; align-items:center; border: 1px solid #e2e8f0; margin-top:15px;">
                 <label style="font-size:0.9rem; color:var(--text-main); font-weight:600;">🎯 Haftalık Hedef (dk):</label>
                 <input type="number" id="weeklyGoalInput" value="1000" onchange="updateGoal()" style="width:90px; margin:0; padding:10px; text-align:center; border:1px solid #cbd5e1; background:white;">
             </div>
         </div>
 
-        <div class="card">
-            <div class="tabs">
-                <div class="tab active" onclick="switchTab('manual')" id="tabManual">⚡ Hızlı Giriş</div>
-                <div class="tab" onclick="switchTab('pomodoro')" id="tabPomodoro">⏱️ Sayaçlı</div>
-            </div>
-            <div id="panelManual" class="fade-in">
-                <label style="margin-bottom:10px; display:block; font-weight:600; font-size:0.85rem; color:var(--text-sub); letter-spacing:1px;">DERS SEÇİMİ</label>
-                <div id="chipsManual" class="chips"></div>
+        <div class="tabs">
+            <div class="tab active" onclick="switchTab('home', this)">🏠 Giriş</div>
+            <div class="tab" onclick="switchTab('pomo', this)">⏱️ Sayaç</div>
+            <div class="tab" onclick="switchTab('arena', this)">⚔️ Yarışma</div>
+            <div class="tab" onclick="switchTab('store', this)">🛒 Pazar</div>
+            <div class="tab" onclick="switchTab('future', this)">✉️ Gelecek</div>
+            <div class="tab" onclick="switchTab('history', this)">📜 Geçmiş</div>
+        </div>
+
+        <div id="viewHome" class="fade-in">
+            <div class="card">
+                <h4>HIZLI DERS GİRİŞİ</h4>
+                <div class="chips" id="chipsManual"></div>
                 <input type="hidden" id="selectedSubject" value="">
-                <label style="margin-bottom:10px; display:block; font-weight:600; font-size:0.85rem; color:var(--text-sub); letter-spacing:1px;">TARİH</label>
-                <select id="entryDateSelect" style="margin-bottom:20px;"><option value="0" selected>📅 Bugün (Şimdi)</option><option value="1">⏪ Dün</option><option value="2">⏮️ Evvelsi Gün</option></select>
-                <label style="margin-bottom:10px; display:block; font-weight:600; font-size:0.85rem; color:var(--text-sub); letter-spacing:1px;">SÜRE (DK)</label>
-                <div class="time-btn-group"><button class="btn-adjust" onclick="adjustTime(-10)">-</button><input type="number" id="duration" value="40" style="text-align:center; margin:0; font-weight:800; font-size:1.3rem; border:none; background:transparent;"><button class="btn-adjust" onclick="adjustTime(10)">+</button></div>
-                <div class="mood-selector"><div class="mood-btn" onclick="selectMood(this, 'Verimsiz')">😴<span class="mood-text">Az</span></div><div class="mood-btn" onclick="selectMood(this, 'Orta')">😐<span class="mood-text">Orta</span></div><div class="mood-btn selected" onclick="selectMood(this, 'Verimli')">🔥<span class="mood-text">Çok</span></div></div>
-                <input type="hidden" id="selectedMood" value="Verimli">
-                <button class="btn-primary" id="saveBtn" onclick="saveData()">KAYDET ✅</button>
-            </div>
-            <div id="panelPomodoro" class="hidden fade-in">
-                <p style="text-align:center; color:var(--text-sub); font-size:0.9rem; margin-bottom:20px;">Odaklan ve süreyi başlat.</p>
-                <div id="chipsPomo" class="chips"></div>
-                <input type="hidden" id="pomoSubject" value="">
-                <div class="timer-setting"><label style="font-weight:600; font-size:0.9rem;">Süre (dk):</label><input type="number" id="timerSetDuration" value="30" onchange="updateTimerDuration()"></div>
-                <div class="timer-display" id="timerDisplay">30:00</div>
-                <div class="timer-controls"><button class="btn-start" onclick="startTimer()" id="btnTimerStart">BAŞLAT ▶</button><button class="btn-stop" onclick="resetTimer()" id="btnTimerReset">SIFIRLA ↺</button></div>
-                <div class="question-inputs"><div class="q-box"><label>Soru</label><input type="number" id="qCount" placeholder="0"></div><div class="q-box"><label>Doğru</label><input type="number" id="qCorrect" placeholder="0"></div></div>
-                <button class="btn-primary" id="savePomoBtn" onclick="savePomodoroData()">KAYDET ✅</button>
+                <div style="display:flex; gap:10px; margin-top:20px;">
+                    <select id="entryDate" style="flex:1; text-align:center; font-family:inherit; font-weight:600; color:var(--text-main);">
+                        <option value="0">📅 Bugün</option>
+                        <option value="1">⏪ Dün</option>
+                        <option value="2">⏮️ 2 Gün Önce</option>
+                    </select>
+                    <input type="number" id="entryDur" value="40" style="flex:1; text-align:center;" placeholder="Dk">
+                </div>
+                <button class="btn-primary" onclick="saveEntry()" style="margin-top:10px;">KAYDET (+Puan) ✅</button>
             </div>
         </div>
-        <div class="card"><h4>SON KAYITLAR</h4><ul id="historyList" class="history-list"><li style="text-align:center; color:var(--text-sub); padding:15px;">Yükleniyor...</li></ul></div>
+
+        <div id="viewPomo" class="hidden fade-in">
+            <div class="card" style="text-align:center;">
+                <h4>ODAKLANMA MODU</h4>
+                <p style="color:var(--text-sub); font-size:0.9rem;">Dersi seç ve süreyi başlat.</p>
+                <div class="chips" id="chipsPomo"></div>
+                <input type="hidden" id="pomoSubject" value="">
+                <div class="timer-display" id="timerDisplay">30:00</div>
+                <div style="display:flex; gap:10px; justify-content:center; margin-bottom:20px;">
+                    <button style="background:var(--success); color:white; width:auto; padding:15px 30px;" onclick="startTimer()" id="btnStart">BAŞLAT ▶</button>
+                    <button style="background:var(--danger); color:white; width:auto; padding:15px 30px;" onclick="resetTimer()">SIFIRLA ↺</button>
+                </div>
+                <label style="font-size:0.8rem; color:var(--text-sub); font-weight:bold;">Süre Ayarla (dk):</label>
+                <input type="number" id="timerSet" value="30" onchange="updateTimerSet()" style="text-align:center; width:100px; margin:0 auto; display:block;">
+                <button class="btn-primary" onclick="savePomo()" style="margin-top:20px;">BİTİR VE KAYDET 💾</button>
+            </div>
+        </div>
+
+        <!-- YENİ YARIŞMA MODÜLÜ -->
+        <div id="viewArena" class="hidden fade-in">
+            <div class="card">
+                <h4>⚔️ ÇALIŞMA ARENASI</h4>
+                <p style="color:var(--text-sub); font-size:0.9rem; margin-bottom:20px;">Şu an seninle birlikte çalışanlar. Onları geçmek için süreni artır!</p>
+                
+                <div id="arenaList" class="arena-list">
+                    <div style="text-align:center; padding:20px; color:#999;">Arenaya bağlanılıyor...</div>
+                </div>
+                
+                <!-- SAYAÇLI ÇALIŞMA KONTROLÜ (ARENA İÇİNDE) -->
+                <div style="margin-top:20px; border-top:1px solid #e2e8f0; padding-top:15px;">
+                     <div class="timer-display" id="arenaTimerDisplay" style="font-size: 3rem;">00:00</div>
+                     <button class="btn-primary" id="arenaStartBtn" onclick="startArenaSession()">SAYACI BAŞLAT (ARENA)</button>
+                </div>
+
+                <div style="background:#fffbeb; border:1px solid #fcd34d; padding:15px; border-radius:16px; margin-top:20px; font-size:0.85rem; color:#b45309;">
+                    🔥 <strong>İpucu:</strong> Yarışma modunda çalışmak <strong>0.5 Puan</strong> daha fazla kazandırır!
+                </div>
+            </div>
+        </div>
+
+        <div id="viewStore" class="hidden fade-in">
+            <div class="card" style="background:#f0fdf4; border-color:#bbf7d0;">
+                <h4 style="color:#166534;">🎯 NASIL PUAN KAZANILIR?</h4>
+                <div class="rules-box" style="border:none; background:transparent; padding:0;">
+                    <div class="rules-item">⚡ <strong>Normal Çalışma:</strong> 1 Dk = 1 Puan</div>
+                    <div class="rules-item">🍅 <strong>Sayaçlı Çalışma:</strong> 1 Dk = 1.5 Puan</div>
+                    <div class="rules-item">⚔️ <strong>Yarışma Modu:</strong> 1 Dk = 2.0 Puan (Bonuslu!)</div>
+                    <div class="rules-item">✉️ <strong>Zaman Kapsülü:</strong> Mektup Yaz = 50 Puan</div>
+                    <div class="rules-item">🏆 <strong>Haftalık Hedef:</strong> Tamamla = 500 Puan</div>
+                    <div class="rules-item">📅 <strong>Geçmişe Dönük:</strong> Puan Geçerli</div>
+                </div>
+            </div>
+
+            <div class="card">
+                <h4>KİMLİĞİNİ SEÇ (ÇIKARTMALAR)</h4>
+                <p style="color:var(--text-sub); font-size:0.9rem; margin-bottom:20px;">Puanlarını harcayarak yeni bir simge seç.</p>
+                <div class="store-grid" id="avatarShop"></div>
+            </div>
+        </div>
+
+        <div id="viewFuture" class="hidden fade-in">
+            <div class="card">
+                <h4>ZAMAN KAPSÜLÜ 🕰️</h4>
+                <p style="color:var(--text-sub); font-size:0.9rem;">Gelecekteki kendine veya Hakanına bir not bırak (+50 Puan).</p>
+                <textarea id="futureMsg" placeholder="Sevgili gelecekteki ben..." style="height:150px;"></textarea>
+                <button class="btn-primary" onclick="saveFuture()">KİLİTLE VE GÖNDER 🔒</button>
+            </div>
+        </div>
+
+        <div id="viewHistory" class="hidden fade-in">
+             <div class="card">
+                <h4>SON ÇALIŞMALAR</h4>
+                <ul id="historyList" style="list-style:none; padding:0; margin:0;"><li style="text-align:center; color:#aaa;">Yükleniyor...</li></ul>
+            </div>
+        </div>
+
+        <div class="wise-coach-container" id="wiseCoachContainer" style="display:none;">
+            <div class="coach-bubble" id="coachBubble" onclick="openMsgModal()">Mesajın var!</div>
+            <div class="wise-avatar idle" id="wiseAvatar" onclick="openMsgModal()">🦉<div class="coach-badge hidden" id="coachBadge">0</div></div>
+        </div>
     </div>
 
+    <!-- 3. YÖNETİCİ PANELİ -->
     <div id="adminScreen" class="hidden fade-in">
         <div class="admin-header">
-            <div><h3 style="margin:0; font-size:1.5rem; letter-spacing: -0.5px;">Yönetici Paneli 👑</h3><small style="opacity:0.8;">Veriler birleştirildi ve analiz edildi.</small></div>
-            <button class="btn-logout-distinct" onclick="handleLogout()" style="background:rgba(255,255,255,0.15); color:white; border:none; backdrop-filter:blur(5px);">Çıkış</button>
+            <div><h3 style="margin:0; font-size:1.5rem; letter-spacing: -0.5px; color:white;">Yönetici Paneli 👑</h3><small style="opacity:0.8;">Veriler birleştirildi ve analiz edildi.</small></div>
+            <button class="btn-logout-distinct" onclick="handleLogout()">Çıkış</button>
         </div>
-
         <div class="tabs">
-            <div class="tab active" onclick="switchAdminTab('dashboard')" id="tabAdminDash">📊 Genel Durum</div>
-            <div class="tab" onclick="switchAdminTab('messages')" id="tabAdminMsg">✉️ Mesaj Merkezi</div>
+            <div class="tab active" onclick="switchAdminTab('dashboard', this)" id="tabAdminDash">📊 Genel Durum</div>
+            <div class="tab" onclick="switchAdminTab('messages', this)" id="tabAdminMsg">✉️ Mesaj Merkezi</div>
+            <div class="tab" onclick="switchAdminTab('history', this)" id="tabAdminHist">📜 Gönderilenler</div>
         </div>
-
+        
         <div id="adminPanelDashboard" class="fade-in">
+            <div class="coach-insight-box">
+                <div class="insight-avatar">🦉</div>
+                <div class="insight-content">
+                    <h5>Hakanım, Raporum Hazır!</h5>
+                    <p style="font-size:0.9rem; color:#475569; margin:0;">İncelemelerime göre <strong id="insightRiskCount" style="color:var(--danger);">0</strong> öğrenci geride kaldı, <strong id="insightStarCount" style="color:var(--success);">0</strong> öğrenci ise uçuşa geçti.</p>
+                    <div class="insight-actions">
+                        <button class="btn-insight btn-insight-warn" onclick="openBulkSelectModal('risk')">⚠️ Geride Kalanları Uyar</button>
+                        <button class="btn-insight btn-insight-praise" onclick="openBulkSelectModal('star')">🌟 Yıldızları Kutla</button>
+                    </div>
+                </div>
+            </div>
+
             <div class="kpi-grid">
                 <div class="kpi-card"><span class="kpi-value" id="adminTotalStudents">0</span><span class="kpi-label">Toplam Öğrenci</span></div>
                 <div class="kpi-card"><span class="kpi-value" id="adminTotalHours">0</span><span class="kpi-label">Toplam Saat</span></div>
                 <div class="kpi-card"><span class="kpi-value" id="adminActiveToday" style="color:var(--success);">0</span><span class="kpi-label">Bugün Aktif</span></div>
             </div>
             <div class="card"><h4>🚀 YÜKSELEN YILDIZLAR</h4><div class="rising-stars" id="risingStarsContainer"><div style="width:100%; text-align:center; color:var(--text-sub); font-size:0.9rem;">Analiz ediliyor...</div></div></div>
-            <div class="card"><h4>📈 GENEL PERFORMANS</h4><p style="font-size:0.8rem; color:var(--text-sub); margin-bottom:10px;">Tabloyu sağa/sola kaydırarak tüm öğrencileri görebilirsiniz.</p><div class="chart-scroll-container"><div class="chart-scroll-inner" id="chartInner"><canvas id="adminLeaderboardChart"></canvas></div></div></div>
-            <div class="card"><h4>👥 ÖĞRENCİ LİSTESİ & DEĞERLENDİRME</h4><div style="overflow-x:auto;"><table class="student-table" id="studentTable"><thead><tr><th>Sıra</th><th>Öğrenci</th><th>Durum</th><th>Toplam</th></tr></thead><tbody id="studentTableBody"><tr><td colspan="4" style="text-align:center;">Veriler birleştiriliyor...</td></tr></tbody></table></div></div>
+            <div class="card"><h4>📈 GENEL PERFORMANS</h4><div class="chart-scroll-container"><div class="chart-scroll-inner" id="chartInner"><canvas id="adminLeaderboardChart"></canvas></div></div></div>
+            <div class="card">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+                    <h4 style="margin:0;">👥 ÖĞRENCİ LİSTESİ</h4>
+                    <button onclick="exportToExcel()" style="padding:8px 15px; font-size:0.8rem; background:#0f172a; color:white; border-radius:10px;">📥 İndir</button>
+                </div>
+                <div style="overflow-x:auto;"><table class="student-table" id="studentTable"><thead><tr><th>Sıra</th><th>Öğrenci</th><th>Durum</th><th>Puan</th><th>Toplam</th></tr></thead><tbody id="studentTableBody"><tr><td colspan="5" style="text-align:center;">Veriler birleştiriliyor...</td></tr></tbody></table></div>
+            </div>
         </div>
-
+        
         <div id="adminPanelMessages" class="hidden fade-in">
             <div class="card">
                 <h4>✉️ ÖZEL MESAJ GÖNDER</h4>
-                <p style="color:var(--text-sub); font-size:0.9rem;">Öğrenciye motive edici bir mektup gönderin.</p>
-                <label style="font-weight:600; font-size:0.85rem; color:var(--text-sub); display:block; margin-bottom:5px;">Öğrenci Seçin</label>
-                <select id="msgStudentSelect"><option value="">Yükleniyor...</option></select>
-                
-                <label style="font-weight:600; font-size:0.85rem; color:var(--text-sub); display:block; margin-bottom:5px; margin-top:15px;">Akıllı Şablonlar</label>
-                <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px; margin-bottom:15px;">
-                    <button class="template-btn" onclick="useTemplate('welcome')">🏰 Geleceğin Mimarı (Giriş)</button>
-                    <button class="template-btn" onclick="useTemplate('explorer')">🧭 Bilgi Kaşifi (Merak)</button>
-                    <button class="template-btn" onclick="useTemplate('champion')">🏆 Azim ve Zafer (Tebrik)</button>
-                    <button class="template-btn" onclick="useTemplate('focus')">⚓ Potansiyel (Uyarı)</button>
+                <p style="color:var(--text-sub); font-size:0.9rem;">Mesajınız öğrenci panelinde Bilge Koç tarafından iletilecektir.</p>
+                <label style="font-weight:600; font-size:0.85rem; color:var(--text-sub); display:block; margin-bottom:5px;">Öğrenci Seçin</label><select id="msgStudentSelect"><option value="">Yükleniyor...</option></select>
+                <label style="font-weight:600; font-size:0.85rem; color:var(--text-sub); display:block; margin-bottom:5px; margin-top:15px;">Kütüphaneden Otomatik Seç 🎲</label>
+                <div style="display:grid; grid-template-columns: 1fr 1fr; gap:8px; margin-bottom:15px;">
+                    <button class="template-btn" onclick="fetchRandomMessage('student', 'motivation')" style="border-left: 3px solid var(--primary);">🚀 Öğrenci: Motivasyon</button>
+                    <button class="template-btn" onclick="fetchRandomMessage('student', 'praise')" style="border-left: 3px solid var(--success);">🏆 Öğrenci: Tebrik</button>
+                    <button class="template-btn" onclick="fetchRandomMessage('student', 'warning')" style="border-left: 3px solid var(--warning);">⚓ Öğrenci: Uyarı</button>
+                    <button class="template-btn" onclick="fetchRandomMessage('parent', 'praise')" style="border-left: 3px solid #3b82f6;">👨‍👩‍👧 Veli: Teşekkür</button>
+                    <button class="template-btn" onclick="fetchRandomMessage('parent', 'warning')" style="border-left: 3px solid var(--danger);">⚠️ Veli: Bilgilendirme</button>
                 </div>
-
                 <label style="font-weight:600; font-size:0.85rem; color:var(--text-sub); display:block; margin-bottom:5px;">Mesajınız</label>
                 <textarea id="msgContent" class="msg-box" placeholder="Mesajınızı buraya yazın..."></textarea>
-                
-                <button class="btn-primary" onclick="sendAdminMessage()">GÖNDER 🚀</button>
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-top:10px;">
+                    <label style="font-size:0.8rem; color:var(--text-sub);"><input type="radio" name="targetAudience" value="student" checked> Öğrenci <input type="radio" name="targetAudience" value="parent" class="ms-2"> Veli</label>
+                    <button class="btn-primary" style="width:auto; padding: 10px 25px;" onclick="sendAdminMessage()">GÖNDER 🚀</button>
+                </div>
+            </div>
+        </div>
+
+        <div id="adminPanelHistory" class="hidden fade-in">
+            <div class="card">
+                <div style="display:flex; justify-content:space-between;"><h4>📜 Mesaj Arşivi</h4><button onclick="deleteAllMessages()" style="background:none; border:none; color:var(--danger); cursor:pointer; font-size:0.85rem;">Tümünü Temizle</button></div>
+                <div id="adminMsgHistoryList" class="msg-list-container"><div style="text-align:center; padding:20px;">Yükleniyor...</div></div>
             </div>
         </div>
     </div>
+
 </div>
 
-<div id="modalAdminDetail" class="modal hidden fade-in">
-    <div class="modal-content" style="max-width:500px;">
-        <div style="text-align:right;"><button onclick="closeAdminDetail()" style="width:32px; height:32px; padding:0; border-radius:50%; background:#f1f5f9; border:none; cursor:pointer;">✕</button></div>
-        <div class="guidance-header"><h2 id="detailStudentName" style="color:var(--text-main); margin-bottom:5px;">Öğrenci Adı</h2><div id="smartEvaluationBadge" style="display:inline-block; padding:5px 15px; background:#e0e7ff; border-radius:20px; font-weight:700; color:var(--primary); font-size:0.9rem;">Analiz Ediliyor...</div></div>
-        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:15px; margin-bottom:20px;">
-            <div style="background:#fff; border:1px solid #f1f5f9; padding:15px; border-radius:16px; text-align:center;"><div class="guidance-score" id="statTotalMin">0</div><div class="guidance-label">Toplam Dakika</div></div>
-            <div style="background:#fff; border:1px solid #f1f5f9; padding:15px; border-radius:16px; text-align:center;"><div class="guidance-score" id="statAvg">0</div><div class="guidance-label">Günlük Ort.</div></div>
+<!-- MODALS -->
+<div id="modalAdminDetail" class="modal hidden fade-in"><div class="modal-content" style="max-width:500px;"><div style="text-align:right;"><button onclick="closeAdminDetail()" style="width:32px; height:32px; padding:0; border-radius:50%; background:#f1f5f9; border:none; cursor:pointer;">✕</button></div><h2 id="detailStudentName" style="color:var(--text-main); margin-bottom:5px;">Öğrenci Adı</h2><div id="smartEvaluationBadge" style="display:inline-block; padding:5px 15px; background:#e0e7ff; border-radius:20px; font-weight:700; color:var(--primary); font-size:0.9rem; margin-bottom:15px;">Analiz Ediliyor...</div><div style="display:grid; grid-template-columns: 1fr 1fr; gap:15px; margin-bottom:20px;"><div style="background:#f8fafc; border:1px solid #f1f5f9; padding:15px; border-radius:16px; text-align:center;"><div style="font-size:1.4rem; font-weight:800; color:var(--primary);" id="statTotalMin">0</div><div style="font-size:0.8rem; text-transform:uppercase; color:var(--text-sub);">Toplam Dakika</div></div><div style="background:#f8fafc; border:1px solid #f1f5f9; padding:15px; border-radius:16px; text-align:center;"><div style="font-size:1.4rem; font-weight:800; color:var(--warning);" id="statAvg">0</div><div class="guidance-label" style="font-size:0.8rem; text-transform:uppercase; color:var(--text-sub);">Bilge Puan</div></div></div><h4>🧠 AKILLI DEĞERLENDİRME</h4><div id="aiComment" style="background:#f0fdf4; border:1px solid #bbf7d0; color:#166534; padding:15px; border-radius:12px; font-size:0.9rem; line-height:1.5; margin-bottom:20px;">Öğrenci verileri inceleniyor...</div><div style="height: 200px; width: 100%; margin-bottom: 20px;"><canvas id="studentDetailChart"></canvas></div><button class="btn-primary" onclick="closeAdminDetail()">KAPAT</button></div></div>
+<div id="modalMsg" class="modal hidden"><div class="modal-content" style="max-width:400px;"><div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;"><h3 style="margin:0;">Posta Kutusu 📬</h3><button onclick="document.getElementById('modalMsg').classList.add('hidden')" style="width:30px; height:30px; padding:0; border-radius:50%; background:#f1f5f9; border:none;">✕</button></div><div id="msgList" class="msg-list-container"><div style="text-align:center; color:#aaa; padding:20px;">Mesajınız yok.</div></div></div></div>
+<div id="modalProfile" class="modal hidden fade-in"><div class="modal-content"><div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;"><h3 style="margin:0;">Profil Ayarları</h3><button onclick="closeProfileModal()" style="width:32px; height:32px; padding:0; border-radius:50%; background:#f1f5f9; color:#333;">✕</button></div><label style="font-size:0.8rem; color:var(--text-sub); margin-bottom:5px; display:block;">Öğrenci Adı Soyadı</label><input type="text" id="editProfileName" style="margin-bottom:15px;"><label style="font-size:0.8rem; color:var(--text-sub); margin-bottom:5px; display:block;">E-Posta (Değiştirilemez)</label><input type="text" id="editProfileEmail" disabled style="opacity:0.6; margin-bottom:20px;"><button class="btn-primary" onclick="saveUserProfile()">KAYDET</button><div style="margin-top:20px; text-align:center;"><button onclick="sendPasswordReset()" style="background:none; border:none; color:var(--primary); text-decoration:underline; font-size:0.85rem; padding:5px;">Şifremi Unuttum / Sıfırla</button></div></div></div>
+
+<!-- BULK MESSAGE SELECTION MODAL -->
+<div id="modalBulkSelect" class="modal hidden fade-in">
+    <div class="modal-content">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
+            <h3 style="margin:0;">Alıcıları Seç 📢</h3>
+            <button onclick="closeBulkSelectModal()" style="width:30px; height:30px; padding:0; border-radius:50%; background:#f1f5f9; border:none; cursor:pointer;">✕</button>
         </div>
-        <h4>🧠 AKILLI DEĞERLENDİRME</h4>
-        <div class="ai-comment" id="aiComment">Öğrenci verileri inceleniyor...</div>
-        <div style="height: 200px; width: 100%; margin-bottom: 20px;"><canvas id="studentDetailChart"></canvas></div>
-        <button class="btn-primary" onclick="closeAdminDetail()">KAPAT</button>
+        <p style="font-size:0.85rem; color:var(--text-sub); margin-bottom:10px;" id="bulkModalDesc">Aşağıdaki listeye mesaj gönderilecek.</p>
+        
+        <div style="margin-bottom:10px; display:flex; justify-content:space-between; font-size:0.85rem;">
+            <button onclick="toggleSelectAll(true)" style="background:none; border:none; color:var(--primary); cursor:pointer; font-weight:600;">Tümünü Seç</button>
+            <button onclick="toggleSelectAll(false)" style="background:none; border:none; color:var(--danger); cursor:pointer;">Temizle</button>
+        </div>
+
+        <div id="bulkUserList" class="selection-list"></div>
+        
+        <div style="margin-top:15px;">
+             <textarea id="bulkMsgContent" class="msg-box" placeholder="Mesajınızı düzenleyebilirsiniz..." style="min-height:60px; margin-bottom:10px;"></textarea>
+             <button class="btn-primary" onclick="confirmBulkSend()">SEÇİLENLERE GÖNDER 🚀</button>
+        </div>
     </div>
 </div>
 
-<div id="modalSubjects" class="modal hidden fade-in"><div class="modal-content"><div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;"><h3 style="margin:0;">Dersleri Düzenle</h3><button onclick="closeSubjectModal()" style="width:32px; height:32px; padding:0; border-radius:50%; background:#f1f5f9; color:#333;">✕</button></div><div id="subjectListContainer"></div><div style="display:flex; gap:10px; margin-top:20px;"><input type="text" id="newSubjectName" placeholder="Yeni Ders Ekle" style="margin:0;"><button onclick="addSubject()" style="width:60px; background:var(--success); color:white; padding:0; border-radius:12px;">+</button></div></div></div>
-<div id="modalEditEntry" class="modal hidden fade-in"><div class="modal-content"><div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;"><h3 style="margin:0;">Kaydı Düzenle</h3><button onclick="closeEditModal()" style="width:32px; height:32px; padding:0; border-radius:50%; background:#f1f5f9; color:#333;">✕</button></div><input type="hidden" id="editEntryId"><input type="hidden" id="editOldDuration"> <label style="font-size:0.8rem; color:var(--text-sub); margin-bottom:5px; display:block;">Ders</label><select id="editSubject" style="margin-bottom:15px; padding:12px; border-radius:12px; border:2px solid #e5e7eb;"></select><label style="font-size:0.8rem; color:var(--text-sub); margin-bottom:5px; display:block;">Süre (dk)</label><input type="number" id="editDuration" style="margin-bottom:15px;"><div style="display:flex; gap:10px; margin-bottom:15px;"><div style="flex:1;"><label style="font-size:0.8rem; color:var(--text-sub); margin-bottom:5px; display:block;">Soru</label><input type="number" id="editQCount"></div><div style="flex:1;"><label style="font-size:0.8rem; color:var(--text-sub); margin-bottom:5px; display:block;">Doğru</label><input type="number" id="editQCorrect"></div></div><label style="font-size:0.8rem; color:var(--text-sub); margin-bottom:5px; display:block;">Verim</label><select id="editMood" style="margin-bottom:20px; padding:12px; border-radius:12px; border:2px solid #e5e7eb;"><option value="Verimli">🔥 Verimli (Süper)</option><option value="Orta">😐 Orta (Normal)</option><option value="Verimsiz">😴 Verimsiz (Az)</option></select><button class="btn-primary" onclick="saveEditedEntry()">DEĞİŞİKLİKLERİ KAYDET</button></div></div>
-<div id="modalProfile" class="modal hidden fade-in"><div class="modal-content"><div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;"><h3 style="margin:0;">Profil Ayarları</h3><button onclick="closeProfileModal()" style="width:32px; height:32px; padding:0; border-radius:50%; background:#f1f5f9; color:#333;">✕</button></div><label style="font-size:0.8rem; color:var(--text-sub); margin-bottom:5px; display:block;">Öğrenci Adı Soyadı</label><input type="text" id="editProfileName" style="margin-bottom:15px;"><label style="font-size:0.8rem; color:var(--text-sub); margin-bottom:5px; display:block;">E-Posta (Değiştirilemez)</label><input type="text" id="editProfileEmail" disabled style="opacity:0.6; margin-bottom:20px;"><button class="btn-primary" onclick="saveUserProfile()">KAYDET</button><div style="margin-top:20px; text-align:center;"><button onclick="sendPasswordReset()" style="background:none; border:none; color:var(--primary); text-decoration:underline; font-size:0.85rem; padding:5px;">Şifremi Unuttum / Sıfırla</button></div></div></div>
-
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js";
-    import { getFirestore, collection, doc, setDoc, getDoc, updateDoc, addDoc, deleteDoc, getDocs, query, where, onSnapshot, serverTimestamp, arrayUnion, arrayRemove, increment } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js";
-    import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged, updateProfile, sendPasswordResetEmail } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-auth.js";
+    import { getFirestore, collection, doc, setDoc, getDoc, updateDoc, addDoc, deleteDoc, getDocs, query, where, onSnapshot, serverTimestamp, increment, writeBatch } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js";
+    import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, onAuthStateChanged, updateProfile, sendPasswordResetEmail } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-auth.js";
 
     const firebaseConfig = { apiKey: "AIzaSyBkJg6hiMPcgM-bywHjUCKdD8CapA1VDHk", authDomain: "ogrencitakip-bcdbd.firebaseapp.com", projectId: "ogrencitakip-bcdbd", storageBucket: "ogrencitakip-bcdbd.firebasestorage.app", messagingSenderId: "74510222174", appId: "1:74510222174:web:9d379386762064ee0f45cf" };
     const app = initializeApp(firebaseConfig); const db = getFirestore(app); const auth = getAuth(app);
     const ADMIN_EMAIL = "mremzi@gmail.com";
+    const SUBJECTS = ['Matematik','Türkçe','Fen','Sosyal','İngilizce','Din','Kitap','Diğer'];
+    
+    // AVATAR SHOP DATA
+    const AVATAR_SHOP = [
+        { icon: '🐺', name: 'Bozkurt', cost: 500 },
+        { icon: '🚀', name: 'Astronot', cost: 750 },
+        { icon: '🐉', name: 'Ejderha', cost: 1000 },
+        { icon: '🐎', name: 'Tulpar', cost: 1200 },
+        { icon: '🕵️', name: 'Dedektif', cost: 600 },
+        { icon: '🦸', name: 'Süper Kahraman', cost: 1500 },
+        { icon: '🦅', name: 'Anka Kuşu', cost: 800 },
+        { icon: '🧙‍♂️', name: 'Büyücü', cost: 2000 }
+    ];
 
-    let currentUser = null; let isLoginMode = true; let myChart = null, adminChart = null, detailChart = null; let currentWeeklyTotal = 0; let mySubjects = []; let timerInterval = null, timeLeft = 30 * 60, isTimerRunning = false;
-    let globalUserList = []; // Admin için birleştirilmiş liste
+    let currentUser=null, isLogin=true;
+    let myChart=null, admBar=null, admPie=null, detailChart=null, adminChart=null;
+    let timerInterval=null, timeLeft=0, isTimerRunning=false;
+    let globalUserList=[];
+    let bulkType = null;
+    let activeArenaListener = null; // Listener temizliği için
+    let arenaStartTime = null;
 
-    // --- TEMPLATES ---
-    const msgTemplates = {
-        'welcome': "Hoş geldin Geleceğin Mimarı. Bugün koyacağın o 'bir tuğla', yarın inşa edeceğin kalenin en sağlam parçası olacak.",
-        'explorer': "Selam Bilgi Kaşifi! Zihnin, henüz haritası çıkarılmamış kıtalar gibi. Bugün nereyi fethedeceğiz?",
-        'champion': "Bu azmin, sadece notlarını değil, şahsiyetini de yüceltiyor. Emeklerine şahidiz ve seninle gurur duyuyoruz.",
-        'focus': "Potansiyelin okyanuslar kadar derin, kıyıda beklemek sana yakışmıyor. Hadi, açılalım mı?"
-    };
-
-    onAuthStateChanged(auth, async (user) => {
-        if (user) {
-            currentUser = user; document.getElementById('authScreen').classList.add('hidden');
-            if(user.email === ADMIN_EMAIL) {
-                document.getElementById('adminScreen').classList.remove('hidden'); document.getElementById('mainContainer').classList.add('admin-mode');
-                loadAdminDashboard();
+    // --- AUTH & SETUP ---
+    onAuthStateChanged(auth, async(user)=>{
+        if(user){
+            currentUser=user; document.getElementById('authScreen').classList.add('hidden');
+            if(user.email === ADMIN_EMAIL){
+                document.getElementById('adminScreen').classList.remove('hidden');
+                document.getElementById('mainContainer').classList.add('admin-mode');
+                initAdmin();
+                listenAllMessagesForAdmin();
             } else {
                 document.getElementById('dashboardScreen').classList.remove('hidden');
-                const name = user.displayName || "Öğrenci"; document.getElementById('studentNameDisplay').innerText = name.split(' ')[0];
-                await loadUserProfile(user.uid); if(!myChart) initChart(); listenToData();
-                checkMessages(user.uid); // Mesaj kontrolü
+                document.getElementById('wiseCoachContainer').style.display = 'flex';
+                document.getElementById('stName').innerText = user.displayName ? user.displayName.split(' ')[0] : 'Öğrenci';
+                await initStudent(user.uid);
             }
         } else {
-            currentUser = null; document.getElementById('authScreen').classList.remove('hidden'); document.getElementById('dashboardScreen').classList.add('hidden'); document.getElementById('adminScreen').classList.add('hidden'); document.getElementById('mainContainer').classList.remove('admin-mode');
+            currentUser=null;
+            ['dashboardScreen','adminScreen'].forEach(id => document.getElementById(id).classList.add('hidden'));
+            document.getElementById('authScreen').classList.remove('hidden');
+            document.getElementById('mainContainer').classList.remove('admin-mode');
+            document.querySelector('.wise-coach-container').style.display = 'none';
         }
     });
 
-    // --- STUDENT MESSAGE CHECKER ---
-    function checkMessages(uid) {
-        const q = query(collection(db, "messages"), where("toUid", "==", uid), where("read", "==", false));
-        onSnapshot(q, (snapshot) => {
-            snapshot.forEach(async (docSnap) => {
-                const msg = docSnap.data();
-                // SweetAlert ile şık bildirim
-                await Swal.fire({
-                    title: 'Yeni Bir Mektubun Var! 📜',
-                    text: msg.content,
-                    icon: 'info',
-                    confirmButtonText: 'Okudum, Teşekkürler',
-                    confirmButtonColor: '#6366f1',
-                    background: '#f8fafc',
-                    backdrop: `rgba(0,0,123,0.4)`
-                });
-                // Okundu olarak işaretle
-                await updateDoc(doc(db, "messages", docSnap.id), { read: true });
-            });
+    // --- STUDENT LOGIC ---
+    async function initStudent(uid){
+        const userRef = doc(db,"users",uid);
+        const userSnap = await getDoc(userRef);
+        if(!userSnap.exists()){ await setDoc(userRef, { email: currentUser.email, displayName: currentUser.displayName, totalMinutes: 0, bilgePoints: 0, weeklyGoal: 1000, avatar: '🎓', createdAt: serverTimestamp() }); }
+        const data = userSnap.exists() ? userSnap.data() : { bilgePoints:0, weeklyGoal:1000, avatar: '🎓' };
+        
+        document.getElementById('stPoints').innerText = data.bilgePoints || 0;
+        document.getElementById('targetMins').innerText = data.weeklyGoal || 1000;
+        document.getElementById('weeklyGoalInput').value = data.weeklyGoal || 1000;
+        document.getElementById('userAvatar').innerText = data.avatar || '🎓';
+        
+        // Dropdown default
+        const entryDateEl = document.getElementById('entryDate');
+        if(entryDateEl) entryDateEl.value = "0";
+
+        renderChips(); renderAvatarShop();
+        listenStudentData(uid); listenMessages(uid);
+    }
+
+    function renderAvatarShop() {
+        const grid = document.getElementById('avatarShop');
+        grid.innerHTML = "";
+        AVATAR_SHOP.forEach(item => {
+            const div = document.createElement('div');
+            div.className = 'store-item';
+            div.innerHTML = `
+                <div class="store-icon">${item.icon}</div>
+                <strong>${item.name}</strong>
+                <div class="store-price">${item.cost} Puan</div>
+                <button onclick="buyAvatar('${item.icon}', ${item.cost})" style="margin-top:10px; padding:10px; font-size:0.9rem; background:#f1f9f9; color:#333;">Satın Al</button>
+            `;
+            grid.appendChild(div);
         });
     }
 
-    // --- ADMIN MESSAGING ---
-    window.switchAdminTab = (tab) => {
-        if(tab === 'dashboard') {
-            document.getElementById('adminPanelDashboard').classList.remove('hidden'); document.getElementById('adminPanelMessages').classList.add('hidden');
-            document.getElementById('tabAdminDash').classList.add('active'); document.getElementById('tabAdminMsg').classList.remove('active');
-        } else {
-            document.getElementById('adminPanelDashboard').classList.add('hidden'); document.getElementById('adminPanelMessages').classList.remove('hidden');
-            document.getElementById('tabAdminDash').classList.remove('active'); document.getElementById('tabAdminMsg').classList.add('active');
-            populateStudentSelect();
+    window.buyAvatar = async (icon, cost) => {
+        const currentPoints = parseInt(document.getElementById('stPoints').innerText);
+        if(currentPoints < cost) return Swal.fire("Yetersiz Puan", "Daha çok çalışmalısın!", "error");
+        
+        if(confirm(`${cost} puan karşılığında bu simgeyi kullanmak istiyor musun?`)){ 
+            try { 
+                await updateDoc(doc(db,"users",currentUser.uid), { bilgePoints: increment(-cost), avatar: icon }); 
+                document.getElementById('userAvatar').innerText = icon;
+                Swal.fire("Harika!", `Yeni simgen hayırlı olsun!`, "success"); 
+                confetti(); 
+            } catch(e) { alert(e.message); } 
         }
     };
 
-    function populateStudentSelect() {
-        const sel = document.getElementById('msgStudentSelect'); sel.innerHTML = '<option value="">Öğrenci Seçiniz...</option>';
-        globalUserList.forEach(u => {
-            // Ana ID'yi kullanıyoruz
-            const opt = document.createElement('option');
-            opt.value = u.originalDocs[0]; // İlk bulunan doküman ID'si ana ID olsun
-            opt.innerText = u.name;
-            sel.appendChild(opt);
-        });
-    }
-
-    window.useTemplate = (key) => { document.getElementById('msgContent').value = msgTemplates[key]; };
-
-    window.sendAdminMessage = async () => {
-        const targetUid = document.getElementById('msgStudentSelect').value;
-        const content = document.getElementById('msgContent').value;
-        if(!targetUid || !content) return Swal.fire('Eksik Bilgi', 'Lütfen öğrenci seçin ve mesaj yazın.', 'warning');
+    // HAFTALIK BONUSU AL (GÜNCELLENDİ: 1000 dk KURALI)
+    window.claimWeeklyBonus = async () => {
+        if(!currentUser) return;
         
+        const currentGoal = parseInt(document.getElementById('targetMins').innerText) || 1000;
+        if(currentGoal < 1000) {
+             Swal.fire("Hedef Yetersiz", "Haftalık hedefin en az 1000 dk olmalı ki ödül alabilesin!", "warning"); 
+             return;
+        }
+
         try {
-            await addDoc(collection(db, "messages"), {
-                toUid: targetUid,
-                content: content,
-                read: false,
-                createdAt: serverTimestamp()
-            });
-            Swal.fire('Başarılı', 'Mesajınız iletildi.', 'success');
-            document.getElementById('msgContent').value = "";
-        } catch(e) { Swal.fire('Hata', e.message, 'error'); }
+            await updateDoc(doc(db,"users",currentUser.uid), { bilgePoints: increment(500) });
+            Swal.fire("Tebrikler!", "Haftalık hedefini tutturdun! +500 Puan hesabına eklendi.", "success");
+            confetti();
+            document.getElementById('btnClaimWeekly').classList.add('hidden'); // Butonu gizle
+        } catch(e) { alert(e.message); }
     };
 
-    // --- SMART ADMIN DASHBOARD ---
-    async function loadAdminDashboard() {
-        const usersRef = collection(db, "users");
-        onSnapshot(usersRef, (snapshot) => {
-            const mergedUsers = {}; 
-            snapshot.forEach(doc => {
-                const data = doc.data();
-                if(data.email === ADMIN_EMAIL) return;
-                const key = (data.displayName || data.email).toLowerCase().trim();
-                if (!mergedUsers[key]) {
-                    mergedUsers[key] = { displayId: doc.id, name: data.displayName || data.email, totalMinutes: 0, lastStudyDate: null, originalDocs: [] };
-                }
-                mergedUsers[key].totalMinutes += (data.totalMinutes || 0);
-                mergedUsers[key].originalDocs.push(doc.id);
-                const docDate = data.lastStudyDate ? (data.lastStudyDate.toDate ? data.lastStudyDate.toDate() : new Date(data.lastStudyDate)) : null;
-                if (docDate) { if (!mergedUsers[key].lastStudyDate || docDate > mergedUsers[key].lastStudyDate) { mergedUsers[key].lastStudyDate = docDate; } }
-            });
-
-            globalUserList = Object.values(mergedUsers).sort((a, b) => b.totalMinutes - a.totalMinutes);
+    function listenStudentData(uid){
+        const q = query(collection(db,"users",uid,"sessions"), where("createdAt",">",new Date(Date.now()-7*24*60*60*1000)));
+        onSnapshot(q, (snap)=>{
+            let totalWeekly=0; const list=document.getElementById('historyList'); list.innerHTML="";
+            const acts=[]; snap.forEach(d=>{ acts.push({id:d.id, ...d.data()}); });
+            acts.sort((a,b)=>(b.createdAt?.seconds||0)-(a.createdAt?.seconds||0));
+            if(acts.length===0) list.innerHTML="<li style='text-align:center; padding:10px; color:#999;'>Henüz kayıt yok.</li>";
+            else { acts.forEach(a=>{ list.innerHTML+=`<li style="padding:15px; border-bottom:1px solid #f1f9f9; display:flex; justify-content:space-between; align-items:center;"><div><div style="font-weight:700; color:var(--text-main);">${a.subject}</div><div style="font-size:0.8rem; color:var(--text-sub);">${a.dateStr}</div></div><div style="font-weight:bold; color:var(--primary); font-size:1.1rem;">${a.duration}dk</div></li>`; totalWeekly+=a.duration; }); }
             
-            document.getElementById('adminTotalStudents').innerText = globalUserList.length;
-            let totalSystemMins = 0; let activeTodayCount = 0; const today = new Date().toDateString();
-            globalUserList.forEach(u => { totalSystemMins += u.totalMinutes; if(u.lastStudyDate && u.lastStudyDate.toDateString() === today) activeTodayCount++; });
-            document.getElementById('adminTotalHours').innerText = Math.floor(totalSystemMins / 60);
-            document.getElementById('adminActiveToday').innerText = activeTodayCount;
-
-            renderAdminTable(globalUserList);
-            renderAdminChart(globalUserList);
-            renderRisingStars(globalUserList);
-        });
+            const goal = parseInt(document.getElementById('targetMins').innerText) || 1000;
+            document.getElementById('progVal').innerText = Math.min(100, Math.round((totalWeekly/goal)*100));
+            
+            const progText = document.getElementById('progText');
+            const claimBtn = document.getElementById('btnClaimWeekly');
+            
+            if (totalWeekly >= goal) { 
+                progText.innerHTML = "🎉 HEDEFE ULAŞILDI! 🎉"; 
+                progText.style.color = "var(--success)"; 
+                if(claimBtn.classList.contains('hidden')) claimBtn.classList.remove('hidden'); // Hedef tutunca butonu göster
+                if(!window.confettiFired) { confetti(); window.confettiFired = true; } 
+            } else { 
+                progText.innerHTML = `%<span id="progVal">${Math.min(100, Math.round((totalWeekly/goal)*100))}</span> Tamamlandı`; 
+                progText.style.color = "var(--primary)"; 
+                claimBtn.classList.add('hidden');
+                window.confettiFired = false; 
+            }
+            updateStudentChart(totalWeekly, goal);
+            
+            getDoc(doc(db,"users",uid)).then(d => { if(d.exists()) {
+                const data = d.data();
+                document.getElementById('stPoints').innerText = data.bilgePoints || 0; 
+                if(data.avatar) document.getElementById('userAvatar').innerText = data.avatar;
+            }});
+        }, (error) => { if(error.code === 'permission-denied') Swal.fire("Hata", "Verilere erişim izni yok.", "error"); });
     }
+    function updateStudentChart(val, goal){ const ctx = document.getElementById('weeklyChart').getContext('2d'); if(myChart) myChart.destroy(); myChart = new Chart(ctx, { type: 'doughnut', data: { labels: ['Yapılan', 'Kalan'], datasets: [{ data: [val, Math.max(0, goal-val)], backgroundColor: ['#009688', '#e2e8f0'], borderWidth: 0 }] }, options: { cutout: '80%', maintainAspectRatio: false, plugins: { legend: { display: false } } } }); }
+    window.updateGoal = async () => { const val = parseInt(document.getElementById('weeklyGoalInput').value); if(currentUser && val) { await updateDoc(doc(db,"users",currentUser.uid), { weeklyGoal: val }); Swal.fire("Hedef Güncellendi", `Yeni haftalık hedefin: ${val} dk`, "success"); } };
+    
+    // --- POINT SYSTEM UPDATE (GEÇMİŞE DÖNÜK) ---
+    // Normal Entry: 1 min = 1 point
+    window.saveEntry = async () => { 
+        const sub = document.getElementById('selectedSubject').value; const dur = parseInt(document.getElementById('entryDur').value);
+        if(!sub || !dur) return Swal.fire("Eksik Bilgi", "Lütfen ders ve süre seçin.", "warning");
+        
+        // DROP DOWN MANTIĞI (0=Bugün, 1=Dün, 2=2 Gün Önce)
+        const offset = parseInt(document.getElementById('entryDate').value) || 0;
+        const dt = new Date();
+        dt.setDate(dt.getDate() - offset);
+        dt.setHours(12,0,0,0);
 
-    function renderRisingStars(users) {
-        const container = document.getElementById('risingStarsContainer'); container.innerHTML = "";
-        const now = new Date(); const oneDay = 24 * 60 * 60 * 1000;
-        const stars = users.filter(u => { if(!u.lastStudyDate) return false; return (now - u.lastStudyDate) < (oneDay * 2); }).sort((a,b) => b.totalMinutes - a.totalMinutes).slice(0, 5);
-        if (stars.length === 0) { container.innerHTML = "<div style='width:100%; text-align:center; padding:10px; color:#94a3b8;'>Henüz yükselen yıldız yok.</div>"; return; }
-        stars.forEach(u => { const card = document.createElement('div'); card.className = "star-card"; card.innerHTML = `<span class="star-icon">🚀</span><div style="font-weight:700; font-size:0.9rem; color:var(--text-main);">${u.name.split(' ')[0]}</div><div style="font-size:0.8rem; color:var(--success); font-weight:600;">Aktif</div>`; container.appendChild(card); });
-    }
-
-    function renderAdminTable(users) {
-        const tbody = document.getElementById('studentTableBody'); tbody.innerHTML = "";
-        users.forEach((u, index) => {
-            const tr = document.createElement('tr'); 
-            const evaluation = evaluateStudent(u.totalMinutes, u.lastStudyDate);
-            // Birden fazla ID varsa hepsini iletmek gerekir ama şimdilik displayId yeterli
-            tr.onclick = () => openAdminDetail(u.originalDocs[0], u.name, evaluation, u);
-            tr.innerHTML = `<td style="font-weight:700; color:#94a3b8;">#${index+1}</td><td><div style="font-weight:600; color:var(--text-main); font-size:1rem;">${u.name}</div><div style="font-size:0.75rem; color:var(--text-sub);">${u.lastStudyDate ? u.lastStudyDate.toLocaleDateString('tr-TR') : 'Giriş Yok'}</div></td><td><span class="smart-badge ${evaluation.badgeClass}">${evaluation.icon} ${evaluation.text}</span></td><td style="font-weight:800; color:var(--primary); font-size:1rem;">${Math.floor(u.totalMinutes / 60)}s ${(u.totalMinutes % 60)}dk</td>`;
-            tbody.appendChild(tr);
-        });
-    }
-
-    function evaluateStudent(minutes, lastDate) {
-        if (!lastDate) return { text: "Veri Yok", badgeClass: "sb-idle", icon: "⚪", comment: "Henüz veri girişi yapılmamış." };
-        const now = new Date(); const daysDiff = (now - lastDate) / (1000 * 60 * 60 * 24);
-        if (daysDiff > 7) return { text: "Riskli", badgeClass: "sb-risk", icon: "⚠️", comment: "1 haftadan fazladır aktif değil. İletişime geçilmeli." };
-        if (daysDiff > 3) return { text: "Kopuk", badgeClass: "sb-idle", icon: "💤", comment: "Süreklilik düşmüş. Motivasyon lazım." };
-        if (minutes > 3000) return { text: "Yıldız", badgeClass: "sb-star", icon: "🌟", comment: "Muazzam performans! Lider ruhlu." };
-        if (minutes > 1000) return { text: "İyi", badgeClass: "sb-good", icon: "👍", comment: "İstikrarlı ve başarılı." };
-        return { text: "Başlangıç", badgeClass: "sb-good", icon: "🌱", comment: "Gayretli, takibe devam." };
-    }
-
-    function renderAdminChart(users) {
-        const container = document.getElementById('chartInner'); const minWidth = Math.max(users.length * 60, 400); container.style.width = minWidth + "px";
-        const ctx = document.getElementById('adminLeaderboardChart').getContext('2d');
-        const labels = users.map(u => u.name.split(' ')[0]); const data = users.map(u => u.totalMinutes);
-        if(adminChart) adminChart.destroy();
-        adminChart = new Chart(ctx, { type: 'bar', data: { labels: labels, datasets: [{ label: 'Toplam Dakika', data: data, backgroundColor: '#6366f1', borderRadius: 8, barThickness: 40 }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, grid: { display: false } }, x: { grid: { display: false } } } } });
-    }
-
-    window.openAdminDetail = async (uid, name, evaluation, userObj) => {
-        document.getElementById('detailStudentName').innerText = name;
-        document.getElementById('smartEvaluationBadge').innerText = evaluation.icon + " " + evaluation.text; document.getElementById('smartEvaluationBadge').className = `smart-badge ${evaluation.badgeClass}`;
-        document.getElementById('aiComment').innerText = evaluation.comment;
-        document.getElementById('modalAdminDetail').classList.remove('hidden');
-        document.getElementById('statTotalMin').innerText = userObj.totalMinutes;
-        const dates = []; for (let i = 0; i < 7; i++) { const d = new Date(); d.setDate(d.getDate() - i); dates.push(d.toLocaleDateString('tr-TR')); } dates.reverse();
-        const snapshot = await getDocs(query(collection(db, "users", uid, "sessions")));
-        const statsByDate = {}; dates.forEach(d => statsByDate[d] = 0); let totalWeek = 0;
-        snapshot.forEach(doc => { const s = doc.data(); if (statsByDate.hasOwnProperty(s.dateStr)) { statsByDate[s.dateStr] += s.duration; totalWeek += s.duration; } });
-        document.getElementById('statAvg').innerText = Math.round(totalWeek / 7);
-        const ctx = document.getElementById('studentDetailChart').getContext('2d'); if (detailChart) detailChart.destroy(); 
-        detailChart = new Chart(ctx, { type: 'line', data: { labels: dates, datasets: [{ label: 'Dakika', data: dates.map(d => statsByDate[d]), borderColor: '#ec4899', backgroundColor: 'rgba(236, 72, 153, 0.1)', tension: 0.4, fill: true }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } } });
+        try { 
+            await addDoc(collection(db,"users",currentUser.uid,"sessions"), { subject: sub, duration: dur, createdAt: dt, dateStr: dt.toLocaleDateString('tr-TR'), type: 'manual' }); 
+            await updateDoc(doc(db,"users",currentUser.uid), { totalMinutes: increment(dur), bilgePoints: increment(dur), lastStudyDate: serverTimestamp() }); 
+            Swal.fire("Harika!", `${dur} dakika eklendi ve ${dur} puan kazandın!`, "success"); confetti(); 
+        } catch(e) { Swal.fire("Hata", e.message, "error"); } 
     };
     
-    window.closeAdminDetail = () => { document.getElementById('modalAdminDetail').classList.add('hidden'); };
+    // Pomodoro Entry: 1 min = 1.5 points (Arena Bonus +0.5)
+    window.savePomo = async () => { 
+        window.resetTimer(); 
+        const sub = document.getElementById('pomoSubject').value; 
+        const dur = parseInt(document.getElementById('timerSet').value); 
+        if(!sub) return Swal.fire("Ders Seç", "Lütfen bir ders seç.", "warning"); 
+        
+        // ARENA BONUS CHECK
+        const isArenaActive = !document.getElementById('viewArena').classList.contains('hidden') || localStorage.getItem('arenaActive') === 'true';
+        const multiplier = isArenaActive ? 2.0 : 1.5; // Arena: 2.0, Normal: 1.5
+        const points = Math.ceil(dur * multiplier);
 
-    // Standard Functions (Minified for brevity as they are unchanged logic)
-    async function loadUserProfile(uid){const r=doc(db,"users",uid);const s=await getDoc(r);if(s.exists()){const d=s.data();mySubjects=d.subjects||['Matematik','Türkçe','Fen','İngilizce','Genel','Kitap'];document.getElementById('weeklyGoalInput').value=d.weeklyGoal||1000}else{mySubjects=['Matematik','Türkçe','Fen','İngilizce','Genel','Kitap'];await setDoc(r,{email:currentUser.email,displayName:currentUser.displayName,subjects:mySubjects,weeklyGoal:1000,totalMinutes:0,createdAt:serverTimestamp()})}renderAllChips()}
+        try { 
+            await addDoc(collection(db,"users",currentUser.uid,"sessions"), { subject: sub, duration: dur, createdAt: serverTimestamp(), dateStr: new Date().toLocaleDateString('tr-TR'), type: 'pomodoro' }); 
+            await updateDoc(doc(db,"users",currentUser.uid), { totalMinutes: increment(dur), bilgePoints: increment(points), lastStudyDate: serverTimestamp() }); 
+            if(isArenaActive) {
+                // Arena'dan çıkış yap
+                await updateDoc(doc(db, "arena", currentUser.uid), { isActive: false });
+                localStorage.removeItem('arenaActive');
+            }
+            Swal.fire("Tebrikler!", `${dur} dk çalışma + ${points} Puan kazandın!`, "success"); confetti(); 
+        } catch(e) { alert(e.message); } 
+    };
+
+    // --- ARENA LOGIC ---
+    function startArenaSession() {
+        if(!currentUser) return;
+        // Arena koleksiyonuna "Aktifim" diye işaret koy
+        setDoc(doc(db, "arena", currentUser.uid), {
+            name: currentUser.displayName,
+            subject: document.getElementById('pomoSubject').value || "Ders",
+            startTime: serverTimestamp(),
+            duration: parseInt(document.getElementById('timerSet').value),
+            isActive: true,
+            avatar: document.getElementById('userAvatar').innerText
+        });
+        localStorage.setItem('arenaActive', 'true');
+        
+        // Sayacı Arena içinde başlat (Aynı fonksiyonu kullanır ama bağlamı farklı)
+        // Kullanıcıyı Pomo sekmesine değil, Arena içinde sayacı göstererek tutabiliriz
+        // Veya basitçe Pomo sekmesini açıp oradan devam ettiririz.
+        // Emriniz: "Bu bölüme Arttırmalı Sayaç yapalım"
+        
+        startTimer(); // Global timer'ı başlat
+        document.getElementById('arenaStartBtn').innerText = "SAVAŞ BAŞLADI (SAYAÇ AKTİF)";
+        document.getElementById('arenaStartBtn').disabled = true;
+    }
+
+    function listenArena() {
+        if(activeArenaListener) activeArenaListener(); // Öncekini temizle
+        const q = query(collection(db, "arena"), where("isActive", "==", true));
+        activeArenaListener = onSnapshot(q, (snap) => {
+            const list = document.getElementById('arenaList'); list.innerHTML = "";
+            if(snap.empty) { list.innerHTML = "<div style='text-align:center; padding:20px; color:#999;'>Arenada kimse yok. İlk gladyatör sen ol!</div>"; return; }
+
+            snap.forEach(d => {
+                const data = d.data();
+                if(d.id === currentUser.uid) return; // Kendini gösterme
+                const el = document.createElement('div'); el.className = "arena-item";
+                el.innerHTML = `<div class="arena-user"><span style="font-size:1.5rem;">${data.avatar || '👤'}</span><div><div>${data.name.split(' ')[0]}</div><div style="font-size:0.75rem; color:var(--text-sub);">${data.subject} Çalışıyor</div></div></div><div style="text-align:right;"><div class="arena-status">AKTİF</div><button class="btn-boost" onclick="boostDuration()">+5 Dk Artır</button></div>`;
+                list.appendChild(el);
+            });
+        });
+    }
+
+    window.boostDuration = () => {
+        if(!isTimerRunning) return Swal.fire("Sayaç Kapalı", "Önce bir çalışma başlatmalısın!", "warning");
+        timeLeft += 5 * 60; // 5 dk ekle
+        Swal.fire("Meydan Okuma Kabul!", "Süreni 5 dakika artırdın. Harikasın!", "success");
+    }
+
+    window.buyItem = async (itemName, cost) => { const currentPoints = parseInt(document.getElementById('stPoints').innerText); if(currentPoints < cost) return Swal.fire("Yetersiz Puan", "Daha çok çalışmalısın!", "error"); if(confirm(`${itemName} almak için ${cost} puan harcanacak. Onaylıyor musun?`)){ try { await updateDoc(doc(db,"users",currentUser.uid), { bilgePoints: increment(-cost) }); Swal.fire("Hayırlı Olsun!", `${itemName} çantana eklendi.`, "success"); confetti(); } catch(e) { alert(e.message); } } };
+    
+    window.saveFuture = async () => { 
+        const msg = document.getElementById('futureMsg').value; if(!msg) return; 
+        try { 
+            await addDoc(collection(db,"users",currentUser.uid,"timecapsule"), { content: msg, createdAt: serverTimestamp() }); 
+            // Zaman Kapsülü Bonusu: +50 Puan
+            await updateDoc(doc(db,"users",currentUser.uid), { bilgePoints: increment(50) });
+            Swal.fire("Kapsül Mühürlendi", "Mektubun geleceğe yollandı. +50 Puan kazandın!", "success"); 
+            document.getElementById('futureMsg').value = ""; 
+        } catch(e) { alert(e.message); } 
+    };
+
+    // --- ADMIN LOGIC ---
+    function initAdmin(){
+        onSnapshot(collection(db,"users"), (snap)=>{
+            globalUserList=[]; const select = document.getElementById('msgStudentSelect'); select.innerHTML = '<option value="">Öğrenci Seç...</option>';
+            snap.forEach(d=>{ 
+                const dt = d.data();
+                if(dt.email !== ADMIN_EMAIL) {
+                    globalUserList.push({id:d.id, ...dt});
+                    const opt = document.createElement('option'); opt.value = d.id; opt.innerText = dt.displayName || dt.email; select.appendChild(opt);
+                }
+            });
+            globalUserList.sort((a,b) => (b.totalMinutes||0) - (a.totalMinutes||0)); renderAdminDashboard();
+        }, (error) => { if(error.code === 'permission-denied') Swal.fire("Admin Hatası", "Kullanıcı listesi alınamadı (İzin hatası).", "error"); });
+    }
+    function renderAdminDashboard(){
+        let risk=0, stars=0; const now = new Date(); const table = document.getElementById('studentTableBody'); table.innerHTML = "";
+        globalUserList.forEach((u,i) => {
+            const last = u.lastStudyDate ? (u.lastStudyDate.toDate?u.lastStudyDate.toDate():new Date(u.lastStudyDate)) : null;
+            let status = "✅ İyi"; let rowClass = "sb-good"; let icon="👍";
+            if(!last || (now-last)/(1000*60*60*24) > 3) { status="Riskli"; risk++; rowClass="sb-risk"; icon="⚠️"; }
+            else if((u.totalMinutes||0) > 1000) { status="Lider"; stars++; rowClass="sb-star"; icon="🌟"; }
+            const tr = document.createElement('tr');
+            tr.innerHTML = `<td style="color:#94a3b8;">#${i+1}</td><td style="font-weight:600; font-size:1rem;">${u.displayName||"İsimsiz"}</td><td><span class="smart-badge ${rowClass}">${icon} ${status}</span></td><td style="color:var(--warning); font-weight:bold;">${u.bilgePoints||0}</td><td style="color:var(--primary); font-weight:800;">${Math.floor((u.totalMinutes||0)/60)}s ${(u.totalMinutes||0)%60}dk</td>`;
+            tr.onclick = () => openAdminDetail(u.id, u.displayName||"İsimsiz", u.totalMinutes||0, u.bilgePoints||0);
+            table.appendChild(tr);
+        });
+        document.getElementById('insightRiskCount').innerText = risk; document.getElementById('insightStarCount').innerText = stars;
+        document.getElementById('adminTotalStudents').innerText = globalUserList.length;
+        let tm=0; let ta=0; const td=new Date().toDateString();
+        globalUserList.forEach(u=>{ tm+=(u.totalMinutes||0); if(u.lastStudyDate && (u.lastStudyDate.toDate?u.lastStudyDate.toDate():new Date(u.lastStudyDate)).toDateString()===td) ta++; });
+        document.getElementById('adminTotalHours').innerText = Math.floor(tm/60); document.getElementById('adminActiveToday').innerText = ta;
+        renderRisingStars(globalUserList); renderAdminChart(globalUserList);
+    }
+    function renderRisingStars(users) { 
+        const c=document.getElementById('risingStarsContainer');c.innerHTML="";const n=new Date();const od=24*60*60*1000;
+        const s=users.filter(u=>{if(!u.lastStudyDate)return false; const d=u.lastStudyDate.toDate?u.lastStudyDate.toDate():new Date(u.lastStudyDate); return(n-d)<(od*2)}).sort((a,b)=>b.totalMinutes-a.totalMinutes).slice(0,5);
+        if(s.length===0){c.innerHTML="<div style='width:100%;text-align:center;padding:10px;color:#94a3b8;'>Henüz yükselen yıldız yok.</div>";return}
+        s.forEach(u=>{
+            const cd=document.createElement('div');cd.className="star-card";
+            cd.innerHTML=`<span class="star-icon">🚀</span><div class="star-name">${u.displayName||"Öğrenci"}</div><div style="font-size:0.8rem;color:var(--success);font-weight:600;">Aktif</div>`;
+            c.appendChild(cd)
+        })
+    }
+    function renderAdminChart(users) { const c=document.getElementById('chartInner');const mw=Math.max(users.length*60,400);c.style.width=mw+"px";const ctx=document.getElementById('adminLeaderboardChart').getContext('2d');const l=users.map(u=>(u.displayName||"Öğrenci").split(' ')[0]);const d=users.map(u=>u.totalMinutes);if(adminChart)adminChart.destroy();adminChart=new Chart(ctx,{type:'bar',data:{labels:l,datasets:[{label:'Toplam Dakika',data:d,backgroundColor:'#009688',borderRadius:8,barThickness:40}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{y:{beginAtZero:true,grid:{display:false}},x:{grid:{display:false}}}}})}
+    window.openAdminDetail = async (uid, name, total, points) => { document.getElementById('modalAdminDetail').classList.remove('hidden'); document.getElementById('detailStudentName').innerText = name; document.getElementById('statTotalMin').innerText = total; document.getElementById('statAvg').innerText = points; const s = await getDocs(query(collection(db,"users",uid,"sessions"))); let days={}; for(let i=0; i<7; i++){ const d=new Date(); d.setDate(d.getDate()-i); days[d.toLocaleDateString('tr-TR')]=0; } s.forEach(doc=>{ const dt=doc.data(); if(days[dt.dateStr]!==undefined) days[dt.dateStr]+=dt.duration; }); const lbl=Object.keys(days).reverse(); const da=Object.values(days).reverse(); const ctx=document.getElementById('studentDetailChart').getContext('2d'); if(detailChart) detailChart.destroy(); detailChart=new Chart(ctx,{type:'line',data:{labels:lbl,datasets:[{label:'Günlük',data:da,borderColor:'#ec4899',tension:0.4,fill:true,backgroundColor:'rgba(236,72,153,0.1)'}]},options:{responsive:true,maintainAspectRatio:false}});}; window.closeAdminDetail=()=>document.getElementById('modalAdminDetail').classList.add('hidden');
+
+    // --- NEW: BULK MESSAGE SELECT ---
+    window.openBulkSelectModal = (type) => {
+        bulkType = type;
+        const list = document.getElementById('bulkUserList');
+        list.innerHTML = "";
+        const desc = document.getElementById('bulkModalDesc');
+        const txt = document.getElementById('bulkMsgContent');
+        const now = new Date();
+
+        let targets = [];
+        if(type === 'risk') {
+            desc.innerText = "Aşağıdaki öğrenciler 3 günden fazladır aktif değil.";
+            txt.value = "Sahalara dönme vakti! Seni özledik. 🚀";
+            targets = globalUserList.filter(u => { const last = u.lastStudyDate ? (u.lastStudyDate.toDate?u.lastStudyDate.toDate():new Date(u.lastStudyDate)) : null; return (!last || (now-last)/(1000*60*60*24) > 3); });
+        } else {
+            desc.innerText = "Aşağıdaki öğrenciler 1000 dakika barajını aştı.";
+            txt.value = "Harika gidiyorsun! Aynen devam! 🌟";
+            targets = globalUserList.filter(u => (u.totalMinutes||0) > 1000);
+        }
+
+        if(targets.length === 0) {
+            list.innerHTML = "<div style='text-align:center; padding:20px; color:#999;'>Kriterlere uygun öğrenci yok.</div>";
+        } else {
+            targets.forEach(u => {
+                const div = document.createElement('div');
+                div.className = 'selection-item';
+                div.innerHTML = `<input type="checkbox" class="bulk-check" value="${u.id}" checked> <label>${u.displayName || u.email}</label>`;
+                list.appendChild(div);
+            });
+        }
+
+        document.getElementById('modalBulkSelect').classList.remove('hidden');
+    };
+
+    window.closeBulkSelectModal = () => document.getElementById('modalBulkSelect').classList.add('hidden');
+    window.toggleSelectAll = (state) => { document.querySelectorAll('.bulk-check').forEach(c => c.checked = state); };
+
+    window.confirmBulkSend = async () => {
+        const checks = document.querySelectorAll('.bulk-check:checked');
+        const msg = document.getElementById('bulkMsgContent').value;
+        
+        if(checks.length === 0) return Swal.fire("Seçim Yok", "Lütfen en az bir öğrenci seçin.", "warning");
+        if(!msg) return Swal.fire("Mesaj Yok", "Mesaj metni boş olamaz.", "warning");
+
+        const ids = Array.from(checks).map(c => c.value);
+        const batch = writeBatch(db); 
+
+        ids.forEach(uid => {
+            const ref = doc(collection(db, "messages"));
+            batch.set(ref, { toUid: uid, content: msg, read: false, type: 'auto', target: 'student', createdAt: serverTimestamp() });
+        });
+
+        await batch.commit();
+        Swal.fire("Başarılı", `${ids.length} öğrenciye mesaj gönderildi.`, "success");
+        closeBulkSelectModal();
+    };
+
+    window.sendAdminMessage = async () => { const uid = document.getElementById('msgStudentSelect').value; const msg = document.getElementById('msgContent').value; const aud = document.querySelector('input[name="targetAudience"]:checked').value; if(!uid || !msg) return Swal.fire("Eksik", "Bilgileri tamamlayın.", "warning"); await addDoc(collection(db,"messages"),{ toUid:uid, content:msg, read:false, type:'admin', target:aud, createdAt:serverTimestamp() }); Swal.fire("Gönderildi", "", "success"); document.getElementById('msgContent').value=""; };
+    window.fetchRandomMessage = async (target, type) => { const q = query(collection(db, "message_library"), where("target", "==", target), where("type", "==", type)); const s = await getDocs(q); const m = []; s.forEach(d => m.push(d.data().text)); if(m.length>0) document.getElementById('msgContent').value = m[Math.floor(Math.random()*m.length)]; else document.getElementById('msgContent').value = "Mesaj bulunamadı."; };
+    function listenAllMessagesForAdmin() { onSnapshot(query(collection(db, "messages")), (s) => { const l = document.getElementById('adminMsgHistoryList'); l.innerHTML = ""; const m = []; s.forEach(d => m.push({ id: d.id, ...d.data() })); m.sort((a,b) => (b.createdAt?.seconds || 0) - (a.createdAt?.seconds || 0)); m.forEach(msg => { const u = globalUserList.find(x => x.id === msg.toUid); const n = u ? u.displayName : "Bilinmeyen"; l.innerHTML += `<div class="msg-card"><button class="btn-delete-msg" onclick="deleteMessage('${msg.id}')">🗑️</button><div style="font-weight:bold;">${n} <span style="font-weight:normal; color:#aaa;">(${msg.createdAt?(msg.createdAt.toDate?msg.createdAt.toDate():new Date(msg.createdAt)).toLocaleDateString('tr-TR'):''})</span></div><div>${msg.content}</div><div style="font-size:0.7rem; color:#666; margin-top:5px;">Hedef: ${msg.target==='parent'?'Veli':'Öğrenci'} | ${msg.read?'Okundu':'İletildi'}</div></div>`; }); }, (error) => { if(error.code==='permission-denied') console.error("Msg Listener Error: Permission Denied"); }); }
+    window.deleteMessage = async (id) => { if(confirm("Silinsin mi?")) await deleteDoc(doc(db,"messages",id)); }; window.deleteAllMessages = async () => { if(confirm("TÜM mesajlar silinecek?")) { const s = await getDocs(collection(db,"messages")); s.forEach(d => deleteDoc(doc(db,"messages",d.id))); } };
+    function listenMessages(uid){ onSnapshot(query(collection(db, "messages"), where("toUid", "==", uid)), s=>{ let ur=0; const list=document.getElementById('msgList'); list.innerHTML=""; const msgs = []; s.forEach(d => msgs.push({id:d.id, ...d.data()})); msgs.sort((a,b)=>(b.createdAt?.seconds||0)-(a.createdAt?.seconds||0)); if (msgs.length === 0) list.innerHTML = "<div style='text-align:center; padding:20px; color:#aaa;'>Posta kutun boş.</div>"; msgs.forEach(m => { if(!m.read) ur++; const st = m.read ? '' : 'unread'; const tg = m.target==='parent'?'type-parent':'type-student'; list.innerHTML += `<div class="msg-card ${st} ${tg}" onclick="readMsg('${m.id}')"><div style="font-weight:bold; color:var(--primary);">${m.type==='auto'?'🦉 Bilge Koç':'👨‍🏫 Yönetici'} ${!m.read?'<span style="color:red; font-size:0.7rem;">YENİ</span>':''}</div><div>${m.content}</div></div>`; }); const bd = document.getElementById('coachBadge'); const av = document.getElementById('wiseAvatar'); bd.innerText = ur; if (ur > 0) { bd.classList.remove('hidden'); av.classList.add('excited'); av.classList.remove('idle'); document.getElementById('coachBubble').classList.add('show'); setTimeout(()=>document.getElementById('coachBubble').classList.remove('show'),5000); } else { bd.classList.add('hidden'); av.classList.remove('excited'); av.classList.add('idle'); } }, (error) => { if(error.code === 'permission-denied') console.error("Öğrenci mesajları yüklenemedi."); }); }
+    window.readMsg = async(id) => { await updateDoc(doc(db,"messages",id),{read:true}); }; window.openMsgModal = () => document.getElementById('modalMsg').classList.remove('hidden');
     window.openProfileModal=()=>{document.getElementById('editProfileName').value=currentUser.displayName||"";document.getElementById('editProfileEmail').value=currentUser.email||"";document.getElementById('modalProfile').classList.remove('hidden')};window.closeProfileModal=()=>document.getElementById('modalProfile').classList.add('hidden');window.saveUserProfile=async()=>{const n=document.getElementById('editProfileName').value.trim();if(!n){alert("İsim boş olamaz.");return}try{await updateProfile(currentUser,{displayName:n});await updateDoc(doc(db,"users",currentUser.uid),{displayName:n});document.getElementById('studentNameDisplay').innerText=n.split(' ')[0];alert("Profil güncellendi ✅");closeProfileModal()}catch(e){alert("Hata: "+e.message)}};window.sendPasswordReset=async()=>{if(confirm(currentUser.email+" adresine şifre sıfırlama e-postası gönderilsin mi?")){try{await sendPasswordResetEmail(auth,currentUser.email);alert("E-posta gönderildi!")}catch(e){alert("Hata: "+e.message)}}};
-    function listenToData(){if(!currentUser)return;const q=query(collection(db,"users",currentUser.uid,"sessions"));onSnapshot(q,(s)=>{const l=document.getElementById('historyList');l.innerHTML="";let wt=0;const now=new Date();const wa=new Date();wa.setDate(now.getDate()-7);const i=[];s.forEach(d=>i.push({id:d.id,...d.data()}));i.sort((a,b)=>(b.createdAt?.seconds||0)-(a.createdAt?.seconds||0));i.forEach((d,idx)=>{if(idx<10){const li=document.createElement('li');li.className='history-item fade-in';const ds=JSON.stringify(d).replace(/"/g,'&quot;');li.innerHTML=`<div style="flex:1;"><div style="font-weight:600;color:var(--text-main);">${d.subject}</div><div style="font-size:0.8rem;color:var(--text-sub);margin-top:2px;">⏱️ ${d.duration} dk <span style="margin-left:5px;opacity:0.6;">• ${d.dateStr}</span></div></div><div style="display:flex;align-items:center;"><button class="btn-action btn-edit" onclick="openEditModal(${ds})">✏️</button><button class="btn-action btn-delete" onclick="deleteEntry('${d.id}',${d.duration})">🗑️</button></div>`;l.appendChild(li)}let is=(d.createdAt?.seconds)||0;let id=new Date(is*1000);if(id>=wa)wt+=d.duration});if(i.length===0)l.innerHTML="<li style='padding:20px;text-align:center;color:var(--text-sub);'>Henüz kayıt yok.</li>";currentWeeklyTotal=wt;updateChartDisplay(wt);calculateStreak(i)})};
-    window.deleteEntry=async(id,dur)=>{if(!confirm("Silinsin mi?"))return;try{await deleteDoc(doc(db,"users",currentUser.uid,"sessions",id));await updateDoc(doc(db,"users",currentUser.uid),{totalMinutes:increment(-dur)})}catch(e){alert(e.message)}};
-    window.openEditModal=(d)=>{const s=document.getElementById('editSubject');s.innerHTML="";mySubjects.forEach(x=>{const o=document.createElement('option');o.value=x;o.innerText=x;if(x===d.subject)o.selected=true;s.appendChild(o)});document.getElementById('editEntryId').value=d.id;document.getElementById('editOldDuration').value=d.duration;document.getElementById('editDuration').value=d.duration;document.getElementById('editMood').value=d.mood;document.getElementById('modalEditEntry').classList.remove('hidden')};window.closeEditModal=()=>document.getElementById('modalEditEntry').classList.add('hidden');window.saveEditedEntry=async()=>{const id=document.getElementById('editEntryId').value;const od=parseInt(document.getElementById('editOldDuration').value);const nd=parseInt(document.getElementById('editDuration').value);const mood=document.getElementById('editMood').value;const sub=document.getElementById('editSubject').value;try{await updateDoc(doc(db,"users",currentUser.uid,"sessions",id),{subject:sub,duration:nd,mood:mood});const diff=nd-od;if(diff!==0)await updateDoc(doc(db,"users",currentUser.uid),{totalMinutes:increment(diff)});closeEditModal()}catch(e){alert(e.message)}};
-    window.renderAllChips=()=>{renderChips('chipsManual','selectedSubject');renderChips('chipsPomo','pomoSubject')};window.renderChips=(cId,iId)=>{const c=document.getElementById(cId);c.innerHTML="";let cv=document.getElementById(iId).value;if(!mySubjects.includes(cv)&&mySubjects.length>0){cv=mySubjects[0];document.getElementById(iId).value=cv}mySubjects.forEach(s=>{const d=document.createElement('div');d.className='chip';d.innerText=s;if(s===cv)d.classList.add('active');d.onclick=function(){c.querySelectorAll('.chip').forEach(x=>x.classList.remove('active'));this.classList.add('active');document.getElementById(iId).value=s};c.appendChild(d)});const e=document.createElement('div');e.className='chip chip-edit';e.innerText="✏️";e.onclick=openSubjectModal;c.appendChild(e)};
-    window.openSubjectModal=()=>{const l=document.getElementById('subjectListContainer');l.innerHTML="";mySubjects.forEach(s=>{const i=document.createElement('div');i.innerHTML=`<span>${s}</span> <button onclick="removeSubject('${s}')">🗑️</button>`;i.style.cssText="display:flex;justify-content:space-between;padding:10px;border-bottom:1px solid #eee;";l.appendChild(i)});document.getElementById('modalSubjects').classList.remove('hidden')};window.closeSubjectModal=()=>document.getElementById('modalSubjects').classList.add('hidden');window.addSubject=async()=>{const n=document.getElementById('newSubjectName').value.trim();if(n&&currentUser){await updateDoc(doc(db,"users",currentUser.uid),{subjects:arrayUnion(n)});mySubjects.push(n);document.getElementById('newSubjectName').value="";openSubjectModal();renderAllChips()}};window.removeSubject=async(n)=>{if(confirm("Silinsin mi?")&&currentUser){await updateDoc(doc(db,"users",currentUser.uid),{subjects:arrayRemove(n)});mySubjects=mySubjects.filter(s=>s!==n);openSubjectModal();renderAllChips()}};
-    window.updateGoal=async()=>{const v=parseInt(document.getElementById('weeklyGoalInput').value);if(currentUser&&v){await updateDoc(doc(db,"users",currentUser.uid),{weeklyGoal:v});updateChartDisplay(currentWeeklyTotal)}};function initChart(){const c=document.getElementById('weeklyChart').getContext('2d');myChart=new Chart(c,{type:'doughnut',data:{labels:['Tamamlanan','Kalan'],datasets:[{data:[0,100],backgroundColor:['#6366f1','#e2e8f0'],borderWidth:0}]},options:{responsive:true,maintainAspectRatio:false,cutout:'80%',plugins:{legend:{display:false}}}})}function calculateStreak(i){const u=[...new Set(i.map(x=>x.dateStr))];document.getElementById('streakCount').innerText=u.length>0?u.length:0;}function updateChartDisplay(t){if(!myChart)return;const g=parseInt(document.getElementById('weeklyGoalInput').value)||1000;document.getElementById('completedMins').innerText=t;document.getElementById('targetMins').innerText=g;let r=g-t;if(r<0)r=0;myChart.data.datasets[0].data=[t,r];myChart.update()}
-    window.handleLogin=async()=>{const e=document.getElementById('email').value,p=document.getElementById('password').value,n=document.getElementById('regStudentName').value;try{if(isLoginMode)await signInWithEmailAndPassword(auth,e,p);else{const c=await createUserWithEmailAndPassword(auth,e,p);await updateProfile(c.user,{displayName:n})}}catch(err){document.getElementById('authError').style.display='block';document.getElementById('authError').innerText=err.message}};window.toggleAuthMode=()=>{isLoginMode=!isLoginMode;document.getElementById('authTitle').innerText=isLoginMode?"Giriş Yap":"Kayıt Ol";document.getElementById('mainAuthBtn').innerText=isLoginMode?"GİRİŞ YAP":"KAYIT OL";document.getElementById('regStudentName').classList.toggle('hidden');document.getElementById('toggleText').innerHTML=isLoginMode?"Hesabınız yok mu? <b>Kayıt Olun</b>":"Hesabınız var mı? <b>Giriş Yapın</b>"};window.handleLogout=()=>signOut(auth);
-    window.selectMood=(e,v)=>{document.querySelectorAll('.mood-btn').forEach(b=>b.classList.remove('selected'));e.classList.add('selected');document.getElementById('selectedMood').value=v};window.adjustTime=(v)=>{const e=document.getElementById('duration');e.value=Math.max(0,(parseInt(e.value)||0)+v)};window.switchTab=(t)=>{if(t==='manual'){document.getElementById('panelManual').classList.remove('hidden');document.getElementById('panelPomodoro').classList.add('hidden');document.getElementById('tabManual').classList.add('active');document.getElementById('tabPomodoro').classList.remove('active')}else{document.getElementById('panelManual').classList.add('hidden');document.getElementById('panelPomodoro').classList.remove('hidden');document.getElementById('tabManual').classList.remove('active');document.getElementById('tabPomodoro').classList.add('active')}};window.updateTimerDuration=()=>{if(!isTimerRunning){timeLeft=(parseInt(document.getElementById('timerSetDuration').value)||30)*60;updateTimerDisplay()}};window.startTimer=()=>{if(isTimerRunning)return;isTimerRunning=true;document.getElementById('btnTimerStart').innerText="⏳";timerInterval=setInterval(()=>{timeLeft--;updateTimerDisplay();if(timeLeft<=0){clearInterval(timerInterval);finishPomodoro()}},1000)};window.resetTimer=()=>{clearInterval(timerInterval);isTimerRunning=false;timeLeft=(parseInt(document.getElementById('timerSetDuration').value)||30)*60;updateTimerDisplay();document.getElementById('btnTimerStart').innerText="BAŞLAT ▶"};function updateTimerDisplay(){const m=Math.floor(timeLeft/60),s=timeLeft%60;document.getElementById('timerDisplay').innerText=`${m}:${s.toString().padStart(2,'0')}`}function finishPomodoro(){const a=new Audio('https://actions.google.com/sounds/v1/alarms/beep_short.ogg');a.play().catch(e=>{});savePomodoroData();alert("Süre Doldu!");resetTimer()}
-    window.savePomodoroData=()=>{if(isTimerRunning){if(!confirm("Kaydedilsin mi?"))return;resetTimer()}const s=document.getElementById('pomoSubject').value,d=parseInt(document.getElementById('timerSetDuration').value)||30;saveToFirebase(s,d,0,0,'Verimli','savePomoBtn')};
-    window.saveData=()=>{const s=document.getElementById('selectedSubject').value,d=parseInt(document.getElementById('duration').value),m=document.getElementById('selectedMood').value,o=parseInt(document.getElementById('entryDateSelect').value)||0,dt=new Date();dt.setDate(dt.getDate()-o);saveToFirebase(s,d,0,0,m,'saveBtn',dt.toLocaleDateString('tr-TR'))};
-    async function saveToFirebase(s,d,q,c,m,bId,dateS=null){if(!currentUser)return;const btn=document.getElementById(bId);btn.disabled=true;const fDate=dateS||new Date().toLocaleDateString('tr-TR');try{await addDoc(collection(db,"users",currentUser.uid,"sessions"),{subject:s,duration:d,questionCount:q,correctCount:c,mood:m,dateStr:fDate,createdAt:serverTimestamp()});await updateDoc(doc(db,"users",currentUser.uid),{totalMinutes:increment(d),lastStudyDate:serverTimestamp()});btn.disabled=false;if(bId!=='savePomoBtn')document.getElementById('entryDateSelect').value="0"}catch(e){alert("Hata: "+e.message);btn.disabled=false}}
+    window.toggleAuth=()=>{ isLogin=!isLogin; document.getElementById('authBtn').innerText=isLogin?"GİRİŞ YAP":"KAYIT OL"; document.getElementById('regName').classList.toggle('hidden'); document.getElementById('authTitle').innerText=isLogin?"Giriş Yap":"Kayıt Ol"; }; window.handleLogin=async()=>{ const e=document.getElementById('email').value, p=document.getElementById('password').value; try{ if(isLogin) await signInWithEmailAndPassword(auth,e,p); else { const c=await createUserWithEmailAndPassword(auth,e,p); await updateProfile(c.user,{displayName:document.getElementById('regName').value}); } } catch(e){ document.getElementById('authError').style.display='block'; document.getElementById('authError').innerText=e.message; } }; window.handleLogout=()=>signOut(auth); 
+    
+    // --- TAB SWITCHER (FIXED) ---
+    window.switchTab=(t, el)=>{ 
+        // Öğrenci Paneli Sekmeleri
+        if(el) { document.querySelectorAll('.tabs .tab').forEach(e=>e.classList.remove('active')); el.classList.add('active'); }
+        ['viewHome','viewPomo','viewStore','viewFuture','viewHistory', 'viewArena'].forEach(x=>document.getElementById(x).classList.add('hidden')); 
+        document.getElementById('view'+t.charAt(0).toUpperCase()+t.slice(1)).classList.remove('hidden');
+        
+        // Arena dinleyicisini sadece arena sekmesi açıkken çalıştır
+        if(t === 'arena') listenArena();
+        else if(activeArenaListener) activeArenaListener(); // Kapat
+    };
+    window.switchAdminTab = (tab, el) => {
+        // Yönetici Paneli Sekmeleri
+        if(el) { 
+             document.getElementById('tabAdminDash').classList.remove('active'); 
+             document.getElementById('tabAdminMsg').classList.remove('active'); 
+             document.getElementById('tabAdminHist').classList.remove('active');
+             el.classList.add('active');
+        }
+        document.getElementById('adminPanelDashboard').classList.add('hidden'); 
+        document.getElementById('adminPanelMessages').classList.add('hidden'); 
+        document.getElementById('adminPanelHistory').classList.add('hidden');
+        if(tab === 'dashboard') document.getElementById('adminPanelDashboard').classList.remove('hidden');
+        else if(tab === 'messages') document.getElementById('adminPanelMessages').classList.remove('hidden');
+        else if(tab === 'history') document.getElementById('adminPanelHistory').classList.remove('hidden');
+    };
 
-    // Export Window Functions
-    window.removeSubject=window.removeSubject;window.addSubject=window.addSubject;window.openSubjectModal=window.openSubjectModal;window.closeSubjectModal=window.closeSubjectModal;window.savePomodoroData=window.savePomodoroData;window.openAdminDetail=window.openAdminDetail;window.closeAdminDetail=window.closeAdminDetail;window.openProfileModal=window.openProfileModal;window.closeProfileModal=window.closeProfileModal;window.saveUserProfile=window.saveUserProfile;window.sendPasswordReset=window.sendPasswordReset;window.saveEditedEntry=window.saveEditedEntry;window.openEditModal=window.openEditModal;window.closeEditModal=window.closeEditModal;window.deleteEntry=window.deleteEntry;
-    window.switchAdminTab = window.switchAdminTab; window.useTemplate = window.useTemplate; window.sendAdminMessage = window.sendAdminMessage;
+    window.updateTimerSet=()=>{ if(!timerInterval) timeLeft=parseInt(document.getElementById('timerSet').value)*60; }; 
+    window.startTimer=()=>{ 
+        if(isTimerRunning) return; isTimerRunning = true;
+        timeLeft=parseInt(document.getElementById('timerSet').value)*60; document.getElementById('btnStart').innerText="⏳"; 
+        timerInterval=setInterval(()=>{ timeLeft--; const m=Math.floor(timeLeft/60), s=timeLeft%60; document.getElementById('timerDisplay').innerText=`${m}:${s.toString().padStart(2,'0')}`; 
+        // Arena Timer Update
+        if(document.getElementById('arenaTimerDisplay')) document.getElementById('arenaTimerDisplay').innerText=`${m}:${s.toString().padStart(2,'0')}`;
+        if(timeLeft<=0){ clearInterval(timerInterval); Swal.fire("Bitti!","Süre doldu, kaydet.","success"); window.savePomo(); } },1000); 
+    }; 
+    window.resetTimer=()=>{ clearInterval(timerInterval); timerInterval=null; isTimerRunning=false; document.getElementById('btnStart').innerText="BAŞLAT ▶"; document.getElementById('timerDisplay').innerText="30:00"; if(document.getElementById('arenaTimerDisplay')) document.getElementById('arenaTimerDisplay').innerText="00:00"; };
+    function renderChips(){ const c1=document.getElementById('chipsManual'), c2=document.getElementById('chipsPomo'); c1.innerHTML=""; c2.innerHTML=""; SUBJECTS.forEach(s=>{ const d=document.createElement('div'); d.className='chip'; d.innerText=s; d.onclick=function(){ c1.querySelectorAll('.chip').forEach(x=>x.classList.remove('active')); this.classList.add('active'); document.getElementById('selectedSubject').value=s; }; c1.appendChild(d); const d2=d.cloneNode(true); d2.onclick=function(){ c2.querySelectorAll('.chip').forEach(x=>x.classList.remove('active')); this.classList.add('active'); document.getElementById('pomoSubject').value=s; }; c2.appendChild(d2); }); document.getElementById('selectedSubject').value=SUBJECTS[0]; document.getElementById('pomoSubject').value=SUBJECTS[0]; }
+    window.selectMood=(e,v)=>{document.querySelectorAll('.mood-btn').forEach(b=>b.classList.remove('selected'));e.classList.add('selected');document.getElementById('selectedMood').value=v};window.adjustTime=(v)=>{const e=document.getElementById('duration');e.value=Math.max(0,(parseInt(e.value)||0)+v)};
+    window.exportToExcel = () => { if(!globalUserList || globalUserList.length === 0) return Swal.fire("Veri Yok", "Listelenecek öğrenci bulunamadı.", "warning"); let csvContent = "data:text/csv;charset=utf-8,\uFEFF"; csvContent += "Sıra,Öğrenci Adı,E-Posta,Durum,Bilge Puan,Toplam Süre (dk),Son Çalışma Tarihi\n"; const now = new Date(); globalUserList.forEach((u, index) => { const last = u.lastStudyDate ? (u.lastStudyDate.toDate?u.lastStudyDate.toDate():new Date(u.lastStudyDate)) : null; let status = "İyi"; if(!last || (now-last)/(1000*60*60*24) > 3) status = "Riskli"; else if((u.totalMinutes||0) > 1000) status = "Lider"; const dateStr = last ? last.toLocaleDateString('tr-TR') : "Giriş Yok"; const name = u.displayName || "İsimsiz"; const email = u.email || "-"; csvContent += `${index+1},"${name}","${email}",${status},${u.bilgePoints||0},${u.totalMinutes||0},"${dateStr}"\n`; }); const encodedUri = encodeURI(csvContent); const link = document.createElement("a"); link.setAttribute("href", encodedUri); link.setAttribute("download", "ogrenci_listesi_" + new Date().toLocaleDateString('tr-TR') + ".csv"); document.body.appendChild(link); link.click(); document.body.removeChild(link); };
+
+    // Exports
+    window.switchAdminTab=window.switchAdminTab; window.triggerBulkMessage=window.triggerBulkMessage; window.sendAdminMessage=window.sendAdminMessage; window.fetchRandomMessage=window.fetchRandomMessage; window.deleteMessage=window.deleteMessage; window.deleteAllMessages=window.deleteAllMessages; window.readMsg=window.readMsg; window.openMsgModal=window.openMsgModal; window.saveEntry=window.saveEntry; window.buyItem=window.buyItem; window.saveFuture=window.saveFuture; window.savePomo=window.savePomo; window.startTimer=window.startTimer; window.resetTimer=window.resetTimer; window.updateTimerSet=window.updateTimerSet; window.handleLogin=window.handleLogin; window.toggleAuth=window.toggleAuth; window.handleLogout=window.handleLogout; window.switchTab=window.switchTab; window.openAdminDetail=window.openAdminDetail; window.closeAdminDetail=window.closeAdminDetail;
+    window.openProfileModal=window.openProfileModal; window.closeProfileModal=window.closeProfileModal; window.saveUserProfile=window.saveUserProfile; window.sendPasswordReset=window.sendPasswordReset;
+    window.updateGoal=window.updateGoal; window.openBulkSelectModal = window.openBulkSelectModal; window.closeBulkSelectModal = window.closeBulkSelectModal; window.toggleSelectAll = window.toggleSelectAll; window.confirmBulkSend = window.confirmBulkSend; window.buyAvatar = window.buyAvatar; window.exportToExcel = window.exportToExcel; window.claimWeeklyBonus = window.claimWeeklyBonus;
+    window.startArenaSession = startArenaSession; window.boostDuration = window.boostDuration;
 </script>
 </body>
 </html>
