@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Bilge Takip Sistemi v8.5 (RPG Rank)</title>
+    <title>Bilge Takip Sistemi v9.0 (Final)</title>
     
     <link rel="icon" href="Designer (1).jpg" type="image/jpeg">
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
@@ -36,8 +36,12 @@
         
         input, select, textarea { width: 100%; padding: 15px; margin-bottom: 12px; border: 2px solid transparent; border-radius: 16px; font-size: 1rem; background: #f1f9f9; color: var(--text-main); transition: 0.3s; font-family: inherit; font-weight: 600; }
         input:focus, select:focus, textarea:focus { border-color: var(--primary); background: #fff; outline: none; }
+        
+        /* BUTON GÜNCELLEMESİ: Disabled stili */
         button { width: 100%; padding: 15px; border: none; border-radius: 16px; font-size: 1rem; font-weight: 700; cursor: pointer; transition: 0.2s; font-family: inherit; }
         button:active { transform: scale(0.96); }
+        button:disabled { background: #cbd5e1 !important; color: #64748b !important; cursor: not-allowed; transform: none !important; box-shadow: none !important; }
+        
         .btn-primary { background: linear-gradient(135deg, var(--primary), #26a69a); color: white; box-shadow: 0 10px 20px -5px rgba(0, 150, 136, 0.4); }
         .btn-logout { background: #fee2e2; color: var(--danger); padding: 8px 16px; border-radius: 12px; font-weight: 700; font-size: 0.85rem; width: auto; border: 1px solid #fca5a5; display:inline-block;}
         .btn-logout-distinct { background: rgba(255,255,255,0.2); color: white; padding: 8px 16px; border-radius: 12px; font-weight: 700; cursor: pointer; display: flex; align-items: center; gap: 6px; font-size: 0.85rem; width: auto; border: 1px solid rgba(255,255,255,0.3); backdrop-filter: blur(4px); }
@@ -67,7 +71,6 @@
         .chip.active { background: var(--primary); color: white; border-color: var(--primary); transform: translateY(-2px); box-shadow: 0 5px 15px rgba(0, 150, 136, 0.3); }
         .timer-display { font-size: 4rem; font-weight: 800; text-align: center; background: linear-gradient(to right, var(--primary), #4db6ac); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin: 15px 0; letter-spacing: -2px; }
         
-        /* MAĞAZA TASARIMI */
         .store-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
         .store-item { 
             background: linear-gradient(145deg, #ffffff, #f0f9ff); 
@@ -83,6 +86,7 @@
         .store-item:hover { transform: translateY(-5px); border-color: var(--primary); }
         .store-item:active { transform: scale(0.95); }
         .store-price { color:var(--warning); font-weight:800; margin: 5px 0; font-size: 0.9rem; }
+        
         .store-icon { 
             font-size: 3rem; 
             margin-bottom: 10px; 
@@ -255,9 +259,9 @@
                         <option value="1">⏪ Dün</option>
                         <option value="2">⏮️ 2 Gün Önce</option>
                     </select>
-                    <input type="number" id="entryDur" value="40" style="flex:1; text-align:center;" placeholder="Dk">
+                    <input type="number" id="entryDur" value="40" min="1" max="300" style="flex:1; text-align:center;" placeholder="Dk">
                 </div>
-                <button class="btn-primary" onclick="saveEntry()" style="margin-top:10px;">KAYDET (+Puan) ✅</button>
+                <button class="btn-primary" id="btnManualSave" onclick="saveEntry()" style="margin-top:10px;">KAYDET (+Puan) ✅</button>
             </div>
 
             <div class="card" style="text-align:center;">
@@ -293,7 +297,7 @@
                     <button style="background:var(--danger); color:white; width:auto; padding:15px 30px;" onclick="requestStopPomo()">DURDUR ⏹</button>
                 </div>
                 <label style="font-size:0.8rem; color:var(--text-sub); font-weight:bold;">Süre Ayarla (dk):</label>
-                <input type="number" id="timerSet" value="30" onchange="updateTimerSet()" style="text-align:center; width:100px; margin:0 auto; display:block;">
+                <input type="number" id="timerSet" value="30" min="1" max="120" onchange="updateTimerSet()" style="text-align:center; width:100px; margin:0 auto; display:block;">
             </div>
         </div>
 
@@ -556,15 +560,14 @@
         }
     });
 
-    // --- NEW: SYNC SCORE FUNCTION ---
-    // Bu fonksiyon tüm çalışma geçmişini tarar ve puanı yeniden hesaplar.
+    // --- CRITICAL FIX: SYNC LOGIC (ONLY MINUTES) ---
+    // Puan bakiyesini bozmadan sadece dakikaları senkronize eder.
     async function syncUserScore(uid) {
         if(!uid) return;
         
         let totalMins = 0;
-        let totalPoints = 0;
+        let totalPointsCalculated = 0;
 
-        // 1. Çalışma Oturumlarını Topla
         try {
             const snapshot = await getDocs(collection(db, "users", uid, "sessions"));
             snapshot.forEach(doc => {
@@ -572,57 +575,37 @@
                 const dur = data.duration || 0;
                 const type = data.type || 'manual';
                 
-                // Toplam Dakika (Sadece çalışma süresi)
-                // Bonus kayıtlarının süresi 0 olmalı, ama yine de kontrol edelim.
+                // Toplam Dakika (Bonus hariç)
                 if(type !== 'bonus') {
                     totalMins += dur;
                 }
-
-                // Puan Hesaplama
-                if(type === 'arena') totalPoints += (dur * 2.0);
-                else if(type === 'pomodoro') totalPoints += (dur * 1.5);
-                else if(type === 'manual') totalPoints += (dur * 1.0);
-                else if(type === 'bonus') totalPoints += 500; // Haftalık Bonus
+                
+                // Puan Hesaplaması (Sadece veri tutarlılığı için hesaplanır, bakiyeyi ezmez)
+                if(type === 'arena') totalPointsCalculated += (dur * 2.0);
+                else if(type === 'pomodoro') totalPointsCalculated += (dur * 1.5);
+                else if(type === 'manual') totalPointsCalculated += (dur * 1.0);
+                else if(type === 'bonus') totalPointsCalculated += 500;
             });
 
-            // 2. Zaman Kapsüllerini Ekle (+50 Puan)
+            // Zaman Kapsülleri
             const capsSnap = await getDocs(collection(db, "users", uid, "timecapsule"));
-            totalPoints += (capsSnap.size * 50);
+            totalPointsCalculated += (capsSnap.size * 50);
 
-            // 3. Avatar Satın Alımlarını Düş (Harcamalar)
-            // Bu kısım kritik. Eğer harcamaları tutmuyorsak, puan hep artar.
-            // Şimdilik sadece 'kazanılan' puanı güncelleyelim.
-            // Harcamaları takip etmek için ayrı bir koleksiyon olmadığı için,
-            // sadece 'totalMinutes' ve 'totalEarnedPoints' gibi bir mantıkla ilerliyoruz.
-            // Ancak kullanıcı 'bilgePoints' harcadıysa, bu fonksiyon onu sıfırlar.
-            // *ÇÖZÜM*: Harcama geçmişi yoksa, mevcut puanı korumak adına, 
-            // sadece 'totalMinutes'i fixleyelim. Puanı sadece EKSİKSE tamamlayalım.
-            
-            // Veritabanındaki mevcut durumu al
+            // Veritabanı Güncelleme
             const userRef = doc(db, "users", uid);
             const userSnap = await getDoc(userRef);
+            
             if(userSnap.exists()) {
                 const userData = userSnap.data();
                 const currentPoints = userData.bilgePoints || 0;
-                
-                // Eğer hesaplanan puan, mevcut puandan ÇOK FAZLA ise (harcama yapılmamışsa), güncelle.
-                // Ama harcama yapılmışsa (yani mevcut puan azsa), dokunma.
-                // Sadece 'totalMinutes' kesinlikle doğrudur, onu güncelleyelim.
-                
-                // Kullanıcı isteği: "Çalışma sürelerine göre puan hesapla"
-                // Bu yüzden totalMinutes'i kesin güncelliyoruz.
-                
-                // Puan için: Harcamaları bilmediğimiz için,
-                // Şimdilik sadece 'totalMinutes'i senkronize ediyoruz.
-                // Eğer puan sistemini sıfırdan kuruyorsanız:
-                // await updateDoc(userRef, { totalMinutes: totalMins, bilgePoints: Math.floor(totalPoints) });
-                
-                // Güvenli Güncelleme: Sadece Dakikayı düzelt.
-                await updateDoc(userRef, { totalMinutes: totalMins });
-                
-                // Eğer sistemde hiç puan yoksa (0), hesaplanan puanı ver.
-                if(currentPoints === 0 && totalPoints > 0) {
-                     await updateDoc(userRef, { bilgePoints: Math.floor(totalPoints) });
+
+                // 1. Sadece 'totalMinutes' kesinlikle güncellenir.
+                // 2. 'bilgePoints' SADECE eğer kullanıcıda 0 puan görünüyorsa ama geçmişi varsa güncellenir.
+                // (Bu sayede harcamalar silinmez)
+                if(currentPoints === 0 && totalPointsCalculated > 0) {
+                     await updateDoc(userRef, { totalMinutes: totalMins, bilgePoints: Math.floor(totalPointsCalculated) });
+                } else {
+                     await updateDoc(userRef, { totalMinutes: totalMins });
                 }
             }
 
@@ -633,7 +616,7 @@
 
     // --- STUDENT LOGIC ---
     async function initStudent(uid){
-        // GİRİŞTE SENKRONİZASYON YAP
+        // GİRİŞTE SENKRONİZASYON YAP (HATA DÜZELTME)
         await syncUserScore(uid);
 
         const userRef = doc(db,"users",uid);
@@ -790,6 +773,7 @@
 
         if (result.isConfirmed) {
             try { 
+                // ÖDEME İŞLEMİ
                 await updateDoc(doc(db,"users",currentUser.uid), { 
                     bilgePoints: increment(-cost), 
                     avatar: icon 
@@ -803,17 +787,23 @@
         }
     };
 
-    // --- HAFTALIK BONUS ÖDÜL SİSTEMİ ---
+    // --- HAFTALIK BONUS ÖDÜL SİSTEMİ (KORUMALI) ---
     window.claimWeeklyBonus = async () => {
         if(!currentUser) return;
         
+        // ÇİFT TIKLAMAYI ÖNLEMEK İÇİN BUTONU KAPAT
+        const btn = document.getElementById('btnClaimWeekly');
+        btn.disabled = true; 
+        btn.innerText = "İşleniyor...";
+
         const now = new Date();
         if(window.lastBonusDate) {
             const diffTime = Math.abs(now - window.lastBonusDate);
             const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)); 
             if(diffDays < 7) {
                  Swal.fire("Zaten Aldın", "Haftalık ödülü bu hafta zaten almışsın. Haftaya tekrar gel! 🛑", "warning");
-                 document.getElementById('btnClaimWeekly').classList.add('hidden');
+                 btn.classList.add('hidden');
+                 btn.disabled = false;
                  return;
             }
         }
@@ -821,6 +811,7 @@
         const currentGoal = parseInt(document.getElementById('targetMins').innerText) || 1000;
         if(currentGoal < 1000) {
              Swal.fire("Hedef Yetersiz", "Haftalık hedefin en az 1000 dk olmalı ki ödül alabilesin!", "warning"); 
+             btn.disabled = false;
              return;
         }
 
@@ -830,19 +821,23 @@
                 lastBonusDate: serverTimestamp() 
             });
             
-            // BONUS KAYDINI SAKLA (Gelecekteki hesaplamalar için)
+            // BONUS KAYDINI SAKLA
             await addDoc(collection(db, "users", currentUser.uid, "sessions"), {
                 subject: "Haftalık Bonus",
-                duration: 0, // Süreye etki etmesin
-                type: "bonus", // Özel tip
+                duration: 0,
+                type: "bonus", 
                 createdAt: serverTimestamp(),
                 dateStr: new Date().toLocaleDateString('tr-TR')
             });
 
             Swal.fire("Tebrikler!", "Haftalık hedefini tutturdun! +500 Puan hesabına eklendi.", "success");
             confetti();
-            document.getElementById('btnClaimWeekly').classList.add('hidden');
-        } catch(e) { alert(e.message); }
+            btn.classList.add('hidden');
+        } catch(e) { 
+            alert(e.message); 
+            btn.disabled = false; 
+            btn.innerText = "🏆 500 Puanlık Ödülü Al";
+        }
     };
 
     function checkBonusButtonVisibility() {
@@ -859,7 +854,11 @@
             }
 
             if(!alreadyClaimed) {
-                if(claimBtn.classList.contains('hidden')) claimBtn.classList.remove('hidden');
+                if(claimBtn.classList.contains('hidden')) {
+                    claimBtn.classList.remove('hidden');
+                    claimBtn.disabled = false;
+                    claimBtn.innerText = "🏆 500 Puanlık Ödülü Al";
+                }
             } else {
                 claimBtn.classList.add('hidden');
             }
@@ -879,7 +878,6 @@
             if(acts.length===0) list.innerHTML="<li style='text-align:center; padding:10px; color:#999;'>Henüz kayıt yok.</li>";
             else { 
                 acts.forEach(a=>{ 
-                    // Bonus kayıtlarını listede gösterme, sadece hesapla
                     if(a.type !== 'bonus') {
                         list.innerHTML+=`<li style="padding:15px; border-bottom:1px solid #f1f9f9; display:flex; justify-content:space-between; align-items:center;"><div><div style="font-weight:700; color:var(--text-main);">${a.subject}</div><div style="font-size:0.8rem; color:var(--text-sub);">${a.dateStr}</div></div><div style="font-weight:bold; color:var(--primary); font-size:1.1rem;">${a.duration}dk</div></li>`; 
                         totalWeekly+=a.duration; 
@@ -915,10 +913,28 @@
     function updateStudentChart(val, goal){ const ctx = document.getElementById('weeklyChart').getContext('2d'); if(myChart) myChart.destroy(); myChart = new Chart(ctx, { type: 'doughnut', data: { labels: ['Yapılan', 'Kalan'], datasets: [{ data: [val, Math.max(0, goal-val)], backgroundColor: ['#009688', '#e2e8f0'], borderWidth: 0 }] }, options: { cutout: '80%', maintainAspectRatio: false, plugins: { legend: { display: false } } } }); }
     window.updateGoal = async () => { const val = parseInt(document.getElementById('weeklyGoalInput').value); if(currentUser && val) { await updateDoc(doc(db,"users",currentUser.uid), { weeklyGoal: val }); Swal.fire("Hedef Güncellendi", `Yeni haftalık hedefin: ${val} dk`, "success"); } };
     
-    // --- MANUAL ENTRY ---
+    // --- MANUAL ENTRY (KORUMALI) ---
     window.saveEntry = async () => { 
-        const sub = document.getElementById('selectedSubject').value; const dur = parseInt(document.getElementById('entryDur').value);
-        if(!sub || !dur) return Swal.fire("Eksik Bilgi", "Lütfen ders ve süre seçin.", "warning");
+        // 1. BUTON KİLİTLEME
+        const btn = document.getElementById('btnManualSave');
+        btn.disabled = true;
+        btn.innerText = "Kaydediliyor...";
+
+        const sub = document.getElementById('selectedSubject').value; 
+        let dur = parseInt(document.getElementById('entryDur').value);
+        
+        // 2. GİRİŞ DOĞRULAMA (Input Validation)
+        if(!sub || !dur) {
+            Swal.fire("Eksik Bilgi", "Lütfen ders ve süre seçin.", "warning");
+            btn.disabled = false;
+            btn.innerText = "KAYDET (+Puan) ✅";
+            return;
+        }
+        if(dur < 1) dur = 1;
+        if(dur > 300) {
+            dur = 300; // Max sınır
+            Swal.fire("Uyarı", "Bir seferde en fazla 300 dakika girebilirsin. Süre 300 olarak ayarlandı.", "info");
+        }
         
         const offset = parseInt(document.getElementById('entryDate').value) || 0;
         const dt = new Date();
@@ -928,8 +944,15 @@
         try { 
             await addDoc(collection(db,"users",currentUser.uid,"sessions"), { subject: sub, duration: dur, createdAt: dt, dateStr: dt.toLocaleDateString('tr-TR'), type: 'manual' }); 
             await updateDoc(doc(db,"users",currentUser.uid), { totalMinutes: increment(dur), bilgePoints: increment(dur), lastStudyDate: serverTimestamp() }); 
-            Swal.fire("Harika!", `${dur} dakika eklendi ve ${dur} puan kazandın!`, "success"); confetti(); 
-        } catch(e) { Swal.fire("Hata", e.message, "error"); } 
+            Swal.fire("Harika!", `${dur} dakika eklendi ve ${dur} puan kazandın!`, "success"); 
+            confetti(); 
+        } catch(e) { 
+            Swal.fire("Hata", e.message, "error"); 
+        } finally {
+            // İŞLEM BİTİNCE BUTONU AÇ
+            btn.disabled = false;
+            btn.innerText = "KAYDET (+Puan) ✅";
+        }
     };
 
     // --- SEPARATED POMODORO LOGIC ---
