@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Bilge Takip Sistemi(Otopilot 🦉)</title>
+    <title>Bilge Takip Sistemi v8.5 (RPG Rank)</title>
     
     <link rel="icon" href="Designer (1).jpg" type="image/jpeg">
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
@@ -77,7 +77,7 @@
         .rules-item { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; font-size: 0.9rem; color: #166534; padding-bottom: 8px; border-bottom: 1px dashed #bbf7d0; }
         .rules-item:last-child { margin-bottom: 0; border-bottom: none; }
 
-        /* COACH STYLES - UPDATED */
+        /* COACH STYLES */
         .wise-coach-container { position: fixed; bottom: 90px; right: 10px; z-index: 999; display: flex; flex-direction: column; align-items: flex-end; }
         .wise-avatar { width: 60px; height: 60px; background: linear-gradient(135deg, #4f46e5, #9333ea); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 2rem; box-shadow: 0 10px 25px rgba(79, 70, 229, 0.4); cursor: pointer; border: 3px solid #fff; position: relative; transition: transform 0.3s; }
         .wise-avatar:hover { transform: scale(1.1); }
@@ -148,9 +148,15 @@
         .btn-boost { background: linear-gradient(135deg, #f59e0b, #d97706); color: white; padding: 8px 15px; border-radius: 12px; font-size: 0.8rem; font-weight: 700; border: none; cursor: pointer; box-shadow: 0 4px 10px rgba(245, 158, 11, 0.3); transition: 0.2s; }
         .btn-boost:hover { transform: scale(1.05); }
 
-        /* MESSAGE TYPE BADGES */
         .msg-badge-admin { background: #000; color: #fff; padding: 2px 6px; border-radius: 4px; font-size: 0.7rem; margin-right: 5px; }
         .msg-badge-auto { background: #6366f1; color: #fff; padding: 2px 6px; border-radius: 4px; font-size: 0.7rem; margin-right: 5px; }
+
+        /* --- LEVEL & XP SYSTEM STYLES --- */
+        .level-container { margin-top: 5px; width: 100%; }
+        .xp-track { width: 100%; background: rgba(0, 0, 0, 0.1); height: 6px; border-radius: 10px; overflow: hidden; position: relative; margin-top: 4px; }
+        .xp-fill { height: 100%; background: linear-gradient(90deg, #FFD700, #FFA500); width: 0%; transition: width 1s cubic-bezier(0.4, 0, 0.2, 1); box-shadow: 0 0 10px rgba(255, 215, 0, 0.5); }
+        .rank-badge { font-size: 0.75rem; font-weight: 800; color: #fff; background: rgba(0,0,0,0.2); padding: 2px 8px; border-radius: 12px; margin-left: 6px; backdrop-filter: blur(4px); border: 1px solid rgba(255,255,255,0.3); display: inline-block; vertical-align: middle; }
+        .next-level-info { font-size: 0.65rem; color: var(--text-sub); text-align: right; margin-top: 2px; font-weight: 600; }
     </style>
 </head>
 <body>
@@ -172,11 +178,17 @@
         <div class="card" style="display:flex; justify-content:space-between; align-items:center; padding:15px 20px; position: sticky; top: 10px; z-index: 900;">
             <div style="display:flex; align-items:center;">
                 <div>
-                    <h3 style="margin:0; font-size:1.3rem;">
+                    <h3 style="margin:0; font-size:1.3rem; display:flex; align-items:center;">
                         <span id="userAvatar" style="margin-right:5px;">🎓</span>
-                        Selam, <span id="stName" style="color:var(--primary);">Öğrenci</span>
+                        <span style="display:flex; flex-direction:column;">
+                            <span>Selam, <span id="stName" style="color:var(--primary);">Öğrenci</span> <span id="rankBadgeDisplay" class="rank-badge">Çırak</span></span>
+                        </span>
                     </h3>
-                    <div style="font-size:0.9rem; color:var(--warning); font-weight:800; margin-top:5px;">💎 <span id="stPoints">0</span> Bilge Puan</div>
+                    <div class="level-container">
+                        <div class="xp-track"><div class="xp-fill" id="xpProgressBar"></div></div>
+                        <div class="next-level-info" id="nextLevelText">Sonraki rütbeye: 0 puan</div>
+                    </div>
+                    <div style="font-size:0.9rem; color:var(--warning); font-weight:800; margin-top:2px;">💎 <span id="stPoints">0</span> Bilge Puan</div>
                 </div>
                  <button class="btn-profile-settings" onclick="openProfileModal()" title="Ayarlar">⚙️</button>
             </div>
@@ -462,6 +474,16 @@
         { icon: '🧙‍♂️', name: 'Büyücü', cost: 2000 }
     ];
 
+    // RPG RANK SYSTEM DATA
+    const RANKS = [
+        { name: "Çırak 🪵", threshold: 0 },
+        { name: "Kalfa 🔨", threshold: 500 },
+        { name: "Savaşçı ⚔️", threshold: 1500 },
+        { name: "Komutan 🛡️", threshold: 3000 },
+        { name: "Bilge 📜", threshold: 5000 },
+        { name: "Hakan 👑", threshold: 10000 }
+    ];
+
     let currentUser=null, isLogin=true;
     let myChart=null, admBar=null, admPie=null, detailChart=null, adminChart=null;
     let globalUserList=[];
@@ -532,8 +554,41 @@
         // AUTOMATED FEATURES TRIGGER
         displayRandomGreeting();
         checkAutoPilot(uid, data);
+        updatePlayerRank(data.bilgePoints || 0);
     }
     
+    // YENİ FONKSİYON (Bunu script içinde uygun bir yere yapıştır)
+    function updatePlayerRank(points) {
+        let currentRank = RANKS[0];
+        let nextRank = RANKS[RANKS.length - 1]; // Varsayılan son level
+        
+        // Mevcut rütbeyi bul
+        for (let i = 0; i < RANKS.length; i++) {
+            if (points >= RANKS[i].threshold) {
+                currentRank = RANKS[i];
+                if (i < RANKS.length - 1) nextRank = RANKS[i + 1];
+                else nextRank = null; // Son seviyeye ulaştı
+            }
+        }
+
+        // HTML Güncelle
+        const rankBadge = document.getElementById('rankBadgeDisplay');
+        if (rankBadge) rankBadge.innerText = currentRank.name;
+        
+        if (nextRank) {
+            const needed = nextRank.threshold - points;
+            const range = nextRank.threshold - currentRank.threshold;
+            const progress = points - currentRank.threshold;
+            const percent = Math.min(100, Math.max(0, (progress / range) * 100));
+            
+            document.getElementById('xpProgressBar').style.width = `${percent}%`;
+            document.getElementById('nextLevelText').innerText = `${nextRank.name} için ${needed} puan kaldı`;
+        } else {
+            document.getElementById('xpProgressBar').style.width = '100%';
+            document.getElementById('nextLevelText').innerText = "Zirvedesin! 🦅";
+        }
+    }
+
     // 1. RANDOM GREETING FEATURE
     function displayRandomGreeting() {
         const bubble = document.getElementById('coachBubble');
@@ -676,6 +731,9 @@
                 const data = d.data();
                 document.getElementById('stPoints').innerText = data.bilgePoints || 0; 
                 if(data.avatar) document.getElementById('userAvatar').innerText = data.avatar;
+                
+                // UPDATE RANK ON DATA CHANGE
+                updatePlayerRank(data.bilgePoints || 0);
             }});
         }, (error) => { 
             // Kullanıcı çıkış yapıyorsa hatayı yut
@@ -1079,7 +1137,6 @@
             const l = document.getElementById('adminMsgHistoryList'); l.innerHTML = ""; const m = []; s.forEach(d => m.push({ id: d.id, ...d.data() })); m.sort((a,b) => (b.createdAt?.seconds || 0) - (a.createdAt?.seconds || 0)); m.forEach(msg => { 
                 const u = globalUserList.find(x => x.id === msg.toUid); 
                 const n = u ? u.displayName : "Bilinmeyen"; 
-                // BADGE LOGIC
                 const badge = msg.type === 'auto' ? '<span class="msg-badge-auto">🦉 Otopilot</span>' : '<span class="msg-badge-admin">👑 Hakan</span>';
                 
                 l.innerHTML += `<div class="msg-card"><button class="btn-delete-msg" onclick="deleteMessage('${msg.id}')">🗑️</button><div style="font-weight:bold;">${badge} ${n} <span style="font-weight:normal; color:#aaa;">(${msg.createdAt?(msg.createdAt.toDate?msg.createdAt.toDate():new Date(msg.createdAt)).toLocaleDateString('tr-TR'):''})</span></div><div>${msg.content}</div><div style="font-size:0.7rem; color:#666; margin-top:5px;">Hedef: ${msg.target==='parent'?'Veli':'Öğrenci'} | ${msg.read?'Okundu':'İletildi'}</div></div>`; 
@@ -1098,10 +1155,7 @@
         const q = query(collection(db, "messages"), where("toUid", "==", uid));
         unsubStudentMessages = onSnapshot(q, s=>{ 
             let ur=0; const list=document.getElementById('msgList'); list.innerHTML=""; const msgs = []; s.forEach(d => msgs.push({id:d.id, ...d.data()})); msgs.sort((a,b)=>(b.createdAt?.seconds||0)-(a.createdAt?.seconds||0)); if (msgs.length === 0) list.innerHTML = "<div style='text-align:center; padding:20px; color:#aaa;'>Posta kutun boş.</div>"; msgs.forEach(m => { if(!m.read) ur++; const st = m.read ? '' : 'unread'; const tg = m.target==='parent'?'type-parent':'type-student'; 
-            
-            // Student View Badge
             const senderName = m.type === 'auto' ? '🦉 Bilge Baykuş' : '👨‍🏫 Hakan Hoca';
-            
             list.innerHTML += `<div class="msg-card ${st} ${tg}" onclick="readMsg('${m.id}')"><div style="font-weight:bold; color:var(--primary);">${senderName} ${!m.read?'<span style="color:red; font-size:0.7rem;">YENİ</span>':''}</div><div>${m.content}</div></div>`; }); const bd = document.getElementById('coachBadge'); const av = document.getElementById('wiseAvatar'); bd.innerText = ur; if (ur > 0) { bd.classList.remove('hidden'); av.classList.add('excited'); av.classList.remove('idle'); document.getElementById('coachBubble').classList.add('show'); setTimeout(()=>document.getElementById('coachBubble').classList.remove('show'),5000); } else { bd.classList.add('hidden'); av.classList.remove('excited'); av.classList.add('idle'); } 
         }, (error) => { 
             if(!currentUser) return;
