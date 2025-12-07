@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Bilge Takip Sistemi v9.5 (Günlük Görev & Admin+)</title>
+    <title>Bilge Takip Sistemi v8.5 + Otağ Modülü</title>
     
     <link rel="icon" href="Designer (1).jpg" type="image/jpeg">
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
@@ -13,6 +13,9 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <style>
+        /* --- DÜZELTME 1: Gizlilik sınıfı en güçlü hale getirildi --- */
+        .hidden { display: none !important; visibility: hidden !important; opacity: 0 !important; }
+
         :root {
             --primary: #009688; --primary-dark: #004d40; --secondary: #ec4899;
             --success: #10b981; --warning: #f59e0b; --danger: #ef4444;
@@ -24,9 +27,26 @@
             --bottom-nav-height: 80px;
         }
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-        body { font-family: 'Outfit', sans-serif; background: var(--bg-gradient); margin: 0; padding: 15px; min-height: 100vh; color: var(--text-main); display: flex; justify-content: center; }
         
-        .container { width: 100%; max-width: 480px; padding-bottom: 120px; transition: max-width 0.3s ease; }
+        /* --- DÜZELTME 2: Body yapısı 'block' yapıldı, 'flex' kaldırıldı --- */
+        /* Bu değişiklik, modalların ekranı bozmasını engeller */
+        body { 
+            font-family: 'Outfit', sans-serif; 
+            background: var(--bg-gradient); 
+            margin: 0; padding: 15px; 
+            min-height: 100vh; 
+            color: var(--text-main); 
+            display: block; 
+        }
+        
+        /* Container ortalandı */
+        .container { 
+            width: 100%; 
+            max-width: 480px; 
+            margin: 0 auto; 
+            padding-bottom: 120px; 
+            transition: max-width 0.3s ease; 
+        }
         .container.student-view { padding-bottom: var(--bottom-nav-height); }
         .container.admin-mode { max-width: 1000px; padding-bottom: 50px; }
 
@@ -36,11 +56,8 @@
         
         input, select, textarea { width: 100%; padding: 15px; margin-bottom: 12px; border: 2px solid transparent; border-radius: 16px; font-size: 1rem; background: #f1f9f9; color: var(--text-main); transition: 0.3s; font-family: inherit; font-weight: 600; }
         input:focus, select:focus, textarea:focus { border-color: var(--primary); background: #fff; outline: none; }
-        
         button { width: 100%; padding: 15px; border: none; border-radius: 16px; font-size: 1rem; font-weight: 700; cursor: pointer; transition: 0.2s; font-family: inherit; }
         button:active { transform: scale(0.96); }
-        button:disabled { background: #cbd5e1 !important; color: #64748b !important; cursor: not-allowed; transform: none !important; box-shadow: none !important; }
-        
         .btn-primary { background: linear-gradient(135deg, var(--primary), #26a69a); color: white; box-shadow: 0 10px 20px -5px rgba(0, 150, 136, 0.4); }
         .btn-logout { background: #fee2e2; color: var(--danger); padding: 8px 16px; border-radius: 12px; font-weight: 700; font-size: 0.85rem; width: auto; border: 1px solid #fca5a5; display:inline-block;}
         .btn-logout-distinct { background: rgba(255,255,255,0.2); color: white; padding: 8px 16px; border-radius: 12px; font-weight: 700; cursor: pointer; display: flex; align-items: center; gap: 6px; font-size: 0.85rem; width: auto; border: 1px solid rgba(255,255,255,0.3); backdrop-filter: blur(4px); }
@@ -52,7 +69,7 @@
         .tab { flex: 0 0 auto; padding: 10px 20px; cursor: pointer; border-radius: 15px; font-weight: 600; color: var(--text-sub); transition: 0.3s; font-size: 0.9rem; border: 1px solid transparent; }
         .tab.active { background: white; color: var(--primary); box-shadow: 0 4px 10px rgba(0,0,0,0.05); border-color: #b2dfdb; }
 
-        /* MOBILE BOTTOM NAV */
+        /* MOBILE BOTTOM NAV - GÜNCELLENDİ (OTAĞ İÇİN YER AÇILDI) */
         .mobile-bottom-nav {
             position: fixed; bottom: 0; left: 0; width: 100%; height: var(--bottom-nav-height);
             background: rgba(255, 255, 255, 0.98); backdrop-filter: blur(20px);
@@ -60,8 +77,8 @@
             padding-bottom: 15px; z-index: 1000; box-shadow: 0 -5px 20px rgba(0, 150, 136, 0.08);
             border-top-left-radius: 20px; border-top-right-radius: 20px;
         }
-        .nav-item { display: flex; flex-direction: column; align-items: center; justify-content: center; font-size: 0.7rem; color: #94a3b8; background: none; border: none; cursor: pointer; transition: all 0.3s; flex: 1; height: 100%; padding: 5px 0; }
-        .nav-icon { font-size: 1.6rem; margin-bottom: 4px; display: block; transition: transform 0.2s; }
+        .nav-item { display: flex; flex-direction: column; align-items: center; justify-content: center; font-size: 0.6rem; color: #94a3b8; background: none; border: none; cursor: pointer; transition: all 0.3s; flex: 1; height: 100%; padding: 5px 0; }
+        .nav-icon { font-size: 1.4rem; margin-bottom: 4px; display: block; transition: transform 0.2s; }
         .nav-item.active { color: var(--primary); font-weight: 800; }
         .nav-item.active .nav-icon { transform: translateY(-5px); filter: drop-shadow(0 4px 6px rgba(0,150,136,0.2)); }
         
@@ -70,59 +87,15 @@
         .chip.active { background: var(--primary); color: white; border-color: var(--primary); transform: translateY(-2px); box-shadow: 0 5px 15px rgba(0, 150, 136, 0.3); }
         .timer-display { font-size: 4rem; font-weight: 800; text-align: center; background: linear-gradient(to right, var(--primary), #4db6ac); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin: 15px 0; letter-spacing: -2px; }
         
-        /* MAĞAZA TASARIMI (TILSIM EFEKTİ) */
         .store-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
-        .store-item { 
-            background: linear-gradient(145deg, #ffffff, #f0f9ff); 
-            padding: 20px 10px; 
-            border-radius: 24px; 
-            text-align: center; 
-            border: 1px solid #e0f2fe; 
-            box-shadow: 0 10px 20px -5px rgba(0, 150, 136, 0.1); 
-            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); 
-            position: relative; 
-            overflow: hidden;
-        }
-        .store-item:hover { transform: translateY(-5px); border-color: var(--primary); }
+        .store-item { background: #fff; padding: 15px; border-radius: 20px; text-align: center; border: 1px solid #e2e8f0; transition: transform 0.2s; position: relative; }
         .store-item:active { transform: scale(0.95); }
         .store-price { color:var(--warning); font-weight:800; margin: 5px 0; font-size: 0.9rem; }
-        
-        .store-icon { 
-            font-size: 3rem; 
-            margin-bottom: 10px; 
-            display: inline-block; 
-            filter: drop-shadow(0 0 10px rgba(0, 150, 136, 0.3));
-            animation: floatIcon 3s ease-in-out infinite;
-        }
-        @keyframes floatIcon {
-            0%, 100% { transform: translateY(0); filter: drop-shadow(0 5px 15px rgba(0,150,136,0.2)); }
-            50% { transform: translateY(-8px); filter: drop-shadow(0 15px 25px rgba(0,150,136,0.4)); }
-        }
+        .store-icon { font-size: 2.5rem; margin-bottom: 5px; display: block; }
         
         .rules-box { background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 16px; padding: 15px; margin-bottom: 20px; }
         .rules-item { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; font-size: 0.9rem; color: #166534; padding-bottom: 8px; border-bottom: 1px dashed #bbf7d0; }
         .rules-item:last-child { margin-bottom: 0; border-bottom: none; }
-
-        /* GÜNLÜK GÖREVLER STİLİ */
-        .quest-box { margin-top: 15px; }
-        .quest-item { 
-            display: flex; align-items: center; justify-content: space-between; 
-            background: #fff; padding: 12px; border-radius: 16px; 
-            border: 1px solid #e2e8f0; margin-bottom: 8px; transition: all 0.3s;
-        }
-        .quest-item.completed { 
-            background: #f0fdf4; border-color: #bbf7d0; 
-            box-shadow: 0 4px 6px -1px rgba(16, 185, 129, 0.1); 
-        }
-        .quest-info { display: flex; align-items: center; gap: 10px; }
-        .quest-checkbox { 
-            width: 24px; height: 24px; border-radius: 50%; border: 2px solid #cbd5e1; 
-            display: flex; align-items: center; justify-content: center; color: transparent; 
-        }
-        .quest-item.completed .quest-checkbox { 
-            background: var(--success); border-color: var(--success); color: white; 
-        }
-        .quest-reward { font-size: 0.75rem; font-weight: 800; color: var(--warning); background: #fffbeb; padding: 4px 8px; border-radius: 8px; }
 
         /* COACH STYLES */
         .wise-coach-container { position: fixed; bottom: 90px; right: 10px; z-index: 999; display: flex; flex-direction: column; align-items: flex-end; }
@@ -175,8 +148,7 @@
         .btn-delete-msg { position: absolute; top: 10px; right: 10px; background: none; border: none; color: #cbd5e1; cursor: pointer; transition: 0.2s; font-size: 1.1rem; }
         .btn-delete-msg:hover { color: var(--danger); }
         .fade-in { animation: fadeIn 0.5s cubic-bezier(0.4, 0, 0.2, 1); }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
-        .hidden { display: none !important; }
+        
         .modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 77, 64, 0.6); backdrop-filter: blur(8px); display: flex; justify-content: center; align-items: center; z-index: 2000; padding: 20px; }
         .modal-content { background: white; padding: 30px; border-radius: 30px; width: 100%; max-width: 500px; max-height: 85vh; overflow-y: auto; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25); }
         .btn-profile-settings { background: #f1f9f9; width: 36px; height: 36px; border-radius: 10px; display: inline-flex; align-items: center; justify-content: center; margin-left: 8px; border:none; color:var(--text-sub); cursor: pointer; }
@@ -198,12 +170,29 @@
         .msg-badge-admin { background: #000; color: #fff; padding: 2px 6px; border-radius: 4px; font-size: 0.7rem; margin-right: 5px; }
         .msg-badge-auto { background: #6366f1; color: #fff; padding: 2px 6px; border-radius: 4px; font-size: 0.7rem; margin-right: 5px; }
 
-        /* --- LEVEL & XP SYSTEM STYLES --- */
+        /* --- LEVEL & XP SYSTEM STYLES (v8.5 Orijinal) --- */
         .level-container { margin-top: 5px; width: 100%; }
         .xp-track { width: 100%; background: rgba(0, 0, 0, 0.1); height: 6px; border-radius: 10px; overflow: hidden; position: relative; margin-top: 4px; }
         .xp-fill { height: 100%; background: linear-gradient(90deg, #FFD700, #FFA500); width: 0%; transition: width 1s cubic-bezier(0.4, 0, 0.2, 1); box-shadow: 0 0 10px rgba(255, 215, 0, 0.5); }
         .rank-badge { font-size: 0.75rem; font-weight: 800; color: #fff; background: rgba(0,0,0,0.2); padding: 2px 8px; border-radius: 12px; margin-left: 6px; backdrop-filter: blur(4px); border: 1px solid rgba(255,255,255,0.3); display: inline-block; vertical-align: middle; }
         .next-level-info { font-size: 0.65rem; color: var(--text-sub); text-align: right; margin-top: 2px; font-weight: 600; }
+
+        /* --- YENİ EKLENEN KLAN STİLLERİ --- */
+        .clan-card { background: linear-gradient(135deg, #fff, #f8fafc); border: 2px solid #e2e8f0; border-radius: 20px; padding: 20px; text-align: center; margin-bottom: 15px; position: relative; overflow: hidden; }
+        .clan-card.my-clan { border-color: var(--primary); background: linear-gradient(135deg, #e0f2f1, #fff); }
+        .clan-banner { font-size: 3.5rem; margin-bottom: 10px; display: inline-block; filter: drop-shadow(0 5px 5px rgba(0,0,0,0.1)); }
+        .clan-name { font-size: 1.2rem; font-weight: 800; color: var(--primary-dark); margin-bottom: 5px; }
+        .clan-stats { display: flex; justify-content: center; gap: 15px; font-size: 0.85rem; color: var(--text-sub); margin-bottom: 15px; }
+        .clan-rank-item { display: flex; align-items: center; justify-content: space-between; padding: 12px; background: white; border-radius: 12px; margin-bottom: 8px; border: 1px solid #f1f5f9; transition: 0.2s; }
+        .clan-rank-item:hover { transform: translateX(5px); border-color: var(--primary); }
+        .clan-badge { width: 40px; height: 40px; background: #f1f5f9; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; margin-right: 10px; }
+        .rank-number { font-size: 1.2rem; font-weight: 800; color: #cbd5e1; margin-right: 10px; width: 25px; }
+        .rank-number.top3 { color: var(--warning); }
+        .icon-select { display: flex; gap: 10px; overflow-x: auto; padding-bottom: 10px; }
+        .icon-option { font-size: 2rem; padding: 10px; border: 2px solid #eee; border-radius: 10px; cursor: pointer; }
+        .icon-option.selected { border-color: var(--primary); background: #e0f2f1; }
+        .tore-box { background: #fffbeb; border: 1px solid #fcd34d; padding: 15px; border-radius: 16px; margin-bottom: 15px; font-size: 0.9rem; color: #92400e; font-style: italic; }
+
     </style>
 </head>
 <body>
@@ -242,6 +231,26 @@
             <button class="btn-logout" onclick="handleLogout()">Çıkış</button>
         </div>
 
+        <div class="card" style="text-align:center;">
+            <div style="display:flex; justify-content:space-between; margin-bottom:10px;">
+                <h4 style="border:none; margin:0;">HAFTALIK HEDEF</h4>
+                <small style="color:var(--text-sub);">Haftalık Hedef: <span id="targetMins">1000</span>dk</small>
+            </div>
+            <div style="position:relative; height:200px; width:100%;"><canvas id="weeklyChart"></canvas></div>
+            <div style="margin-top:15px; font-weight:800; font-size:1.1rem; color:var(--primary);" id="progText">
+                %<span id="progVal">0</span> Tamamlandı
+            </div>
+            
+            <button id="btnClaimWeekly" class="hidden" onclick="claimWeeklyBonus()" style="background:linear-gradient(135deg, #f59e0b, #d97706); color:white; width:100%; margin-top:10px; box-shadow: 0 5px 15px rgba(245, 158, 11, 0.4); animation: pulseBadge 2s infinite;">
+                🏆 500 Puanlık Ödülü Al
+            </button>
+            
+            <div style="background:#f8fafc; padding:12px; border-radius:16px; display:flex; justify-content:space-between; align-items:center; border: 1px solid #e2e8f0; margin-top:15px;">
+                <label style="font-size:0.9rem; color:var(--text-main); font-weight:600;">🎯 Haftalık Hedef (dk):</label>
+                <input type="number" id="weeklyGoalInput" value="1000" onchange="updateGoal()" style="width:90px; margin:0; padding:10px; text-align:center; border:1px solid #cbd5e1; background:white;">
+            </div>
+        </div>
+
         <div class="mobile-bottom-nav">
             <button class="nav-item active" onclick="switchTab('home', this)">
                 <span class="nav-icon">🏠</span>
@@ -250,6 +259,10 @@
             <button class="nav-item" onclick="switchTab('pomo', this)">
                 <span class="nav-icon">⏱️</span>
                 <span>Sayaç</span>
+            </button>
+            <button class="nav-item" onclick="switchTab('clan', this)">
+                <span class="nav-icon">⛺</span>
+                <span>Otağ</span>
             </button>
             <button class="nav-item" onclick="switchTab('arena', this)">
                 <span class="nav-icon">⚔️</span>
@@ -280,36 +293,9 @@
                         <option value="1">⏪ Dün</option>
                         <option value="2">⏮️ 2 Gün Önce</option>
                     </select>
-                    <input type="number" id="entryDur" value="40" min="1" max="300" style="flex:1; text-align:center;" placeholder="Dk">
+                    <input type="number" id="entryDur" value="40" style="flex:1; text-align:center;" placeholder="Dk">
                 </div>
-                <button class="btn-primary" id="btnManualSave" onclick="saveEntry()" style="margin-top:10px;">KAYDET (+Puan) ✅</button>
-            </div>
-
-            <div class="card" style="text-align:center;">
-                <div style="display:flex; justify-content:space-between; margin-bottom:10px;">
-                    <h4 style="border:none; margin:0;">HAFTALIK HEDEF</h4>
-                    <small style="color:var(--text-sub);">Haftalık Hedef: <span id="targetMins">1000</span>dk</small>
-                </div>
-                <div style="position:relative; height:200px; width:100%;"><canvas id="weeklyChart"></canvas></div>
-                <div style="margin-top:15px; font-weight:800; font-size:1.1rem; color:var(--primary);" id="progText">
-                    %<span id="progVal">0</span> Tamamlandı
-                </div>
-                
-                <button id="btnClaimWeekly" class="hidden" onclick="claimWeeklyBonus()" style="background:linear-gradient(135deg, #f59e0b, #d97706); color:white; width:100%; margin-top:10px; box-shadow: 0 5px 15px rgba(245, 158, 11, 0.4); animation: pulseBadge 2s infinite;">
-                    🏆 500 Puanlık Ödülü Al
-                </button>
-                
-                <div style="background:#f8fafc; padding:12px; border-radius:16px; display:flex; justify-content:space-between; align-items:center; border: 1px solid #e2e8f0; margin-top:15px;">
-                    <label style="font-size:0.9rem; color:var(--text-main); font-weight:600;">🎯 Haftalık Hedef (dk):</label>
-                    <input type="number" id="weeklyGoalInput" value="1000" onchange="updateGoal()" style="width:90px; margin:0; padding:10px; text-align:center; border:1px solid #cbd5e1; background:white;">
-                </div>
-            </div>
-
-            <div class="card">
-                <h4>📅 GÜNLÜK GÖREVLER</h4>
-                <div class="quest-box" id="dailyQuestContainer">
-                    <div style="text-align:center; color:#999;">Görevler yükleniyor...</div>
-                </div>
+                <button class="btn-primary" onclick="saveEntry()" style="margin-top:10px;">KAYDET (+Puan) ✅</button>
             </div>
         </div>
 
@@ -325,7 +311,47 @@
                     <button style="background:var(--danger); color:white; width:auto; padding:15px 30px;" onclick="requestStopPomo()">DURDUR ⏹</button>
                 </div>
                 <label style="font-size:0.8rem; color:var(--text-sub); font-weight:bold;">Süre Ayarla (dk):</label>
-                <input type="number" id="timerSet" value="30" min="1" max="120" onchange="updateTimerSet()" style="text-align:center; width:100px; margin:0 auto; display:block;">
+                <input type="number" id="timerSet" value="30" onchange="updateTimerSet()" style="text-align:center; width:100px; margin:0 auto; display:block;">
+            </div>
+        </div>
+
+        <div id="viewClan" class="hidden fade-in">
+            <div id="myClanSection" class="hidden">
+                <div class="card clan-card my-clan">
+                    <div class="clan-banner" id="myClanIcon">🐺</div>
+                    <h2 id="myClanName" class="clan-name">Bozkurtlar</h2>
+                    <div class="clan-stats">
+                        <span>👥 <span id="myClanMembers">0</span> Alp</span>
+                        <span>🏆 <span id="myClanScore">0</span> Puan</span>
+                    </div>
+                    <div style="font-size:0.8rem; color:#64748b; margin-bottom:15px;">
+                        Birlikten kuvvet doğar! Çalışmaların otağına güç katıyor.
+                    </div>
+                    <div class="tore-box">
+                        <strong>📜 ANA SANCAK TÖRESİ:</strong><br>
+                        1. Yalan söyleme, emanete ihanet etme.<br>
+                        2. Büyüğe saygı, küçüğe sevgi.<br>
+                        3. Bilgi güçtür, çalışmak ibadettir.<br>
+                        4. Otağ'ın şerefi, senin şerefindir.
+                    </div>
+                    <button onclick="leaveClan()" style="background:#fee2e2; color:var(--danger); padding:8px 15px; font-size:0.8rem; width:auto;">Otağdan Ayrıl</button>
+                </div>
+            </div>
+
+            <div id="noClanSection" class="card" style="text-align:center;">
+                <h4>HENÜZ BİR OTAĞIN YOK</h4>
+                <p style="color:var(--text-sub); font-size:0.9rem; margin-bottom:20px;">Bir otağa katılarak gücüne güç kat veya kendi otağını kur!</p>
+                <div style="display:flex; gap:10px; justify-content:center;">
+                    <button class="btn-primary" onclick="openCreateClanModal()">Otağ Kurma İsteği Gönder</button>
+                </div>
+                <hr style="margin:20px 0; border-top:1px solid #f1f5f9;">
+                <h5 style="text-align:left;">Katılabileceğin Otağlar</h5>
+                <div id="clanJoinList" style="max-height:200px; overflow-y:auto; text-align:left;">Yükleniyor...</div>
+            </div>
+
+            <div class="card">
+                <h4>🏆 OTAĞLAR SIRALAMASI</h4>
+                <div id="clanLeaderboard">Veriler çekiliyor...</div>
             </div>
         </div>
 
@@ -342,7 +368,7 @@
                      <div class="timer-display" id="arenaTimerDisplay" style="font-size: 3rem; color:var(--warning);">00:00</div>
                      <button class="btn-primary" id="arenaStartBtn" onclick="startArenaSession()">SAVAŞI BAŞLAT ⚔️</button>
                      <div id="arenaControls" class="hidden" style="display:flex; gap:10px; justify-content:center; margin-top:10px;">
-                         <button class="btn-boost" onclick="boostArenaTime()">⚡ ZAMAN ARTIR (+10 DK)</button>
+                         <button class="btn-boost" onclick="boostArenaTime()">⚡ ZAMAN ARTIR (+5 DK)</button>
                          <button style="background:#ef4444; color:white;" onclick="requestStopArena()">PES ET 🏳️</button>
                      </div>
                 </div>
@@ -403,6 +429,7 @@
             <div class="tab active" onclick="switchAdminTab('dashboard', this)" id="tabAdminDash">📊 Genel Durum</div>
             <div class="tab" onclick="switchAdminTab('messages', this)" id="tabAdminMsg">✉️ Mesaj Merkezi</div>
             <div class="tab" onclick="switchAdminTab('history', this)" id="tabAdminHist">📜 Gönderilenler</div>
+            <div class="tab" onclick="switchAdminTab('clan', this)" id="tabAdminClan">⛺ Otağ Yönetimi</div>
         </div>
         
         <div id="adminPanelDashboard" class="fade-in">
@@ -426,18 +453,11 @@
             <div class="card"><h4>🚀 YÜKSELEN YILDIZLAR</h4><div class="rising-stars" id="risingStarsContainer"><div style="width:100%; text-align:center; color:var(--text-sub); font-size:0.9rem;">Analiz ediliyor...</div></div></div>
             <div class="card"><h4>📈 GENEL PERFORMANS</h4><div class="chart-scroll-container"><div class="chart-scroll-inner" id="chartInner"><canvas id="adminLeaderboardChart"></canvas></div></div></div>
             <div class="card">
-                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
-                    <h4 style="margin:0;">👥 ÖĞRENCİ YÖNETİMİ</h4>
-                    <button onclick="exportToExcel()" style="padding:8px 15px; font-size:0.8rem; background:#0f172a; color:white; border-radius:10px;">📥 Excel İndir</button>
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+                    <h4 style="margin:0;">👥 ÖĞRENCİ LİSTESİ</h4>
+                    <button onclick="exportToExcel()" style="padding:8px 15px; font-size:0.8rem; background:#0f172a; color:white; border-radius:10px;">📥 İndir</button>
                 </div>
-                <input type="text" id="adminSearchInput" onkeyup="filterAdminTable()" placeholder="🔍 İsim veya E-posta ile öğrenci ara..." style="background:white; border:1px solid #cbd5e1;">
-                
-                <div style="overflow-x:auto;">
-                    <table class="student-table" id="studentTable">
-                        <thead><tr><th>Sıra</th><th>Öğrenci</th><th>Durum</th><th>Puan</th><th>Toplam</th><th>İşlem</th></tr></thead>
-                        <tbody id="studentTableBody"><tr><td colspan="6" style="text-align:center;">Veriler yükleniyor...</td></tr></tbody>
-                    </table>
-                </div>
+                <div style="overflow-x:auto;"><table class="student-table" id="studentTable"><thead><tr><th>Sıra</th><th>Öğrenci</th><th>Durum</th><th>Puan</th><th>Toplam</th></tr></thead><tbody id="studentTableBody"><tr><td colspan="5" style="text-align:center;">Veriler birleştiriliyor...</td></tr></tbody></table></div>
             </div>
         </div>
         
@@ -469,8 +489,48 @@
                 <div id="adminMsgHistoryList" class="msg-list-container"><div style="text-align:center; padding:20px;">Yükleniyor...</div></div>
             </div>
         </div>
+
+        <div id="adminPanelClan" class="hidden fade-in">
+            <div class="card">
+                <h4>⛺ OTAĞ (KLAN) İSTEKLERİ</h4>
+                <p style="color:var(--text-sub); font-size:0.9rem;">Onay bekleyen otağ kurulumları.</p>
+                <div id="adminClanRequestList" class="selection-list"><div style="text-align:center; padding:10px;">İstek yok.</div></div>
+            </div>
+            <div class="card">
+                <h4>➕ ÜYE KATILIM İSTEKLERİ</h4>
+                <p style="color:var(--text-sub); font-size:0.9rem;">Onay bekleyen üye katılımları.</p>
+                <div id="adminMemberRequestList" class="selection-list"><div style="text-align:center; padding:10px;">İstek yok.</div></div>
+            </div>
+            <div class="card">
+                <h4>🏕️ AKTİF OTAĞLAR</h4>
+                <div id="adminActiveClansList" class="selection-list"><div style="text-align:center; padding:10px;">Yükleniyor...</div></div>
+            </div>
+        </div>
     </div>
 
+</div>
+
+<div id="modalCreateClan" class="modal hidden fade-in">
+    <div class="modal-content">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
+            <h3 style="margin:0;">Yeni Otağ Kur ⛺</h3>
+            <button onclick="document.getElementById('modalCreateClan').classList.add('hidden')" style="width:30px; border:none; background:none;">✕</button>
+        </div>
+        <label>Otağ Adı</label>
+        <input type="text" id="newClanName" placeholder="Örn: Göktürkler">
+        <label>Sancak Motifi Seç</label>
+        <div class="icon-select" id="clanIconSelect">
+            <div class="icon-option selected" onclick="selectClanIcon(this)">🐺</div>
+            <div class="icon-option" onclick="selectClanIcon(this)">🦅</div>
+            <div class="icon-option" onclick="selectClanIcon(this)">🦁</div>
+            <div class="icon-option" onclick="selectClanIcon(this)">🏹</div>
+            <div class="icon-option" onclick="selectClanIcon(this)">⚔️</div>
+            <div class="icon-option" onclick="selectClanIcon(this)">🐎</div>
+        </div>
+        <input type="hidden" id="selectedClanIcon" value="🐺">
+        <p style="font-size:0.8rem; color:var(--text-sub); margin-top:10px;">* Otağ kurmak için "Usta" rütbesinde (1000+ Puan) olmalısın. Kurulum Hakan (Yönetici) onayından sonra aktif olur.</p>
+        <button class="btn-primary" onclick="createClanRequest()">HAKANA ARZ ET</button>
+    </div>
 </div>
 
 <div id="modalAdminDetail" class="modal hidden fade-in"><div class="modal-content" style="max-width:500px;"><div style="text-align:right;"><button onclick="closeAdminDetail()" style="width:32px; height:32px; padding:0; border-radius:50%; background:#f1f5f9; border:none; cursor:pointer;">✕</button></div><h2 id="detailStudentName" style="color:var(--text-main); margin-bottom:5px;">Öğrenci Adı</h2><div id="smartEvaluationBadge" style="display:inline-block; padding:5px 15px; background:#e0e7ff; border-radius:20px; font-weight:700; color:var(--primary); font-size:0.9rem; margin-bottom:15px;">Analiz Ediliyor...</div><div style="display:grid; grid-template-columns: 1fr 1fr; gap:15px; margin-bottom:20px;"><div style="background:#f8fafc; border:1px solid #f1f5f9; padding:15px; border-radius:16px; text-align:center;"><div style="font-size:1.4rem; font-weight:800; color:var(--primary);" id="statTotalMin">0</div><div style="font-size:0.8rem; text-transform:uppercase; color:var(--text-sub);">Toplam Dakika</div></div><div style="background:#f8fafc; border:1px solid #f1f5f9; padding:15px; border-radius:16px; text-align:center;"><div style="font-size:1.4rem; font-weight:800; color:var(--warning);" id="statAvg">0</div><div class="guidance-label" style="font-size:0.8rem; text-transform:uppercase; color:var(--text-sub);">Bilge Puan</div></div></div><h4>🧠 AKILLI DEĞERLENDİRME</h4><div id="aiComment" style="background:#f0fdf4; border:1px solid #bbf7d0; color:#166534; padding:15px; border-radius:12px; font-size:0.9rem; line-height:1.5; margin-bottom:20px;">Öğrenci verileri inceleniyor...</div><div style="height: 200px; width: 100%; margin-bottom: 20px;"><canvas id="studentDetailChart"></canvas></div><button class="btn-primary" onclick="closeAdminDetail()">KAPAT</button></div></div>
@@ -501,7 +561,7 @@
 
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js";
-    import { getFirestore, collection, doc, setDoc, getDoc, updateDoc, addDoc, deleteDoc, getDocs, query, where, onSnapshot, serverTimestamp, increment, writeBatch, arrayUnion } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js";
+    import { getFirestore, collection, doc, setDoc, getDoc, updateDoc, addDoc, deleteDoc, getDocs, query, where, onSnapshot, serverTimestamp, increment, writeBatch, arrayUnion, orderBy, limit, deleteField, runTransaction } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js";
     import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, onAuthStateChanged, updateProfile, sendPasswordResetEmail } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-auth.js";
 
     const firebaseConfig = { apiKey: "AIzaSyBkJg6hiMPcgM-bywHjUCKdD8CapA1VDHk", authDomain: "ogrencitakip-bcdbd.firebaseapp.com", projectId: "ogrencitakip-bcdbd", storageBucket: "ogrencitakip-bcdbd.firebasestorage.app", messagingSenderId: "74510222174", appId: "1:74510222174:web:9d379386762064ee0f45cf" };
@@ -523,16 +583,16 @@
         "Sahne senin, göster kendini! 🎤"
     ];
 
-    // AVATAR SHOP DATA - GÜNCELLENMİŞ ÖZ TÜRK PAKETİ
+    // AVATAR SHOP DATA
     const AVATAR_SHOP = [
-        { icon: '🐺', name: 'Bozkurt', cost: 500 },     // Türklüğün ebedi sembolü
-        { icon: '🏹', name: 'Kemankeş', cost: 600 },    // Usta Okçu (Büyücü yerine)
-        { icon: '🦅', name: 'Çift Başlı Kartal', cost: 750 }, // Selçuklu ve hakimiyet simgesi
-        { icon: '🐆', name: 'Pars', cost: 1000 },       // Tulpar yerine: Çeviklik ve Asalet (Bars)
-        { icon: '🦁', name: 'Arslan', cost: 1200 },     // Ejder yerine: Hükümdarlık (Alp Arslan)
-        { icon: '⛰️', name: 'Ergenekon', cost: 1500 },  // Dağları eriten azim
-        { icon: '⚔️', name: 'Alp', cost: 2000 },        // Yiğit Savaşçı
-        { icon: '👑', name: 'Kağan', cost: 3000 }       // Devletin Başı
+        { icon: '🐺', name: 'Bozkurt', cost: 500 },
+        { icon: '🚀', name: 'Astronot', cost: 750 },
+        { icon: '🐉', name: 'Ejderha', cost: 1000 },
+        { icon: '🐎', name: 'Tulpar', cost: 1200 },
+        { icon: '🕵️', name: 'Dedektif', cost: 600 },
+        { icon: '🦸', name: 'Süper Kahraman', cost: 1500 },
+        { icon: '🦅', name: 'Anka Kuşu', cost: 800 },
+        { icon: '🧙‍♂️', name: 'Büyücü', cost: 2000 }
     ];
 
     // RPG RANK SYSTEM DATA
@@ -545,11 +605,15 @@
         { name: "Hakan 👑", threshold: 10000 }
     ];
 
-    // GÜNLÜK GÖREVLER DATA
-    const DAILY_QUESTS = [
-        { id: 'q_login', text: 'Sisteme Giriş Yap', reward: 10, target: 1, type: 'login' },
-        { id: 'q_study', text: '40 Dk Ders Çalış', reward: 50, target: 40, type: 'minutes' },
-        { id: 'q_pomo', text: '1 Kez Sayaç İle En Az 30 dk Ders Çalış', reward: 30, target: 1, type: 'pomodoro_count' }
+    // KLAN RÜTBELERİ (PUANA GÖRE) - Otağ Sisteminin Parçası
+    const CLAN_RANKS = [
+        { name: "Onbaşı", min: 0 },
+        { name: "Yüzbaşı", min: 1000 },
+        { name: "Binbaşı", min: 2500 },
+        { name: "Tümen Beyi", min: 5000 },
+        { name: "Sancak Beyi", min: 10000 },
+        { name: "Han", min: 20000 },
+        { name: "Kağan", min: 50000 }
     ];
 
     let currentUser=null, isLogin=true;
@@ -564,6 +628,9 @@
     let unsubAdminMessages = null;
     let unsubUserData = null; // YENİ: Kullanıcı verisi dinleyicisi
     let activeArenaListener = null;
+    
+    // Otağ Sistemi Dinleyicileri
+    let unsubAdminClanReq = null; let unsubAdminMemReq = null; let unsubAdminActiveClans = null;
 
     // --- TIMERS VARIABLES ---
     let pomoInterval = null;
@@ -585,6 +652,7 @@
                 document.getElementById('mainContainer').classList.add('admin-mode');
                 initAdmin();
                 listenAllMessagesForAdmin();
+                listenAdminClanRequests(); // YENİ: Klan İsteklerini Dinle
             } else {
                 document.getElementById('dashboardScreen').classList.remove('hidden');
                 document.getElementById('mainContainer').classList.add('student-view'); // Alt menü için padding ekle
@@ -602,147 +670,8 @@
         }
     });
 
-    // --- CRITICAL FIX: SYNC LOGIC (ONLY MINUTES) ---
-    // Puan bakiyesini bozmadan sadece dakikaları senkronize eder.
-    async function syncUserScore(uid) {
-        if(!uid) return;
-        
-        let totalMins = 0;
-        let totalPointsCalculated = 0;
-
-        try {
-            const snapshot = await getDocs(collection(db, "users", uid, "sessions"));
-            snapshot.forEach(doc => {
-                const data = doc.data();
-                const dur = data.duration || 0;
-                const type = data.type || 'manual';
-                
-                // Toplam Dakika (Bonus hariç)
-                if(type !== 'bonus') {
-                    totalMins += dur;
-                }
-                
-                // Puan Hesaplaması (Sadece veri tutarlılığı için hesaplanır, bakiyeyi ezmez)
-                if(type === 'arena') totalPointsCalculated += (dur * 2.0);
-                else if(type === 'pomodoro') totalPointsCalculated += (dur * 1.5);
-                else if(type === 'manual') totalPointsCalculated += (dur * 1.0);
-                else if(type === 'bonus') totalPointsCalculated += 500;
-            });
-
-            // Zaman Kapsülleri
-            const capsSnap = await getDocs(collection(db, "users", uid, "timecapsule"));
-            totalPointsCalculated += (capsSnap.size * 50);
-
-            // Veritabanı Güncelleme
-            const userRef = doc(db, "users", uid);
-            const userSnap = await getDoc(userRef);
-            
-            if(userSnap.exists()) {
-                const userData = userSnap.data();
-                const currentPoints = userData.bilgePoints || 0;
-
-                // 1. Sadece 'totalMinutes' kesinlikle güncellenir.
-                // 2. 'bilgePoints' SADECE eğer kullanıcıda 0 puan görünüyorsa ama geçmişi varsa güncellenir.
-                if(currentPoints === 0 && totalPointsCalculated > 0) {
-                     await updateDoc(userRef, { totalMinutes: totalMins, bilgePoints: Math.floor(totalPointsCalculated) });
-                } else {
-                     await updateDoc(userRef, { totalMinutes: totalMins });
-                }
-            }
-
-        } catch(e) {
-            console.error("Senkronizasyon hatası:", e);
-        }
-    }
-
-    // --- NEW: DAILY QUEST LOGIC ---
-    async function checkDailyQuests(uid) {
-        if (!uid) return;
-        
-        const todayStr = new Date().toLocaleDateString('tr-TR');
-        const userRef = doc(db, "users", uid);
-        const userSnap = await getDoc(userRef);
-        let userData = userSnap.data();
-        
-        // Bugünün görev verisi var mı? Yoksa oluştur.
-        let dailyData = userData.dailyQuests || { date: todayStr, claimed: [] };
-        
-        // Eğer tarih eskiyse sıfırla
-        if (dailyData.date !== todayStr) {
-            dailyData = { date: todayStr, claimed: [] };
-            await updateDoc(userRef, { dailyQuests: dailyData });
-        }
-
-        // İlerlemeyi Hesapla
-        let todayMinutes = 0;
-        let todayPomoCount = 0;
-
-        const q = query(collection(db, "users", uid, "sessions"), 
-            where("createdAt", ">", new Date(new Date().setHours(0,0,0,0))));
-        
-        const sessions = await getDocs(q);
-        sessions.forEach(s => {
-            const d = s.data();
-            if(d.type !== 'bonus') todayMinutes += (d.duration || 0);
-            if(d.type === 'pomodoro' && d.completed) todayPomoCount++;
-        });
-
-        // UI Render Et
-        const container = document.getElementById('dailyQuestContainer');
-        container.innerHTML = "";
-
-        for (const quest of DAILY_QUESTS) {
-            let isCompleted = false;
-            let currentVal = 0;
-
-            if (quest.type === 'login') { isCompleted = true; currentVal = 1; } 
-            if (quest.type === 'minutes') { currentVal = todayMinutes; isCompleted = todayMinutes >= quest.target; }
-            if (quest.type === 'pomodoro_count') { currentVal = todayPomoCount; isCompleted = todayPomoCount >= quest.target; }
-
-            const isClaimed = dailyData.claimed.includes(quest.id);
-            
-            // Ödülü Otomatik Ver (Eğer tamamlandıysa ve alınmadıysa)
-            if (isCompleted && !isClaimed) {
-                await updateDoc(userRef, { 
-                    bilgePoints: increment(quest.reward),
-                    "dailyQuests.claimed": arrayUnion(quest.id)
-                });
-                Swal.fire({
-                    toast: true, position: 'top-end', icon: 'success', 
-                    title: `Görev Tamamlandı: ${quest.text}`, showConfirmButton: false, timer: 3000
-                });
-                confetti({ particleCount: 50, spread: 40, origin: { y: 0.7 } });
-                dailyData.claimed.push(quest.id); 
-            }
-
-            // HTML Oluştur
-            const statusClass = (isCompleted || isClaimed) ? 'completed' : '';
-            const checkIcon = (isCompleted || isClaimed) ? '✓' : '';
-            const rewardHtml = isClaimed ? '<span style="color:var(--success)">Alındı</span>' : `+${quest.reward} P`;
-
-            container.innerHTML += `
-                <div class="quest-item ${statusClass}">
-                    <div class="quest-info">
-                        <div class="quest-checkbox">${checkIcon}</div>
-                        <div>
-                            <div style="font-weight:700; font-size:0.9rem;">${quest.text}</div>
-                            <div style="font-size:0.75rem; color:#64748b;">${Math.min(currentVal, quest.target)} / ${quest.target}</div>
-                        </div>
-                    </div>
-                    <div class="quest-reward">${rewardHtml}</div>
-                </div>
-            `;
-        }
-    }
-
     // --- STUDENT LOGIC ---
     async function initStudent(uid){
-        // GİRİŞTE SENKRONİZASYON YAP (HATA DÜZELTME)
-        await syncUserScore(uid);
-        
-        // GÜNLÜK GÖREVLERİ KONTROL ET
-        checkDailyQuests(uid);
-
         const userRef = doc(db,"users",uid);
         const userSnap = await getDoc(userRef);
         if(!userSnap.exists()){ 
@@ -778,6 +707,9 @@
             
             checkBonusButtonVisibility();
         });
+        
+        // KLAN DURUMUNU KONTROL ET
+        checkClanStatus(uid);
 
         const entryDateEl = document.getElementById('entryDate');
         if(entryDateEl) entryDateEl.value = "0";
@@ -877,57 +809,29 @@
     }
 
     window.buyAvatar = async (icon, cost) => {
-        if(!currentUser) return;
-        const currentPoints = parseInt(document.getElementById('stPoints').innerText || "0");
+        const currentPoints = parseInt(document.getElementById('stPoints').innerText);
+        if(currentPoints < cost) return Swal.fire("Yetersiz Puan", "Daha çok çalışmalısın!", "error");
         
-        if(currentPoints < cost) {
-            return Swal.fire("Yetersiz Puan", "Bu çıkartma için daha fazla çalışmalısın!", "error");
-        }
-        
-        const result = await Swal.fire({
-            title: 'Emin misin?',
-            text: `${cost} puan karşılığında '${icon}' simgesini almak istiyor musun?`,
-            icon: 'question',
-            showCancelButton: true,
-            confirmButtonColor: '#009688',
-            cancelButtonColor: '#d33',
-            confirmButtonText: 'Evet, Al!',
-            cancelButtonText: 'Vazgeç'
-        });
-
-        if (result.isConfirmed) {
+        if(confirm(`${cost} puan karşılığında bu simgeyi kullanmak istiyor musun?`)){ 
             try { 
-                // ÖDEME İŞLEMİ
-                await updateDoc(doc(db,"users",currentUser.uid), { 
-                    bilgePoints: increment(-cost), 
-                    avatar: icon 
-                }); 
-                Swal.fire("Hayırlı Olsun!", `Yeni simgen (${icon}) tanımlandı!`, "success"); 
+                await updateDoc(doc(db,"users",currentUser.uid), { bilgePoints: increment(-cost), avatar: icon }); 
+                Swal.fire("Harika!", `Yeni simgen hayırlı olsun!`, "success"); 
                 confetti(); 
-            } catch(e) { 
-                console.error(e);
-                Swal.fire("Hata", "İşlem sırasında bir hata oluştu: " + e.message, "error"); 
-            } 
+            } catch(e) { alert(e.message); } 
         }
     };
 
-    // --- HAFTALIK BONUS ÖDÜL SİSTEMİ (KORUMALI) ---
+    // --- HAFTALIK BONUS ÖDÜL SİSTEMİ ---
     window.claimWeeklyBonus = async () => {
         if(!currentUser) return;
         
-        // ÇİFT TIKLAMAYI ÖNLEMEK İÇİN BUTONU KAPAT
-        const btn = document.getElementById('btnClaimWeekly');
-        btn.disabled = true; 
-        btn.innerText = "İşleniyor...";
-
         const now = new Date();
         if(window.lastBonusDate) {
             const diffTime = Math.abs(now - window.lastBonusDate);
             const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)); 
             if(diffDays < 7) {
                  Swal.fire("Zaten Aldın", "Haftalık ödülü bu hafta zaten almışsın. Haftaya tekrar gel! 🛑", "warning");
-                 btn.classList.add('hidden');
-                 btn.disabled = false;
+                 document.getElementById('btnClaimWeekly').classList.add('hidden');
                  return;
             }
         }
@@ -935,7 +839,6 @@
         const currentGoal = parseInt(document.getElementById('targetMins').innerText) || 1000;
         if(currentGoal < 1000) {
              Swal.fire("Hedef Yetersiz", "Haftalık hedefin en az 1000 dk olmalı ki ödül alabilesin!", "warning"); 
-             btn.disabled = false;
              return;
         }
 
@@ -944,24 +847,10 @@
                 bilgePoints: increment(500),
                 lastBonusDate: serverTimestamp() 
             });
-            
-            // BONUS KAYDINI SAKLA
-            await addDoc(collection(db, "users", currentUser.uid, "sessions"), {
-                subject: "Haftalık Bonus",
-                duration: 0,
-                type: "bonus", 
-                createdAt: serverTimestamp(),
-                dateStr: new Date().toLocaleDateString('tr-TR')
-            });
-
             Swal.fire("Tebrikler!", "Haftalık hedefini tutturdun! +500 Puan hesabına eklendi.", "success");
             confetti();
-            btn.classList.add('hidden');
-        } catch(e) { 
-            alert(e.message); 
-            btn.disabled = false; 
-            btn.innerText = "🏆 500 Puanlık Ödülü Al";
-        }
+            document.getElementById('btnClaimWeekly').classList.add('hidden');
+        } catch(e) { alert(e.message); }
     };
 
     function checkBonusButtonVisibility() {
@@ -978,11 +867,7 @@
             }
 
             if(!alreadyClaimed) {
-                if(claimBtn.classList.contains('hidden')) {
-                    claimBtn.classList.remove('hidden');
-                    claimBtn.disabled = false;
-                    claimBtn.innerText = "🏆 500 Puanlık Ödülü Al";
-                }
+                if(claimBtn.classList.contains('hidden')) claimBtn.classList.remove('hidden');
             } else {
                 claimBtn.classList.add('hidden');
             }
@@ -1000,14 +885,7 @@
             const acts=[]; snap.forEach(d=>{ acts.push({id:d.id, ...d.data()}); });
             acts.sort((a,b)=>(b.createdAt?.seconds||0)-(a.createdAt?.seconds||0));
             if(acts.length===0) list.innerHTML="<li style='text-align:center; padding:10px; color:#999;'>Henüz kayıt yok.</li>";
-            else { 
-                acts.forEach(a=>{ 
-                    if(a.type !== 'bonus') {
-                        list.innerHTML+=`<li style="padding:15px; border-bottom:1px solid #f1f9f9; display:flex; justify-content:space-between; align-items:center;"><div><div style="font-weight:700; color:var(--text-main);">${a.subject}</div><div style="font-size:0.8rem; color:var(--text-sub);">${a.dateStr}</div></div><div style="font-weight:bold; color:var(--primary); font-size:1.1rem;">${a.duration}dk</div></li>`; 
-                        totalWeekly+=a.duration; 
-                    }
-                }); 
-            }
+            else { acts.forEach(a=>{ list.innerHTML+=`<li style="padding:15px; border-bottom:1px solid #f1f9f9; display:flex; justify-content:space-between; align-items:center;"><div><div style="font-weight:700; color:var(--text-main);">${a.subject}</div><div style="font-size:0.8rem; color:var(--text-sub);">${a.dateStr}</div></div><div style="font-weight:bold; color:var(--primary); font-size:1.1rem;">${a.duration}dk</div></li>`; totalWeekly+=a.duration; }); }
             
             window.currentWeeklyTotal = totalWeekly;
 
@@ -1037,28 +915,10 @@
     function updateStudentChart(val, goal){ const ctx = document.getElementById('weeklyChart').getContext('2d'); if(myChart) myChart.destroy(); myChart = new Chart(ctx, { type: 'doughnut', data: { labels: ['Yapılan', 'Kalan'], datasets: [{ data: [val, Math.max(0, goal-val)], backgroundColor: ['#009688', '#e2e8f0'], borderWidth: 0 }] }, options: { cutout: '80%', maintainAspectRatio: false, plugins: { legend: { display: false } } } }); }
     window.updateGoal = async () => { const val = parseInt(document.getElementById('weeklyGoalInput').value); if(currentUser && val) { await updateDoc(doc(db,"users",currentUser.uid), { weeklyGoal: val }); Swal.fire("Hedef Güncellendi", `Yeni haftalık hedefin: ${val} dk`, "success"); } };
     
-    // --- MANUAL ENTRY (KORUMALI) ---
+    // --- MANUAL ENTRY ---
     window.saveEntry = async () => { 
-        // 1. BUTON KİLİTLEME
-        const btn = document.getElementById('btnManualSave');
-        btn.disabled = true;
-        btn.innerText = "Kaydediliyor...";
-
-        const sub = document.getElementById('selectedSubject').value; 
-        let dur = parseInt(document.getElementById('entryDur').value);
-        
-        // 2. GİRİŞ DOĞRULAMA (Input Validation)
-        if(!sub || !dur) {
-            Swal.fire("Eksik Bilgi", "Lütfen ders ve süre seçin.", "warning");
-            btn.disabled = false;
-            btn.innerText = "KAYDET (+Puan) ✅";
-            return;
-        }
-        if(dur < 1) dur = 1;
-        if(dur > 300) {
-            dur = 300; // Max sınır
-            Swal.fire("Uyarı", "Bir seferde en fazla 300 dakika girebilirsin. Süre 300 olarak ayarlandı.", "info");
-        }
+        const sub = document.getElementById('selectedSubject').value; const dur = parseInt(document.getElementById('entryDur').value);
+        if(!sub || !dur) return Swal.fire("Eksik Bilgi", "Lütfen ders ve süre seçin.", "warning");
         
         const offset = parseInt(document.getElementById('entryDate').value) || 0;
         const dt = new Date();
@@ -1070,15 +930,9 @@
             await updateDoc(doc(db,"users",currentUser.uid), { totalMinutes: increment(dur), bilgePoints: increment(dur), lastStudyDate: serverTimestamp() }); 
             Swal.fire("Harika!", `${dur} dakika eklendi ve ${dur} puan kazandın!`, "success"); 
             confetti(); 
-            // GÖREV KONTROLÜ
-            checkDailyQuests(currentUser.uid);
-        } catch(e) { 
-            Swal.fire("Hata", e.message, "error"); 
-        } finally {
-            // İŞLEM BİTİNCE BUTONU AÇ
-            btn.disabled = false;
-            btn.innerText = "KAYDET (+Puan) ✅";
-        }
+            // YENİ: KLAN PUANI EKLE
+            await addClanPoints(currentUser.uid, dur);
+        } catch(e) { Swal.fire("Hata", e.message, "error"); } 
     };
 
     // --- SEPARATED POMODORO LOGIC ---
@@ -1168,11 +1022,12 @@
             
             if(completed) {
                 Swal.fire("Tebrikler!", "Süreyi tamamladın!", "success");
-                checkDailyQuests(currentUser.uid); // GÖREV KONTROL
             } else {
                 Swal.fire("Kaydedildi", `${spentMinutes} dakika çalıştın.`, "success");
             }
             confetti();
+            // YENİ: KLAN PUANI EKLE
+            await addClanPoints(currentUser.uid, points);
         } catch(e) {
             console.error(e);
         }
@@ -1218,11 +1073,11 @@
     window.boostArenaTime = () => {
         if(!isArenaRunning) return;
         
-        arenaTimeLeft += 600; 
-        arenaTotalDuration += 600; 
+        arenaTimeLeft += 300; 
+        arenaTotalDuration += 300; 
         
         Swal.fire({
-            title: '+10 Dakika Eklendi!',
+            title: '+5 Dakika Eklendi!',
             text: 'Mücadeleye devam et, harikasın!',
             icon: 'success',
             timer: 1500,
@@ -1292,6 +1147,8 @@
             
             Swal.fire("Arena Bitti", `${spentMinutes} dakika dayandın ve ${points} Puan kazandın!`, "success");
             confetti();
+            // YENİ: KLAN PUANI EKLE
+            await addClanPoints(currentUser.uid, points);
         } catch(e) {
             console.error(e);
         }
@@ -1349,102 +1206,25 @@
         });
     }
 
-    // --- YENİ ADMİN FONKSİYONLARI ---
-    function renderAdminDashboard(filteredList = null){
-        const targetList = filteredList || globalUserList;
+    function renderAdminDashboard(){
         let risk=0, stars=0; const now = new Date(); const table = document.getElementById('studentTableBody'); table.innerHTML = "";
-        
-        targetList.forEach((u,i) => {
+        globalUserList.forEach((u,i) => {
             const last = u.lastStudyDate ? (u.lastStudyDate.toDate?u.lastStudyDate.toDate():new Date(u.lastStudyDate)) : null;
             let status = "✅ İyi"; let rowClass = "sb-good"; let icon="👍";
             if(!last || (now-last)/(1000*60*60*24) > 3) { status="Riskli"; risk++; rowClass="sb-risk"; icon="⚠️"; }
             else if((u.totalMinutes||0) > 1000) { status="Lider"; stars++; rowClass="sb-star"; icon="🌟"; }
-            
             const tr = document.createElement('tr');
-            // BUTONLAR VE TIKLANABİLİR İSİM EKLENDİ
-            tr.innerHTML = `
-                <td style="color:#94a3b8;">#${i+1}</td>
-                <td style="font-weight:600; font-size:1rem; cursor:pointer;" onclick="openAdminDetail('${u.id}', '${u.displayName||"İsimsiz"}', ${u.totalMinutes||0}, ${u.bilgePoints||0})">${u.displayName||"İsimsiz"}<br><small style="color:#aaa; font-weight:normal;">${u.email}</small></td>
-                <td><span class="smart-badge ${rowClass}">${icon} ${status}</span></td>
-                <td style="color:var(--warning); font-weight:bold;">${u.bilgePoints||0}</td>
-                <td style="color:var(--primary); font-weight:800;">${Math.floor((u.totalMinutes||0)/60)}s ${(u.totalMinutes||0)%60}dk</td>
-                <td>
-                    <button onclick="editStudent('${u.id}', ${u.bilgePoints}, ${u.totalMinutes})" style="padding:5px 10px; font-size:0.8rem; width:auto; background:#3b82f6; color:white; margin-right:5px;">✏️</button>
-                    <button onclick="deleteStudent('${u.id}')" style="padding:5px 10px; font-size:0.8rem; width:auto; background:#ef4444; color:white;">🗑️</button>
-                </td>
-            `;
+            tr.innerHTML = `<td style="color:#94a3b8;">#${i+1}</td><td style="font-weight:600; font-size:1rem;">${u.displayName||"İsimsiz"}</td><td><span class="smart-badge ${rowClass}">${icon} ${status}</span></td><td style="color:var(--warning); font-weight:bold;">${u.bilgePoints||0}</td><td style="color:var(--primary); font-weight:800;">${Math.floor((u.totalMinutes||0)/60)}s ${(u.totalMinutes||0)%60}dk</td>`;
+            tr.onclick = () => openAdminDetail(u.id, u.displayName||"İsimsiz", u.totalMinutes||0, u.bilgePoints||0);
             table.appendChild(tr);
         });
-
-        if(!filteredList) {
-            document.getElementById('insightRiskCount').innerText = risk; document.getElementById('insightStarCount').innerText = stars;
-            document.getElementById('adminTotalStudents').innerText = globalUserList.length;
-            let tm=0; let ta=0; const td=new Date().toDateString();
-            globalUserList.forEach(u=>{ tm+=(u.totalMinutes||0); if(u.lastStudyDate && (u.lastStudyDate.toDate?u.lastStudyDate.toDate():new Date(u.lastStudyDate)).toDateString()===td) ta++; });
-            document.getElementById('adminTotalHours').innerText = Math.floor(tm/60); document.getElementById('adminActiveToday').innerText = ta;
-            renderRisingStars(globalUserList); renderAdminChart(globalUserList);
-        }
+        document.getElementById('insightRiskCount').innerText = risk; document.getElementById('insightStarCount').innerText = stars;
+        document.getElementById('adminTotalStudents').innerText = globalUserList.length;
+        let tm=0; let ta=0; const td=new Date().toDateString();
+        globalUserList.forEach(u=>{ tm+=(u.totalMinutes||0); if(u.lastStudyDate && (u.lastStudyDate.toDate?u.lastStudyDate.toDate():new Date(u.lastStudyDate)).toDateString()===td) ta++; });
+        document.getElementById('adminTotalHours').innerText = Math.floor(tm/60); document.getElementById('adminActiveToday').innerText = ta;
+        renderRisingStars(globalUserList); renderAdminChart(globalUserList);
     }
-
-    // ARAMA FONKSİYONU
-    window.filterAdminTable = () => {
-        const query = document.getElementById('adminSearchInput').value.toLowerCase();
-        const filtered = globalUserList.filter(u => 
-            (u.displayName && u.displayName.toLowerCase().includes(query)) || 
-            (u.email && u.email.toLowerCase().includes(query))
-        );
-        renderAdminDashboard(filtered);
-    };
-
-    // DÜZENLEME FONKSİYONU
-    window.editStudent = async (uid, currentPoints, currentMins) => {
-        const { value: formValues } = await Swal.fire({
-            title: 'Öğrenci Verisini Düzenle',
-            html:
-                `<label>Bilge Puan:</label><input id="swal-points" class="swal2-input" type="number" value="${currentPoints}">` +
-                `<label>Toplam Dakika:</label><input id="swal-mins" class="swal2-input" type="number" value="${currentMins}">`,
-            focusConfirm: false,
-            showCancelButton: true,
-            confirmButtonText: 'Kaydet',
-            preConfirm: () => {
-                return [
-                    document.getElementById('swal-points').value,
-                    document.getElementById('swal-mins').value
-                ]
-            }
-        });
-
-        if (formValues) {
-            try {
-                await updateDoc(doc(db, "users", uid), {
-                    bilgePoints: parseInt(formValues[0]),
-                    totalMinutes: parseInt(formValues[1])
-                });
-                Swal.fire("Başarılı", "Veriler güncellendi.", "success");
-            } catch(e) { Swal.fire("Hata", e.message, "error"); }
-        }
-    };
-
-    // SİLME FONKSİYONU
-    window.deleteStudent = async (uid) => {
-        const result = await Swal.fire({
-            title: 'Emin misin?',
-            text: "Bu öğrenciyi ve tüm verilerini silmek üzeresin!",
-            icon: 'warning',
-            showCancelButton: true,
-            confirmButtonColor: '#d33',
-            confirmButtonText: 'Evet, Sil!',
-            cancelButtonText: 'İptal'
-        });
-
-        if (result.isConfirmed) {
-            try {
-                await deleteDoc(doc(db, "users", uid));
-                Swal.fire("Silindi!", "Öğrenci veritabanından kaldırıldı.", "success");
-            } catch(e) { Swal.fire("Hata", e.message, "error"); }
-        }
-    };
-
     function renderRisingStars(users) { 
         const c=document.getElementById('risingStarsContainer');c.innerHTML="";const n=new Date();const od=24*60*60*1000;
         const s=users.filter(u=>{if(!u.lastStudyDate)return false; const d=u.lastStudyDate.toDate?u.lastStudyDate.toDate():new Date(u.lastStudyDate); return(n-d)<(od*2)}).sort((a,b)=>b.totalMinutes-a.totalMinutes).slice(0,5);
@@ -1455,73 +1235,7 @@
             c.appendChild(cd)
         })
     }
-
-    // RENKLİ VE TIKLANABİLİR GRAFİK
-    function renderAdminChart(users) { 
-        const c = document.getElementById('chartInner');
-        const mw = Math.max(users.length * 50, 600);
-        c.style.width = mw + "px";
-        
-        const ctx = document.getElementById('adminLeaderboardChart').getContext('2d');
-        const labels = users.map(u => (u.displayName || "Öğrenci").split(' ')[0]);
-        const dataPoints = users.map(u => u.totalMinutes);
-        const userIds = users.map(u => u.id); 
-        const userFullData = users; 
-
-        const backgroundColors = users.map((_, index) => {
-            const hue = (index * 137.508) % 360; 
-            return `hsl(${hue}, 70%, 50%)`;
-        });
-
-        if(adminChart) adminChart.destroy();
-        
-        adminChart = new Chart(ctx, {
-            type: 'bar',
-            data: {
-                labels: labels,
-                datasets: [{
-                    label: 'Toplam Dakika',
-                    data: dataPoints,
-                    backgroundColor: backgroundColors,
-                    borderRadius: 8,
-                    barThickness: 40,
-                    borderWidth: 2,
-                    borderColor: 'white'
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                    legend: { display: false },
-                    tooltip: {
-                        callbacks: {
-                            label: function(context) {
-                                return `⏱️ ${context.raw} Dakika`;
-                            }
-                        }
-                    }
-                },
-                scales: {
-                    y: { beginAtZero: true, grid: { display: false } },
-                    x: { grid: { display: false } }
-                },
-                onClick: (event, elements) => {
-                    if (elements.length > 0) {
-                        const index = elements[0].index;
-                        const uid = userIds[index];
-                        const u = userFullData[index];
-                        // Tıklanınca detay aç
-                        openAdminDetail(uid, u.displayName || "İsimsiz", u.totalMinutes || 0, u.bilgePoints || 0);
-                    }
-                },
-                onHover: (event, chartElement) => {
-                    event.native.target.style.cursor = chartElement[0] ? 'pointer' : 'default';
-                }
-            }
-        });
-    }
-
+    function renderAdminChart(users) { const c=document.getElementById('chartInner');const mw=Math.max(users.length*60,400);c.style.width=mw+"px";const ctx=document.getElementById('adminLeaderboardChart').getContext('2d');const l=users.map(u=>(u.displayName||"Öğrenci").split(' ')[0]);const d=users.map(u=>u.totalMinutes);if(adminChart)adminChart.destroy();adminChart=new Chart(ctx,{type:'bar',data:{labels:l,datasets:[{label:'Toplam Dakika',data:d,backgroundColor:'#009688',borderRadius:8,barThickness:40}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{y:{beginAtZero:true,grid:{display:false}},x:{grid:{display:false}}}}})}
     window.openAdminDetail = async (uid, name, total, points) => { document.getElementById('modalAdminDetail').classList.remove('hidden'); document.getElementById('detailStudentName').innerText = name; document.getElementById('statTotalMin').innerText = total; document.getElementById('statAvg').innerText = points; const s = await getDocs(query(collection(db,"users",uid,"sessions"))); let days={}; for(let i=0; i<7; i++){ const d=new Date(); d.setDate(d.getDate()-i); days[d.toLocaleDateString('tr-TR')]=0; } s.forEach(doc=>{ const dt=doc.data(); if(days[dt.dateStr]!==undefined) days[dt.dateStr]+=dt.duration; }); const lbl=Object.keys(days).reverse(); const da=Object.values(days).reverse(); const ctx=document.getElementById('studentDetailChart').getContext('2d'); if(detailChart) detailChart.destroy(); detailChart=new Chart(ctx,{type:'line',data:{labels:lbl,datasets:[{label:'Günlük',data:da,borderColor:'#ec4899',tension:0.4,fill:true,backgroundColor:'rgba(236,72,153,0.1)'}]},options:{responsive:true,maintainAspectRatio:false}});}; window.closeAdminDetail=()=>document.getElementById('modalAdminDetail').classList.add('hidden');
 
     window.openBulkSelectModal = (type) => {
@@ -1620,14 +1334,20 @@
     window.openProfileModal=()=>{document.getElementById('editProfileName').value=currentUser.displayName||"";document.getElementById('editProfileEmail').value=currentUser.email||"";document.getElementById('modalProfile').classList.remove('hidden')};window.closeProfileModal=()=>document.getElementById('modalProfile').classList.add('hidden');window.saveUserProfile=async()=>{const n=document.getElementById('editProfileName').value.trim();if(!n){alert("İsim boş olamaz.");return}try{await updateProfile(currentUser,{displayName:n});await updateDoc(doc(db,"users",currentUser.uid),{displayName:n});document.getElementById('studentNameDisplay').innerText=n.split(' ')[0];alert("Profil güncellendi ✅");closeProfileModal()}catch(e){alert("Hata: "+e.message)}};window.sendPasswordReset=async()=>{if(confirm(currentUser.email+" adresine şifre sıfırlama e-postası gönderilsin mi?")){try{await sendPasswordResetEmail(auth,currentUser.email);alert("E-posta gönderildi!")}catch(e){alert("Hata: "+e.message)}}};
     window.toggleAuth=()=>{ isLogin=!isLogin; document.getElementById('authBtn').innerText=isLogin?"GİRİŞ YAP":"KAYIT OL"; document.getElementById('regName').classList.toggle('hidden'); document.getElementById('authTitle').innerText=isLogin?"Giriş Yap":"Kayıt Ol"; }; window.handleLogin=async()=>{ const e=document.getElementById('email').value, p=document.getElementById('password').value; try{ if(isLogin) await signInWithEmailAndPassword(auth,e,p); else { const c=await createUserWithEmailAndPassword(auth,e,p); await updateProfile(c.user,{displayName:document.getElementById('regName').value}); } } catch(e){ document.getElementById('authError').style.display='block'; document.getElementById('authError').innerText=e.message; } }; 
     
+    // --- UPDATED LOGOUT HANDLER ---
     window.handleLogout = () => {
         // 1. Tüm dinleyicileri kapat
         if(unsubStudentData) unsubStudentData();
         if(unsubStudentMessages) unsubStudentMessages();
         if(unsubAdminUsers) unsubAdminUsers();
         if(unsubAdminMessages) unsubAdminMessages();
-        if(unsubUserData) unsubUserData();
         if(activeArenaListener) activeArenaListener();
+        
+        // KLAN SİSTEMİ DİNLEYİCİLERİ KAPAT
+        if(unsubAdminClanReq) unsubAdminClanReq();
+        if(unsubAdminMemReq) unsubAdminMemReq();
+        if(unsubAdminActiveClans) unsubAdminActiveClans();
+        if(unsubUserData) unsubUserData();
 
         // 2. Temizlik
         currentUser = null;
@@ -1651,30 +1371,269 @@
             document.querySelectorAll('.mobile-bottom-nav .nav-item').forEach(e=>e.classList.remove('active')); 
             el.classList.add('active'); 
         }
-        ['viewHome','viewPomo','viewStore','viewFuture','viewHistory', 'viewArena'].forEach(x=>document.getElementById(x).classList.add('hidden')); 
+        // GİZLENECEK VIEW'LER (Klan da eklendi)
+        ['viewHome','viewPomo','viewStore','viewFuture','viewHistory', 'viewArena', 'viewClan'].forEach(x=>document.getElementById(x).classList.add('hidden')); 
+        
         document.getElementById('view'+t.charAt(0).toUpperCase()+t.slice(1)).classList.remove('hidden');
         
+        // ÖZEL DURUMLAR
         if(t === 'arena') listenArena();
+        else if(t === 'clan' && currentUser) checkClanStatus(currentUser.uid); // KLAN SEKME AÇILINCA
         else if(activeArenaListener) activeArenaListener(); 
     };
+
     window.switchAdminTab = (tab, el) => {
-        // Yönetici Paneli Sekmeleri (Eski sistem devam)
+        // Yönetici Paneli Sekmeleri
         if(el) { 
              document.getElementById('tabAdminDash').classList.remove('active'); 
              document.getElementById('tabAdminMsg').classList.remove('active'); 
              document.getElementById('tabAdminHist').classList.remove('active');
+             document.getElementById('tabAdminClan').classList.remove('active');
              el.classList.add('active');
         }
         document.getElementById('adminPanelDashboard').classList.add('hidden'); 
         document.getElementById('adminPanelMessages').classList.add('hidden'); 
         document.getElementById('adminPanelHistory').classList.add('hidden');
+        document.getElementById('adminPanelClan').classList.add('hidden');
+
         if(tab === 'dashboard') document.getElementById('adminPanelDashboard').classList.remove('hidden');
         else if(tab === 'messages') document.getElementById('adminPanelMessages').classList.remove('hidden');
         else if(tab === 'history') document.getElementById('adminPanelHistory').classList.remove('hidden');
+        else if(tab === 'clan') document.getElementById('adminPanelClan').classList.remove('hidden'); // YENİ
     };
 
     function renderChips(){ const c1=document.getElementById('chipsManual'), c2=document.getElementById('chipsPomo'); c1.innerHTML=""; c2.innerHTML=""; SUBJECTS.forEach(s=>{ const d=document.createElement('div'); d.className='chip'; d.innerText=s; d.onclick=function(){ c1.querySelectorAll('.chip').forEach(x=>x.classList.remove('active')); this.classList.add('active'); document.getElementById('selectedSubject').value=s; }; c1.appendChild(d); const d2=d.cloneNode(true); d2.onclick=function(){ c2.querySelectorAll('.chip').forEach(x=>x.classList.remove('active')); this.classList.add('active'); document.getElementById('pomoSubject').value=s; }; c2.appendChild(d2); }); document.getElementById('selectedSubject').value=SUBJECTS[0]; document.getElementById('pomoSubject').value=SUBJECTS[0]; }
     window.exportToExcel = () => { if(!globalUserList || globalUserList.length === 0) return Swal.fire("Veri Yok", "Listelenecek öğrenci bulunamadı.", "warning"); let csvContent = "data:text/csv;charset=utf-8,\uFEFF"; csvContent += "Sıra,Öğrenci Adı,E-Posta,Durum,Bilge Puan,Toplam Süre (dk),Son Çalışma Tarihi\n"; const now = new Date(); globalUserList.forEach((u, index) => { const last = u.lastStudyDate ? (u.lastStudyDate.toDate?u.lastStudyDate.toDate():new Date(u.lastStudyDate)) : null; let status = "İyi"; if(!last || (now-last)/(1000*60*60*24) > 3) status = "Riskli"; else if((u.totalMinutes||0) > 1000) status = "Lider"; const dateStr = last ? last.toLocaleDateString('tr-TR') : "Giriş Yok"; const name = u.displayName || "İsimsiz"; const email = u.email || "-"; csvContent += `${index+1},"${name}","${email}",${status},${u.bilgePoints||0},${u.totalMinutes||0},"${dateStr}"\n`; }); const encodedUri = encodeURI(csvContent); const link = document.createElement("a"); link.setAttribute("href", encodedUri); link.setAttribute("download", "ogrenci_listesi_" + new Date().toLocaleDateString('tr-TR') + ".csv"); document.body.appendChild(link); link.click(); document.body.removeChild(link); };
+
+    // --- KLAN SİSTEMİ FONKSİYONLARI ---
+    
+    // 1. Kullanıcının Klan Durumunu Kontrol Et
+    async function checkClanStatus(uid) {
+        const uSnap = await getDoc(doc(db, "users", uid));
+        const uData = uSnap.data();
+        
+        if (uData.clanId) {
+            const cSnap = await getDoc(doc(db, "clans", uData.clanId));
+            if (cSnap.exists()) {
+                const cData = cSnap.data();
+                document.getElementById('noClanSection').classList.add('hidden');
+                document.getElementById('myClanSection').classList.remove('hidden');
+                
+                document.getElementById('myClanName').innerText = cData.name;
+                document.getElementById('myClanIcon').innerText = cData.icon;
+                document.getElementById('myClanMembers').innerText = cData.memberCount;
+                document.getElementById('myClanScore').innerText = cData.totalScore;
+            } else {
+                await updateDoc(doc(db, "users", uid), { clanId: deleteField() });
+                resetClanUI();
+            }
+        } else {
+            resetClanUI();
+            loadJoinableClans(); 
+        }
+        loadClanLeaderboard(); 
+    }
+
+    function resetClanUI() {
+        document.getElementById('noClanSection').classList.remove('hidden');
+        document.getElementById('myClanSection').classList.add('hidden');
+    }
+
+    window.openCreateClanModal = () => document.getElementById('modalCreateClan').classList.remove('hidden');
+    window.selectClanIcon = (el) => {
+        document.querySelectorAll('.icon-option').forEach(e => e.classList.remove('selected'));
+        el.classList.add('selected');
+        document.getElementById('selectedClanIcon').value = el.innerText;
+    };
+
+    // KLAN OLUŞTURMA İSTEĞİ (YÖNETİCİ ONAYLI)
+    window.createClanRequest = async () => {
+        const name = document.getElementById('newClanName').value.trim();
+        const icon = document.getElementById('selectedClanIcon').value;
+        const myPoints = parseInt(document.getElementById('stPoints').innerText);
+
+        if (myPoints < 1000) return Swal.fire("Rütben Yetmiyor", "Otağ kurmak için en az 1000 puana (Usta) ihtiyacın var.", "warning");
+        if (name.length < 3) return Swal.fire("Hata", "Otağ adı en az 3 karakter olmalı.", "error");
+
+        try {
+            await addDoc(collection(db, "clan_requests"), {
+                name: name,
+                icon: icon,
+                leader: currentUser.uid,
+                leaderName: currentUser.displayName,
+                createdAt: serverTimestamp(),
+                status: 'pending'
+            });
+
+            Swal.fire("Arz Edildi", "Otağ kurma isteğin Hakan'a (Yöneticiye) iletildi. Onay bekleniyor.", "info");
+            document.getElementById('modalCreateClan').classList.add('hidden');
+        } catch(e) { Swal.fire("Hata", e.message, "error"); }
+    };
+
+    // KLANA KATILMA İSTEĞİ (YÖNETİCİ ONAYLI)
+    window.joinClanRequest = async (clanId, clanName) => {
+        if(!confirm(`${clanName} otağına katılmak için Hakan'a istek gönderilsin mi?`)) return;
+        
+        try {
+            await addDoc(collection(db, "member_requests"), {
+                clanId: clanId,
+                clanName: clanName,
+                userId: currentUser.uid,
+                userName: currentUser.displayName,
+                createdAt: serverTimestamp(),
+                status: 'pending'
+            });
+            Swal.fire("İstek Gönderildi", "Katılım isteğin Hakan'a iletildi.", "success");
+        } catch(e) { Swal.fire("Hata", e.message, "error"); }
+    };
+
+    async function loadJoinableClans() {
+        const list = document.getElementById('clanJoinList');
+        list.innerHTML = "Yükleniyor...";
+        
+        const q = query(collection(db, "clans"), orderBy("totalScore", "desc"), limit(10));
+        const snap = await getDocs(q);
+        
+        list.innerHTML = "";
+        if(snap.empty) { list.innerHTML = "Henüz kurulmuş bir otağ yok."; return; }
+
+        snap.forEach(d => {
+            const data = d.data();
+            const div = document.createElement('div');
+            div.className = 'clan-rank-item';
+            div.innerHTML = `
+                <div style="display:flex; align-items:center;">
+                    <div class="clan-badge">${data.icon}</div>
+                    <div><strong>${data.name}</strong><br><small>${data.memberCount} Üye</small></div>
+                </div>
+                <button onclick="joinClanRequest('${d.id}', '${data.name}')" style="padding:5px 10px; font-size:0.8rem; width:auto; background:#e0f2f1; color:var(--primary);">Katıl</button>
+            `;
+            list.appendChild(div);
+        });
+    }
+
+    window.leaveClan = async () => {
+        if(!confirm("Otağdan ayrılmak istediğine emin misin? Puanların otağdan silinecek.")) return;
+        
+        const uSnap = await getDoc(doc(db, "users", currentUser.uid));
+        const clanId = uSnap.data().clanId;
+        const myPoints = uSnap.data().bilgePoints || 0;
+
+        if(clanId) {
+            const clanRef = doc(db, "clans", clanId);
+            await updateDoc(clanRef, {
+                memberCount: increment(-1),
+                totalScore: increment(-myPoints)
+            });
+            await updateDoc(doc(db, "users", currentUser.uid), { clanId: deleteField() });
+            checkClanStatus(currentUser.uid);
+            Swal.fire("Ayrıldın", "Otağdan ayrıldın.", "info");
+        }
+    };
+
+    async function loadClanLeaderboard() {
+        const list = document.getElementById('clanLeaderboard');
+        const q = query(collection(db, "clans"), orderBy("totalScore", "desc"), limit(5));
+        const snap = await getDocs(q);
+        
+        list.innerHTML = "";
+        let i = 1;
+        snap.forEach(d => {
+            const data = d.data();
+            const rankClass = i <= 3 ? 'top3' : '';
+            list.innerHTML += `
+                <div class="clan-rank-item">
+                    <div style="display:flex; align-items:center;">
+                        <span class="rank-number ${rankClass}">#${i}</span>
+                        <div class="clan-badge">${data.icon}</div>
+                        <strong>${data.name}</strong>
+                    </div>
+                    <div style="font-weight:800; color:var(--warning);">⭐ ${data.totalScore}</div>
+                </div>
+            `;
+            i++;
+        });
+    }
+
+    // YENİ: KLAN PUANI EKLEME YARDIMCISI
+    async function addClanPoints(uid, points) {
+        const uSnap = await getDoc(doc(db, "users", uid));
+        const clanId = uSnap.data()?.clanId;
+        if (clanId) {
+            await updateDoc(doc(db, "clans", clanId), {
+                totalScore: increment(points)
+            });
+        }
+    }
+
+    // --- ADMIN CLAN YÖNETİMİ ---
+    function listenAdminClanRequests() {
+        if(unsubAdminClanReq) unsubAdminClanReq();
+        unsubAdminClanReq = onSnapshot(collection(db, "clan_requests"), (snap) => {
+            const list = document.getElementById('adminClanRequestList'); list.innerHTML = "";
+            if(snap.empty) { list.innerHTML = "<div style='text-align:center; padding:10px;'>İstek yok.</div>"; return; }
+            snap.forEach(d => {
+                const req = d.data();
+                const div = document.createElement('div'); div.className = 'selection-item';
+                div.innerHTML = `<div><strong>${req.name}</strong> (${req.icon})<br><small>Lider: ${req.leaderName}</small></div><div><button onclick="approveClan('${d.id}', '${req.leader}', '${req.name}', '${req.icon}', ${req.totalScore || 0})" style="background:#dcfce7; color:green; padding:5px; margin-right:5px;">✓</button><button onclick="rejectRequest('clan_requests', '${d.id}')" style="background:#fee2e2; color:red; padding:5px;">✕</button></div>`;
+                list.appendChild(div);
+            });
+        });
+
+        if(unsubAdminMemReq) unsubAdminMemReq();
+        unsubAdminMemReq = onSnapshot(collection(db, "member_requests"), (snap) => {
+            const list = document.getElementById('adminMemberRequestList'); list.innerHTML = "";
+            if(snap.empty) { list.innerHTML = "<div style='text-align:center; padding:10px;'>İstek yok.</div>"; return; }
+            snap.forEach(d => {
+                const req = d.data();
+                const div = document.createElement('div'); div.className = 'selection-item';
+                div.innerHTML = `<div><strong>${req.userName}</strong> -> ${req.clanName}<br><small>${req.createdAt?.toDate().toLocaleDateString('tr-TR')}</small></div><div><button onclick="approveMember('${d.id}', '${req.userId}', '${req.clanId}')" style="background:#dcfce7; color:green; padding:5px; margin-right:5px;">✓</button><button onclick="rejectRequest('member_requests', '${d.id}')" style="background:#fee2e2; color:red; padding:5px;">✕</button></div>`;
+                list.appendChild(div);
+            });
+        });
+
+        if(unsubAdminActiveClans) unsubAdminActiveClans();
+        unsubAdminActiveClans = onSnapshot(collection(db, "clans"), (snap) => {
+            const list = document.getElementById('adminActiveClansList'); list.innerHTML = "";
+            snap.forEach(d => {
+                const c = d.data();
+                const div = document.createElement('div'); div.className = 'selection-item';
+                div.innerHTML = `<div>${c.icon} <strong>${c.name}</strong> (${c.memberCount} Üye)</div><button onclick="deleteClan('${d.id}')" style="background:#fee2e2; color:red; padding:5px;">SİL</button>`;
+                list.appendChild(div);
+            });
+        });
+    }
+
+    window.approveClan = async (reqId, leaderId, name, icon, score) => {
+        try {
+            const uSnap = await getDoc(doc(db, "users", leaderId));
+            const startScore = uSnap.data().bilgePoints || 0;
+            const clanRef = await addDoc(collection(db, "clans"), { name: name, icon: icon, leader: leaderId, memberCount: 1, totalScore: startScore, createdAt: serverTimestamp() });
+            await updateDoc(doc(db, "users", leaderId), { clanId: clanRef.id });
+            await deleteDoc(doc(db, "clan_requests", reqId));
+            Swal.fire("Onaylandı", "Otağ kuruldu.", "success");
+        } catch(e) { Swal.fire("Hata", e.message, "error"); }
+    };
+
+    window.approveMember = async (reqId, userId, clanId) => {
+        try {
+            const clanRef = doc(db, "clans", clanId);
+            const userRef = doc(db, "users", userId);
+            await runTransaction(db, async (transaction) => {
+                const clanDoc = await transaction.get(clanRef);
+                const userDoc = await transaction.get(userRef);
+                if (!clanDoc.exists()) throw "Klan yok.";
+                const userPoints = userDoc.data().bilgePoints || 0;
+                transaction.update(clanRef, { memberCount: (clanDoc.data().memberCount||0)+1, totalScore: (clanDoc.data().totalScore||0)+userPoints });
+                transaction.update(userRef, { clanId: clanId });
+                transaction.delete(doc(db, "member_requests", reqId));
+            });
+            Swal.fire("Onaylandı", "Üye otağa eklendi.", "success");
+        } catch(e) { Swal.fire("Hata", e.message, "error"); }
+    };
+
+    window.rejectRequest = async (col, id) => { if(confirm("İsteği reddetmek istiyor musun?")) { await deleteDoc(doc(db, col, id)); } };
+    window.deleteClan = async (clanId) => { if(!confirm("Bu otağı silmek üzeresin!")) return; await deleteDoc(doc(db, "clans", clanId)); };
 
     // Cleaned Exports
     window.switchAdminTab=window.switchAdminTab; window.sendAdminMessage=window.sendAdminMessage; window.fetchRandomMessage=window.fetchRandomMessage; window.deleteMessage=window.deleteMessage; window.deleteAllMessages=window.deleteAllMessages; window.readMsg=window.readMsg; window.openMsgModal=window.openMsgModal; window.saveEntry=window.saveEntry; window.buyItem=window.buyItem; window.saveFuture=window.saveFuture; window.handleLogin=window.handleLogin; window.toggleAuth=window.toggleAuth; window.handleLogout=window.handleLogout; window.switchTab=window.switchTab; window.openAdminDetail=window.openAdminDetail; window.closeAdminDetail=window.closeAdminDetail;
@@ -1684,7 +1643,8 @@
     // NEW & UPDATED EXPORTS
     window.startPomoTimer = window.startPomoTimer; window.requestStopPomo = window.requestStopPomo; window.updateTimerSet = window.updateTimerSet;
     window.startArenaSession = window.startArenaSession; window.boostArenaTime = window.boostArenaTime; window.requestStopArena = window.requestStopArena;
-    window.filterAdminTable = window.filterAdminTable; window.editStudent = window.editStudent; window.deleteStudent = window.deleteStudent;
+    window.createClanRequest = window.createClanRequest; window.joinClanRequest = window.joinClanRequest; window.leaveClan = window.leaveClan; window.openCreateClanModal = window.openCreateClanModal; window.selectClanIcon = window.selectClanIcon;
+    window.approveClan = window.approveClan; window.approveMember = window.approveMember; window.rejectRequest = window.rejectRequest; window.deleteClan = window.deleteClan;
 </script>
 </body>
 </html>
