@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Bilge Takip - Öğrenci Paneli</title>
+    <link rel="icon" href="Designer.jpg" type="image/jpeg">
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -56,11 +57,17 @@
         .xp-fill { height: 100%; background: linear-gradient(90deg, #FFD700, #FFA500); width: 0%; transition: width 1s cubic-bezier(0.4, 0, 0.2, 1); }
         .rank-badge { font-size: 0.75rem; font-weight: 800; color: #fff; background: rgba(0,0,0,0.2); padding: 2px 8px; border-radius: 12px; margin-left: 6px; }
         .fade-in { animation: fadeIn 0.5s cubic-bezier(0.4, 0, 0.2, 1); } @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        
+        /* BAYKUŞ (Tıklanabilir ve Sadece Üstüne Tıklayınca Kapanır - X Butonu Yok) */
         .wise-coach-container { position: fixed; bottom: 90px; right: 10px; z-index: 999; display: flex; flex-direction: column; align-items: flex-end; }
         .wise-avatar { width: 60px; height: 60px; background: linear-gradient(135deg, #4f46e5, #9333ea); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 2rem; box-shadow: 0 10px 25px rgba(79, 70, 229, 0.4); cursor: pointer; border: 3px solid #fff; position: relative; transition: transform 0.3s; }
         .coach-badge { position: absolute; top: 0; right: 0; background: #ef4444; color: white; font-size: 0.75rem; width: 22px; height: 22px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; border: 2px solid white; animation: pulseBadge 2s infinite; }
-        .coach-bubble { background: white; padding: 15px; border-radius: 20px 20px 4px 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.15); margin-bottom: 10px; max-width: 250px; font-size: 0.9rem; color: var(--text-main); border: 2px solid #e0e7ff; opacity: 0; transform: translateY(20px) scale(0.9); transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); pointer-events: none; position: absolute; bottom: 70px; right: 0; width: max-content; font-weight: 700; z-index: 1000; }
-        .coach-bubble.show { opacity: 1; transform: translateY(0) scale(1); pointer-events: auto; }
+        
+        /* Balon Stili */
+        .coach-bubble { background: white; padding: 15px 25px 15px 15px; border-radius: 20px 20px 4px 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.15); margin-bottom: 10px; max-width: 250px; font-size: 0.9rem; color: var(--text-main); border: 2px solid #e0e7ff; opacity: 0; transform: translateY(20px) scale(0.9); transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); pointer-events: auto; position: absolute; bottom: 70px; right: 0; width: max-content; font-weight: 700; z-index: 1000; cursor: pointer; position: relative; }
+        .coach-bubble.show { opacity: 1; transform: translateY(0) scale(1); }
+        /* X butonu stilini kaldırdım, tıklama ile kapanacak */
+
         @keyframes excited { 0% { transform: scale(1) rotate(0deg); } 25% { transform: scale(1.1) rotate(-5deg); } 50% { transform: scale(1.1) rotate(5deg); } 75% { transform: scale(1.1) rotate(-5deg); } 100% { transform: scale(1) rotate(0deg); } }
         .owl-excited { animation: excited 0.8s infinite; }
         @keyframes pulseBadge { 0% { transform: scale(1); } 50% { transform: scale(1.1); } 100% { transform: scale(1); } }
@@ -83,7 +90,7 @@
         <input type="password" id="password" placeholder="Şifre" class="input-modern">
         <button class="btn-action" onclick="handleLogin()" id="authBtn">GİRİŞ YAP</button>
         <div id="authError" style="color:var(--danger); margin-top:15px; font-weight:600; display:none;"></div>
-        <div class="app-footer">© 2025 Remzi<br><a href="mailto:yabguhakan2025@gmail.com" style="color:var(--primary); text-decoration:none;">yabguhakan2025@gmail.com</a></div>
+        <div class="app-footer">© 2025 Remzi<br><a href="mailto:yabguhakan2025@gmail.com" style="color:var(--primary); text-decoration:none; font-weight:bold;">yabguhakan2025@gmail.com</a></div>
     </div>
 
     <div id="dashboardScreen" class="hidden fade-in">
@@ -94,7 +101,7 @@
                     <div style="font-size:0.8rem; color:var(--text-sub); font-weight:700;">Hoş geldin,</div>
                     <div style="display:flex; align-items:center; flex-wrap:wrap; gap:5px;">
                         <span id="stName" style="color:var(--primary-dark); font-weight:800; font-size:1.1rem;">Öğrenci</span>
-                        <span id="rankBadgeDisplay" class="rank-badge" style="background:linear-gradient(135deg, #f59e0b, #d97706); color:white; padding:3px 10px; border-radius:12px; font-size:0.75rem; box-shadow:0 2px 5px rgba(245, 158, 11, 0.3);">Çırak</span>
+                        <span id="rankBadgeDisplay" class="rank-badge" style="background:linear-gradient(135deg, #f59e0b, #d97706); color:white; padding:3px 10px; border-radius:12px; font-size:0.75rem; box-shadow:0 2px 5px rgba(245, 158, 11, 0.3);">Çırak (0 dk)</span>
                     </div>
                     <div class="level-container" style="width:120px; margin-top:5px;">
                         <div class="xp-track" style="height:4px;"><div class="xp-fill" id="xpProgressBar"></div></div>
@@ -172,16 +179,15 @@
                 <div class="card clan-card-modern">
                     <div class="clan-banner-modern" id="myClanIcon">🐺</div>
                     <div style="font-size:1.1rem; font-weight:700; color:var(--text-sub); margin-bottom:5px;">
-                        👥 <span id="myClanMembers">0</span> Alp | 🏆 <span id="myClanScore">0</span> Puan
+                        👥 <span id="myClanMembers">...</span> Alp | 🏆 <span id="myClanScore">0</span> Puan
                     </div>
                     <div style="font-size:0.9rem; color:var(--primary); font-weight:800; margin-bottom:10px;">
                         <span id="myClanRankDisplay">Sıralama Hesaplanıyor...</span>
                     </div>
                     <h2 id="myClanName" style="color:var(--primary-dark); font-size:1.8rem; margin-bottom:20px;">Bozkurtlar</h2>
-                    <p style="color:var(--text-sub); margin-bottom:20px;">Birlikten kuvvet doğar! Çalışmaların otağına güç katıyor.</p>
                     
-                    <div style="text-align:left; background:#f8fafc; padding:10px; border-radius:10px; margin-bottom:15px; max-height:150px; overflow-y:auto;">
-                        <strong style="font-size:0.8rem; color:#64748b; margin-bottom:5px; display:block;">OTAĞ ALPLERİ:</strong>
+                    <div style="text-align:left; background:#f8fafc; padding:10px; border-radius:10px; margin-bottom:15px; max-height:150px; overflow-y:auto; border:1px solid #e2e8f0;">
+                        <strong style="font-size:0.8rem; color:#64748b; margin-bottom:5px; display:block; border-bottom:1px solid #eee; padding-bottom:5px;">OTAĞ ALPLERİ:</strong>
                         <div id="myClanMemberList" style="font-size:0.9rem; color:#334155;">Yükleniyor...</div>
                     </div>
 
@@ -229,6 +235,7 @@
                     <div>⚔️ <strong>Arena Yarışması:</strong> 1 Dakika = 2.0 Çalışma Yıldız Puanı</div>
                     <div>⛺ <strong>Otağ Bonusu:</strong> Tüm çalışmalar +0.5 Çalışma Yıldız Puanı</div>
                     <div>📅 <strong>Haftalık Hedef:</strong> +500 Çalışma Yıldız Puanı</div>
+                    <div>📅 <strong>Seri Bonusu (7 Gün):</strong> +400 Çalışma Yıldız Puanı</div>
                     <div>✉️ <strong>Zaman Kapsülü:</strong> Mektup Kilitleme = +50 Çalışma Yıldız Puanı</div>
                 </div>
             </div>
@@ -268,9 +275,10 @@
         <div id="viewDesc" class="hidden fade-in">
             <div class="card">
                 <h4 style="color:#004d40; border-bottom:2px solid #e2e8f0; padding-bottom:15px; margin-bottom:20px;">BİLGE TAKİP SİSTEMİ KILAVUZU</h4>
+                
                 <div class="desc-box">
-                    <span class="desc-title" style="display:flex; align-items:center; gap:8px; font-size:1rem;">⚔️ Rütbe Sistemi ve Puanlar</span>
-                    <p style="font-size:0.8rem; color:#666;">(Rütbeler Toplam Dakikaya göre belirlenir)</p>
+                    <span class="desc-title" style="display:flex; align-items:center; gap:8px; font-size:1rem;">⚔️ Rütbe Sistemi</span>
+                    <p style="font-size:0.8rem; color:#666;">(Rütbeler Toplam Çalışma Dakikasına göre belirlenir)</p>
                     <table class="points-table" style="margin-top:15px;">
                         <tr><td style="font-weight:700;">🪵 Çırak</td><td style="text-align:right;">0 - 499 dk</td></tr>
                         <tr><td style="font-weight:700;">🔨 Kalfa</td><td style="text-align:right;">500 - 1499 dk</td></tr>
@@ -294,12 +302,25 @@
             </div>
         </div>
 
-        <div class="app-footer">© 2025 Remzi<br><a href="mailto:yabguhakan2025@gmail.com" style="color:var(--primary); text-decoration:none;">yabguhakan2025@gmail.com</a></div>
-        <div class="wise-coach-container" id="wiseCoachContainer" style="display:none;"><div class="coach-bubble" id="coachBubble" onclick="openMsgModal()">Mesajın var!</div><div class="wise-avatar" id="wiseAvatar" onclick="openMsgModal()">🦉<div class="coach-badge hidden" id="coachBadge">0</div></div></div>
+        <div class="app-footer">© 2025 Remzi<br><a href="mailto:yabguhakan2025@gmail.com" style="color:var(--primary); text-decoration:none; font-weight:bold;">yabguhakan2025@gmail.com</a></div>
+        
+        <div class="wise-coach-container" id="wiseCoachContainer" style="display:none;">
+            <div class="coach-bubble" id="coachBubble" onclick="showNextMessage()">
+                <span id="owlMsgText">Mesajın var!</span>
+                </div>
+            <div class="wise-avatar" id="wiseAvatar" onclick="openMsgModal()">🦉<div class="coach-badge hidden" id="coachBadge">0</div></div>
+        </div>
+        
+        <div id="modalMsg" class="modal hidden" onclick="if(event.target === this) this.classList.add('hidden')">
+            <div class="modal-content">
+                <h3 style="margin-top:0;">Posta Kutusu 📬</h3>
+                <div id="msgList"></div>
+                <button onclick="document.getElementById('modalMsg').classList.add('hidden')" style="margin-top:10px; width:100%; padding:10px; background:#ddd; border-radius:10px;">Kapat</button>
+            </div>
+        </div>
     </div>
-    
-    <div id="modalMsg" class="modal hidden"><div class="modal-content"><h3 style="margin-top:0;">Posta Kutusu 📬</h3><div id="msgList"></div><button onclick="document.getElementById('modalMsg').classList.add('hidden')" style="margin-top:10px; width:100%; padding:10px; background:#ddd; border-radius:10px;">Kapat</button></div></div>
-    <div id="modalCreateClan" class="modal hidden fade-in">
+
+    <div id="modalCreateClan" class="modal hidden fade-in" onclick="if(event.target === this) this.classList.add('hidden')">
         <div class="modal-content">
             <h3>Yeni Otağ Kur ⛺</h3>
             <input type="text" id="newClanName" class="input-modern" placeholder="Otağ Adı" style="margin-bottom:10px;">
@@ -315,7 +336,7 @@
 
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js";
-    import { getFirestore, collection, doc, setDoc, getDoc, updateDoc, addDoc, deleteDoc, getDocs, query, where, onSnapshot, serverTimestamp, increment, deleteField, runTransaction, orderBy, limit } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js";
+    import { getFirestore, collection, doc, setDoc, getDoc, updateDoc, addDoc, deleteDoc, getDocs, query, where, onSnapshot, serverTimestamp, increment, deleteField, runTransaction, orderBy, limit, writeBatch, collectionGroup } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js";
     import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, onAuthStateChanged, updateProfile } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-auth.js";
 
     window.onerror = function(msg, url, line) { console.error("Hata: " + msg); }; 
@@ -333,10 +354,10 @@
     let arenaInterval = null, isArenaRunning = false, arenaEndTime = 0, arenaTotalDuration = 0;
     let wakeLock = null;
     let previousRank = null; 
+    let owlQueue = []; 
 
     onAuthStateChanged(auth, async(user)=>{
         if(user){
-            // Admin girişi engelleme
             if(user.email === ADMIN_EMAIL){ 
                 await signOut(auth);
                 Swal.fire("Yasak Bölge", "Hakanım, burası Alplerin meydanıdır. Lütfen Yönetici Kapısından giriniz.", "error");
@@ -361,7 +382,7 @@
 
     async function initStudent(uid){
         const userRef = doc(db,"users",uid); const userSnap = await getDoc(userRef);
-        if(!userSnap.exists()){ await setDoc(userRef, { email: currentUser.email, displayName: currentUser.displayName, totalMinutes: 0, bilgePoints: 0, weeklyGoal: 1000, avatar: '🎓', createdAt: serverTimestamp() }); }
+        if(!userSnap.exists()){ await setDoc(userRef, { email: currentUser.email, displayName: currentUser.displayName, totalMinutes: 0, bilgePoints: 0, weeklyGoal: 1000, avatar: '🎓', createdAt: serverTimestamp(), streak: 0 }); }
         onSnapshot(doc(db, "users", uid), (docSnap) => {
             const data = docSnap.data(); if(!data) return;
             const userXP = data.xp !== undefined ? data.xp : (data.bilgePoints || 0);
@@ -374,7 +395,6 @@
             if(data.avatar) document.getElementById('userAvatar').innerHTML = data.avatar;
             window.lastBonusDate = data.lastBonusDate;
             
-            // RÜTBE KONTROLÜ (DAKİKAYA GÖRE)
             const newRankObj = updatePlayerRank(userMinutes);
             if(previousRank && previousRank !== newRankObj.name) {
                 if (userMinutes > 0) {
@@ -386,12 +406,7 @@
                         backdrop: `rgba(0,0,123,0.4)`
                     });
                     confetti({ particleCount: 150, spread: 80, origin: { y: 0.6 } });
-                    const avatar = document.getElementById('wiseAvatar');
-                    const bubble = document.getElementById('coachBubble');
-                    avatar.classList.add('owl-excited');
-                    bubble.innerText = "İnanılmazsın! Yeni rütben kutlu olsun! 🎉";
-                    bubble.classList.add('show');
-                    setTimeout(() => { avatar.classList.remove('owl-excited'); bubble.classList.remove('show'); }, 8000);
+                    addToOwlQueue("İnanılmazsın! Yeni rütben kutlu olsun! 🎉");
                 }
             }
             previousRank = newRankObj.name;
@@ -400,13 +415,55 @@
         checkClanStatus(uid); renderChips(); renderAvatarShop(); renderClanIcons(); listenStudentData(uid); checkTimeCapsule(uid); listenStudentMessages(uid); showWiseOwlWelcome();
     }
     
-    async function showWiseOwlWelcome() { let msg = ""; try { const snap = await getDocs(collection(db, "owl_messages")); if (!snap.empty) { const docs = snap.docs; msg = docs[Math.floor(Math.random() * docs.length)].data().text; } else { msg = OWL_MESSAGES[Math.floor(Math.random() * OWL_MESSAGES.length)]; } } catch (e) { msg = OWL_MESSAGES[Math.floor(Math.random() * OWL_MESSAGES.length)]; } const bubble = document.getElementById('coachBubble'); const avatar = document.getElementById('wiseAvatar'); if(bubble && avatar) { bubble.innerText = msg; bubble.classList.add('show'); avatar.classList.add('owl-excited'); setTimeout(() => { bubble.classList.remove('show'); avatar.classList.remove('owl-excited'); }, 6000); } }
+    // YENİ BAYKUŞ KUYRUK VE KAPATMA SİSTEMİ (X Butonu Yok, Tıklama ile Geçiş/Kapanma)
+    function addToOwlQueue(msg) {
+        if(owlQueue.length > 0 && owlQueue[owlQueue.length-1] === msg) return;
+        owlQueue.push(msg);
+        const bubble = document.getElementById('coachBubble');
+        if (!bubble.classList.contains('show')) showNextMessage();
+    }
+
+    // Tıklayınca sıradakini göster veya kapat
+    window.showNextMessage = () => {
+        const bubble = document.getElementById('coachBubble');
+        const avatar = document.getElementById('wiseAvatar');
+        const msgSpan = document.getElementById('owlMsgText');
+        
+        if (owlQueue.length > 0) {
+            const msg = owlQueue.shift();
+            msgSpan.innerText = msg;
+            bubble.classList.add('show');
+            avatar.classList.add('owl-excited');
+        } else {
+            // Kuyruk bittiyse kapat
+            bubble.classList.remove('show');
+            avatar.classList.remove('owl-excited');
+        }
+    };
+
+    async function showWiseOwlWelcome() { 
+        let msg = ""; 
+        try { 
+            const snap = await getDocs(collection(db, "owl_messages")); 
+            if (!snap.empty) msg = snap.docs[Math.floor(Math.random() * snap.docs.length)].data().text;
+            else msg = OWL_MESSAGES[Math.floor(Math.random() * OWL_MESSAGES.length)]; 
+        } catch (e) { msg = OWL_MESSAGES[Math.floor(Math.random() * OWL_MESSAGES.length)]; } 
+        addToOwlQueue(msg);
+
+        // SERİ HATIRLATMASI (2. Gün Kuralı)
+        const d = new Date();
+        const day = d.getDay(); // 2=Salı
+        const userRef = await getDoc(doc(db,"users",currentUser.uid));
+        const userData = userRef.data();
+        if(day >= 2 && userData.streak > 0 && userData.streak < 7) {
+            addToOwlQueue(`Devam et ${userData.streak}. gündesin! 7 gün seri bonusunu kazanacağız! 🔥`);
+        }
+    }
     
-    // RÜTBE FONKSİYONU (Dakika Bazlı)
     function updatePlayerRank(minutes) { 
         let currentRank = RANKS[0]; let nextRank = RANKS[RANKS.length - 1]; 
         for (let i = 0; i < RANKS.length; i++) { if (minutes >= RANKS[i].threshold) { currentRank = RANKS[i]; if (i < RANKS.length - 1) nextRank = RANKS[i + 1]; else nextRank = null; } } 
-        document.getElementById('rankBadgeDisplay').innerText = currentRank.name; 
+        document.getElementById('rankBadgeDisplay').innerText = `${currentRank.name} (${minutes} dk)`; 
         if (nextRank) { const pct = Math.min(100, Math.max(0, ((minutes - currentRank.threshold) / (nextRank.threshold - currentRank.threshold)) * 100)); document.getElementById('xpProgressBar').style.width = `${pct}%`; } else { document.getElementById('xpProgressBar').style.width = '100%'; }
         return currentRank;
     }
@@ -417,6 +474,8 @@
     function renderClanIcons() { const c=document.getElementById('clanIconSelect'); c.innerHTML = ""; CLAN_ICONS.forEach(i => { c.innerHTML += `<div class="chip-modern" onclick="selectClanIcon(this)" style="display:flex; flex-direction:column; align-items:center; padding:10px;"><span>${i.i}</span><span style="font-size:0.7rem;">${i.n}</span></div>`; }); }
 
     window.buyAvatar = async (icon, cost, btn) => { btn.disabled = true; try { const currentGold = parseInt(document.getElementById('stGold').innerText); if(currentGold < cost) { Swal.fire("Yetersiz Altın", "Daha çok çalışmalısın!", "error"); return; } if(confirm("Bu çıkartmayı satın alıp hemen kullanmak istiyor musun? (" + cost + " Altın)")){ await updateDoc(doc(db,"users",currentUser.uid), { gold: increment(-cost), avatar: icon }); const avatarEl = document.getElementById('userAvatar'); avatarEl.innerHTML = icon; avatarEl.style.transform = "scale(1.5) rotate(-10deg)"; setTimeout(() => { avatarEl.style.transform = "scale(1) rotate(0deg)"; }, 400); Swal.fire({ title: "Hayırlı Olsun!", text: "Yeni çıkartman rütbenle beraber parlıyor.", icon: "success", timer: 1500, showConfirmButton: false }); confetti(); } } catch(e) { console.error(e); Swal.fire("Hata", "İşlem sırasında bir sorun oluştu.", "error"); } finally { btn.disabled = false; } };
+    
+    // HAFTALIK BONUS (500)
     window.claimWeeklyBonus = async () => { const btn = document.getElementById('btnClaimWeekly'); btn.disabled = true; try { await updateDoc(doc(db,"users",currentUser.uid), { xp: increment(500), gold: increment(500), lastBonusDate: serverTimestamp() }); window.lastBonusDate = { toDate: () => new Date() }; checkBonusButtonVisibility(); Swal.fire("Tebrikler!", "+500 Çalışma Yıldız Puanı", "success"); confetti(); } catch(e) { btn.disabled = false; } };
     function checkBonusButtonVisibility() { if(!window.currentWeeklyTotal) return; const goal = parseInt(document.getElementById('targetMins').innerText)||1000; const btn = document.getElementById('btnClaimWeekly'); let alreadyClaimed = false; if(window.lastBonusDate) { const last = window.lastBonusDate.toDate(); const now = new Date(); const diffTime = Math.abs(now - last); const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)); if(diffDays < 7) alreadyClaimed = true; } if (window.currentWeeklyTotal >= goal && !alreadyClaimed) { btn.classList.remove('hidden'); } else { btn.classList.add('hidden'); } }
 
@@ -444,62 +503,55 @@
     }
     function updateStudentChart(val, goal){ const ctx = document.getElementById('weeklyChart').getContext('2d'); if(myChart) myChart.destroy(); myChart = new Chart(ctx, { type: 'doughnut', data: { labels: ['Yapılan', 'Kalan'], datasets: [{ data: [val, Math.max(0, goal-val)], backgroundColor: ['#009688', '#e2e8f0'], borderWidth: 0 }] }, options: { cutout: '80%', maintainAspectRatio: false, plugins: { legend: { display: false } } } }); }
     
-    window.saveEntry = async () => { const btn = document.getElementById('btnSaveEntry'); if(btn.disabled) return; const sub = document.getElementById('selectedSubject').value; const dur = parseInt(document.getElementById('entryDur').value); if(!sub || !dur) return Swal.fire("Eksik Bilgi", "", "warning"); btn.disabled = true; btn.innerText = "İşleniyor..."; try { const offset = parseInt(document.getElementById('entryDate').value) || 0; const recordDate = new Date(); recordDate.setDate(recordDate.getDate() - offset); recordDate.setHours(12,0,0,0); let multiplier = 1.0; let bonusText = ""; if (window.userClanId) { multiplier += 0.5; bonusText = " (Otağ Bonusu Aktif 🔥)"; } const points = Math.ceil(dur * multiplier); await addDoc(collection(db,"users",currentUser.uid,"sessions"), { subject: sub, duration: dur, points: points, createdAt: recordDate, dateStr: recordDate.toLocaleDateString('tr-TR'), type: 'manual' }); await updateDoc(doc(db,"users",currentUser.uid), { totalMinutes: increment(dur), xp: increment(points), gold: increment(points), lastStudyDate: serverTimestamp() }); await addClanPoints(currentUser.uid, points); Swal.fire("Kaydedildi!", `+${points} Çalışma Yıldız Puanı${bonusText}`, "success"); confetti(); } catch(e) { Swal.fire("Hata", e.message, "error"); } finally { setTimeout(() => { btn.disabled = false; btn.innerText = "KAYDET (+Puan) ✅"; }, 1000); } };
+    // GİRİŞ KAYDETME (Anti-Hile: 10dk + Seri Kontrolü)
+    window.saveEntry = async () => { const btn = document.getElementById('btnSaveEntry'); if(btn.disabled) return; const sub = document.getElementById('selectedSubject').value; const dur = parseInt(document.getElementById('entryDur').value); if(!sub || !dur) return Swal.fire("Eksik Bilgi", "", "warning"); 
+    if(dur < 10) return Swal.fire("Çok Kısa", "En az 10 dakika girmelisin.", "warning");
+    btn.disabled = true; btn.innerText = "İşleniyor..."; try { const offset = parseInt(document.getElementById('entryDate').value) || 0; const recordDate = new Date(); recordDate.setDate(recordDate.getDate() - offset); recordDate.setHours(12,0,0,0); let multiplier = 1.0; let bonusText = ""; if (window.userClanId) { multiplier += 0.5; bonusText = " (Otağ Bonusu Aktif 🔥)"; } const points = Math.ceil(dur * multiplier); await addDoc(collection(db,"users",currentUser.uid,"sessions"), { subject: sub, duration: dur, points: points, createdAt: recordDate, dateStr: recordDate.toLocaleDateString('tr-TR'), type: 'manual' }); await updateDoc(doc(db,"users",currentUser.uid), { totalMinutes: increment(dur), xp: increment(points), gold: increment(points), lastStudyDate: serverTimestamp() }); await addClanPoints(currentUser.uid, points); await checkStreakAndAward(currentUser.uid); Swal.fire("Kaydedildi!", `+${points} Çalışma Yıldız Puanı${bonusText}`, "success"); confetti(); } catch(e) { Swal.fire("Hata", e.message, "error"); } finally { setTimeout(() => { btn.disabled = false; btn.innerText = "KAYDET (+Puan) ✅"; }, 1000); } };
     window.updateTimerSet=()=>{ if(!isPomoRunning){ const v = parseInt(document.getElementById('timerSet').value); document.getElementById('timerDisplay').innerText=`${v}:00`; } }; 
     window.startPomoTimer = async () => { if(isPomoRunning) return; const sub = document.getElementById('pomoSubject').value; if(!sub) return Swal.fire("Ders Seç", "", "warning"); isPomoRunning = true; pomoTotalDuration = parseInt(document.getElementById('timerSet').value) * 60; pomoEndTime = Date.now() + (pomoTotalDuration * 1000); document.getElementById('btnStartPomo').innerText = "⏳"; document.getElementById('btnStartPomo').disabled = true; try { if ('wakeLock' in navigator) { wakeLock = await navigator.wakeLock.request('screen'); } } catch (err) {} pomoInterval = setInterval(() => { const rem = Math.ceil((pomoEndTime - Date.now()) / 1000); if(rem <= 0) { document.getElementById('timerDisplay').innerText = "00:00"; clearInterval(pomoInterval); finishPomo(true); } else { const m = Math.floor(rem / 60); const s = rem % 60; document.getElementById('timerDisplay').innerText = `${m}:${s.toString().padStart(2,'0')}`; } }, 1000); };
     window.requestStopPomo = () => { if(isPomoRunning) Swal.fire({ title: 'Durdur?', showCancelButton: true }).then((r) => { if (r.isConfirmed) { clearInterval(pomoInterval); finishPomo(false); } }); };
-    async function finishPomo(completed) { if(wakeLock) { wakeLock.release(); wakeLock = null; } const sub = document.getElementById('pomoSubject').value; const spent = completed ? pomoTotalDuration : Math.ceil((pomoTotalDuration - (pomoEndTime - Date.now())/1000)); const mins = Math.floor(spent / 60); isPomoRunning = false; document.getElementById('btnStartPomo').innerText = "BAŞLAT ▶"; document.getElementById('btnStartPomo').disabled = false; document.getElementById('timerDisplay').innerText = `${document.getElementById('timerSet').value}:00`; if(mins < 1) return Swal.fire("Çok Kısa", "", "info"); let multiplier = 1.5; if (window.userClanId) multiplier += 0.5; const pts = Math.ceil(mins * multiplier); await addDoc(collection(db,"users",currentUser.uid,"sessions"), { subject: sub, duration: mins, points: pts, createdAt: serverTimestamp(), type: 'pomodoro', completed: completed }); await updateDoc(doc(db,"users",currentUser.uid), { totalMinutes: increment(mins), xp: increment(pts), gold: increment(pts), lastStudyDate: serverTimestamp() }); Swal.fire("Bitti!", `${mins} dk çalıştın. +${pts} Çalışma Yıldız Puanı`, "success"); confetti(); await addClanPoints(currentUser.uid, pts); }
     
-    // ARENA (Nabız Sistemi Eklendi - Asılı Kalmayı Önler)
-    function listenArena() { 
-        // Sadece son 5 dakikada aktif olanları getir
-        const q = query(collection(db, "arena"), where("isActive", "==", true)); 
-        onSnapshot(q, (snap) => { 
-            const list = document.getElementById('arenaList'); list.innerHTML = ""; 
-            if(snap.empty) { list.innerHTML = "<div style='text-align:center; padding:20px; color:#999;'>Arenada kimse yok.</div>"; return; } 
-            snap.forEach(d => { 
-                const data = d.data(); 
-                // Eğer nabız (lastHeartbeat) eskiyse (3dk) listede gösterme
-                const lastHeartbeat = data.lastHeartbeat ? data.lastHeartbeat.toDate() : new Date();
-                if (Date.now() - lastHeartbeat.getTime() > 3 * 60 * 1000) return;
-
-                if(d.id !== currentUser.uid) list.innerHTML += `<div style="display:flex; justify-content:space-between; padding:10px; border-bottom:1px solid #eee;"><span>${data.avatar} ${data.name.split(' ')[0]}</span><span>${data.duration} dk</span></div>`; 
-            }); 
-        }); 
+    // POMODORO BİTİŞ (Anti-Hile: 5dk)
+    async function finishPomo(completed) { if(wakeLock) { wakeLock.release(); wakeLock = null; } const sub = document.getElementById('pomoSubject').value; const spent = completed ? pomoTotalDuration : Math.ceil((pomoTotalDuration - (pomoEndTime - Date.now())/1000)); const mins = Math.floor(spent / 60); isPomoRunning = false; document.getElementById('btnStartPomo').innerText = "BAŞLAT ▶"; document.getElementById('btnStartPomo').disabled = false; document.getElementById('timerDisplay').innerText = `${document.getElementById('timerSet').value}:00`; 
+    if(mins < 5) return Swal.fire("Çok Kısa", "En az 5 dakika odaklanmalısın.", "info"); 
+    let multiplier = 1.5; if (window.userClanId) multiplier += 0.5; const pts = Math.ceil(mins * multiplier); await addDoc(collection(db,"users",currentUser.uid,"sessions"), { subject: sub, duration: mins, points: pts, createdAt: serverTimestamp(), type: 'pomodoro', completed: completed }); await updateDoc(doc(db,"users",currentUser.uid), { totalMinutes: increment(mins), xp: increment(pts), gold: increment(pts), lastStudyDate: serverTimestamp() }); Swal.fire("Bitti!", `${mins} dk çalıştın. +${pts} Çalışma Yıldız Puanı`, "success"); confetti(); await addClanPoints(currentUser.uid, pts); await checkStreakAndAward(currentUser.uid); }
+    
+    // SERİ VE BONUS SİSTEMİ (7 GÜN = 400 PUAN)
+    async function checkStreakAndAward(uid) {
+        const uSnap = await getDoc(doc(db, "users", uid));
+        const u = uSnap.data();
+        const lastDate = u.lastStudyDate ? u.lastStudyDate.toDate() : new Date(0);
+        const now = new Date();
+        
+        const isSameDay = lastDate.toDateString() === now.toDateString();
+        const yesterday = new Date(); yesterday.setDate(yesterday.getDate() - 1);
+        const isYesterday = lastDate.toDateString() === yesterday.toDateString();
+        
+        let newStreak = u.streak || 0;
+        
+        if (!isSameDay) {
+            if (isYesterday) { newStreak++; } else { newStreak = 1; } // Devam ediyor veya yeni başladı
+            
+            if (newStreak >= 7) {
+                newStreak = 0; // Seri tamamlandı, sıfırla ve ödül ver
+                await updateDoc(doc(db, "users", uid), { xp: increment(400), gold: increment(400) });
+                addToOwlQueue("SERİ TAMAMLANDI! 🔥 7 gün aralıksız çalıştın ve 400 Puan kazandın!");
+                confetti();
+            }
+            await updateDoc(doc(db, "users", uid), { streak: newStreak });
+        }
     }
-    window.listenArena = listenArena;
-    window.startArenaSession = async () => { 
-        if(!currentUser) return; 
-        isArenaRunning = true; 
-        arenaTotalDuration = 30 * 60; 
-        arenaEndTime = Date.now() + (arenaTotalDuration * 1000); 
-        document.getElementById('arenaStartBtn').classList.add('hidden'); 
-        document.getElementById('arenaControls').classList.remove('hidden'); 
-        
-        // İlk kayıt + Heartbeat başlat
-        await setDoc(doc(db, "arena", currentUser.uid), { name: currentUser.displayName, subject: "Genel", startTime: serverTimestamp(), duration: 30, isActive: true, avatar: document.getElementById('userAvatar').innerText, lastHeartbeat: serverTimestamp() }); 
-        
-        try { if ('wakeLock' in navigator) { wakeLock = await navigator.wakeLock.request('screen'); } } catch (err) {} 
-        
-        // Dakikada bir nabız gönder
-        arenaInterval = setInterval(async () => { 
-            const rem = Math.ceil((arenaEndTime - Date.now()) / 1000); 
-            if(rem % 60 === 0) { await updateDoc(doc(db, "arena", currentUser.uid), { lastHeartbeat: serverTimestamp() }); }
 
-            if(rem <= 0) { document.getElementById('arenaTimerDisplay').innerText = "00:00"; clearInterval(arenaInterval); finishArena(true); } 
-            else { const m = Math.floor(rem / 60); const s = rem % 60; document.getElementById('arenaTimerDisplay').innerText = `${m}:${s.toString().padStart(2,'0')}`; } 
-        }, 1000); 
-    };
+    function listenArena() { const q = query(collection(db, "arena"), where("isActive", "==", true)); onSnapshot(q, (snap) => { const list = document.getElementById('arenaList'); list.innerHTML = ""; if(snap.empty) { list.innerHTML = "<div style='text-align:center; padding:20px; color:#999;'>Arenada kimse yok.</div>"; return; } snap.forEach(d => { const data = d.data(); const lastBeat = data.lastHeartbeat ? data.lastHeartbeat.toDate().getTime() : 0; const now = new Date().getTime(); if (now - lastBeat > 3 * 60 * 1000) return; if(d.id !== currentUser.uid) { list.innerHTML += `<div style="display:flex; justify-content:space-between; padding:10px; border-bottom:1px solid #eee;"><span>${data.avatar} ${data.name.split(' ')[0]}</span><span style="font-weight:bold; color:var(--primary);">${data.duration} dk</span></div>`; } }); }); }
+    window.listenArena = listenArena;
+    window.startArenaSession = async () => { if(!currentUser) return; isArenaRunning = true; arenaTotalDuration = 30 * 60; arenaEndTime = Date.now() + (arenaTotalDuration * 1000); document.getElementById('arenaStartBtn').classList.add('hidden'); document.getElementById('arenaControls').classList.remove('hidden'); await setDoc(doc(db, "arena", currentUser.uid), { name: currentUser.displayName, subject: "Genel", startTime: serverTimestamp(), duration: 30, isActive: true, avatar: document.getElementById('userAvatar').innerText, lastHeartbeat: serverTimestamp() }); try { if ('wakeLock' in navigator) { wakeLock = await navigator.wakeLock.request('screen'); } } catch (err) {} arenaInterval = setInterval(async () => { const rem = Math.ceil((arenaEndTime - Date.now()) / 1000); if(rem % 60 === 0) { updateDoc(doc(db, "arena", currentUser.uid), { lastHeartbeat: serverTimestamp() }).catch(()=>{}); } if(rem <= 0) { document.getElementById('arenaTimerDisplay').innerText = "00:00"; clearInterval(arenaInterval); finishArena(true); } else { const m = Math.floor(rem / 60); const s = rem % 60; document.getElementById('arenaTimerDisplay').innerText = `${m}:${s.toString().padStart(2,'0')}`; } }, 1000); };
     window.boostArenaTime = () => { if(isArenaRunning) { arenaEndTime += 600000; arenaTotalDuration += 600; Swal.fire("+10 Dk", "", "success"); updateDoc(doc(db,"arena",currentUser.uid),{duration:increment(10)}); } };
     window.requestStopArena = () => { if(isArenaRunning) Swal.fire({ title: 'Çıkış?', showCancelButton: true }).then((r) => { if (r.isConfirmed) { clearInterval(arenaInterval); finishArena(false); } }); };
-    async function finishArena(completed) { if(wakeLock) { wakeLock.release(); wakeLock = null; } const spent = Math.floor((completed ? arenaTotalDuration : (arenaTotalDuration - (arenaEndTime-Date.now())/1000)) / 60); isArenaRunning = false; clearInterval(arenaInterval); document.getElementById('arenaStartBtn').classList.remove('hidden'); document.getElementById('arenaControls').classList.add('hidden'); document.getElementById('arenaTimerDisplay').innerText = "00:00"; try{ await updateDoc(doc(db, "arena", currentUser.uid), { isActive: false }); }catch(e){} if(spent < 1) return Swal.fire("Çok Kısa", "", "info"); let multiplier = 2.0; if (window.userClanId) multiplier += 0.5; const pts = Math.ceil(spent * multiplier); await addDoc(collection(db,"users",currentUser.uid,"sessions"), { subject: "Arena", duration: spent, points: pts, createdAt: serverTimestamp(), type: 'arena', completed: completed }); await updateDoc(doc(db,"users",currentUser.uid), { totalMinutes: increment(spent), xp: increment(pts), gold: increment(pts) }); Swal.fire("Bitti!", `${spent} dk, +${pts} Çalışma Yıldız Puanı`, "success"); await addClanPoints(currentUser.uid, pts); }
+    async function finishArena(completed) { if(wakeLock) { wakeLock.release(); wakeLock = null; } const spent = Math.floor((completed ? arenaTotalDuration : (arenaTotalDuration - (arenaEndTime-Date.now())/1000)) / 60); isArenaRunning = false; clearInterval(arenaInterval); document.getElementById('arenaStartBtn').classList.remove('hidden'); document.getElementById('arenaControls').classList.add('hidden'); document.getElementById('arenaTimerDisplay').innerText = "00:00"; try{ await updateDoc(doc(db, "arena", currentUser.uid), { isActive: false }); }catch(e){} if(spent < 5) return Swal.fire("Çok Kısa", "En az 5 dakika durmalısın.", "info"); let multiplier = 2.0; if (window.userClanId) multiplier += 0.5; const pts = Math.ceil(spent * multiplier); await addDoc(collection(db,"users",currentUser.uid,"sessions"), { subject: "Arena", duration: spent, points: pts, createdAt: serverTimestamp(), type: 'arena', completed: completed }); await updateDoc(doc(db,"users",currentUser.uid), { totalMinutes: increment(spent), xp: increment(pts), gold: increment(pts) }); Swal.fire("Bitti!", `${spent} dk, +${pts} Çalışma Yıldız Puanı`, "success"); await addClanPoints(currentUser.uid, pts); await checkStreakAndAward(currentUser.uid); }
     
     document.addEventListener("visibilitychange", async () => { if (document.visibilityState === 'visible') { if (isPomoRunning && pomoEndTime > 0 && Date.now() >= pomoEndTime) { clearInterval(pomoInterval); await finishPomo(true); } if (isArenaRunning && arenaEndTime > 0 && Date.now() >= arenaEndTime) { clearInterval(arenaInterval); await finishArena(true); } try { if ('wakeLock' in navigator && (isPomoRunning || isArenaRunning)) { wakeLock = await navigator.wakeLock.request('screen'); } } catch(e){} } });
-    
-    // OTAĞ ÜYELERİ LİSTELEME
-    async function checkClanStatus(uid) { const u = (await getDoc(doc(db, "users", uid))).data(); window.userClanId = u.clanId || null; if (u.clanId) { const c = (await getDoc(doc(db, "clans", u.clanId))).data(); document.getElementById('noClanSection').classList.add('hidden'); document.getElementById('myClanSection').classList.remove('hidden'); document.getElementById('myClanName').innerText = c.name; document.getElementById('myClanIcon').innerText = c.icon; document.getElementById('myClanMembers').innerText = c.memberCount; document.getElementById('myClanScore').innerText = c.totalScore || 0; loadMyClanMembers(u.clanId); } else { document.getElementById('noClanSection').classList.remove('hidden'); document.getElementById('myClanSection').classList.add('hidden'); loadJoinableClans(); } loadClanLeaderboard(); }
-    async function loadMyClanMembers(cid) { const q = query(collection(db, "users"), where("clanId", "==", cid)); const snap = await getDocs(q); let html = ""; snap.forEach(d => { html += `<div>• ${d.data().displayName}</div>`; }); document.getElementById('myClanMemberList').innerHTML = html; }
-
+    async function checkClanStatus(uid) { const u = (await getDoc(doc(db, "users", uid))).data(); window.userClanId = u.clanId || null; if (u.clanId) { const c = (await getDoc(doc(db, "clans", u.clanId))).data(); document.getElementById('noClanSection').classList.add('hidden'); document.getElementById('myClanSection').classList.remove('hidden'); document.getElementById('myClanName').innerText = c.name; document.getElementById('myClanIcon').innerText = c.icon; document.getElementById('myClanScore').innerText = c.totalScore || 0; loadMyClanMembers(u.clanId); } else { document.getElementById('noClanSection').classList.remove('hidden'); document.getElementById('myClanSection').classList.add('hidden'); loadJoinableClans(); } loadClanLeaderboard(); }
+    async function loadMyClanMembers(cid) { const q = query(collection(db, "users"), where("clanId", "==", cid)); const snap = await getDocs(q); document.getElementById('myClanMembers').innerText = snap.size; let html = ""; snap.forEach(d => { html += `<div style="padding:5px 0; border-bottom:1px solid #f1f5f9; font-size:0.9rem;">👤 ${d.data().displayName} <span style="float:right; font-weight:bold; color:#cbd5e1;">${d.data().totalMinutes || 0}dk</span></div>`; }); document.getElementById('myClanMemberList').innerHTML = html || "<small>Kimse yok.</small>"; }
     async function loadJoinableClans() { const list = document.getElementById('clanJoinList'); list.innerHTML = ""; const q = query(collection(db, "clans"), orderBy("totalScore", "desc"), limit(5)); (await getDocs(q)).forEach(d=>{ list.innerHTML+=`<div>${d.data().icon} ${d.data().name} <button onclick="joinClanRequest('${d.id}','${d.data().name}')">Katıl</button></div>`; }); }
     async function loadClanLeaderboard() { const list = document.getElementById('clanLeaderboard'); list.innerHTML=""; const q = query(collection(db, "clans"), orderBy("totalScore", "desc"), limit(5)); const snap = await getDocs(q); if(currentUser) { const uSnap = await getDoc(doc(db, "users", currentUser.uid)); const myClanId = uSnap.data()?.clanId; if(myClanId) { const allClansQ = query(collection(db, "clans"), orderBy("totalScore", "desc")); const allClansSnap = await getDocs(allClansQ); let myRank = 0; allClansSnap.docs.forEach((d, i) => { if(d.id === myClanId) myRank = i + 1; }); const rankDisplay = document.getElementById('myClanRankDisplay'); if(rankDisplay) rankDisplay.innerText = `#${myRank}`; } } snap.docs.forEach((d,i)=>{ const data = d.data(); list.innerHTML += `<div style="margin-bottom:5px; font-weight:600;">#${i+1} ${data.icon} ${data.name} (${data.totalScore || 0})</div>`; }); }
     async function addClanPoints(uid, points) { const u = (await getDoc(doc(db, "users", uid))).data(); if(u.clanId) await updateDoc(doc(db,"clans",u.clanId), { totalScore: increment(points) }); }
@@ -508,7 +560,7 @@
     window.leaveClan=async()=>{const u=(await getDoc(doc(db,"users",currentUser.uid))).data(); await updateDoc(doc(db,"clans",u.clanId),{memberCount:increment(-1)}); await updateDoc(doc(db,"users",currentUser.uid),{clanId:deleteField()}); checkClanStatus(currentUser.uid);};
     function checkTimeCapsule(uid) { const q = query(collection(db, "users", uid, "timecapsule"), orderBy("createdAt", "desc"), limit(1)); onSnapshot(q, (snap) => { const inputArea = document.getElementById('capsuleInputArea'); const lockedArea = document.getElementById('capsuleLocked'); const openArea = document.getElementById('capsuleOpen'); if (!snap.empty) { const data = snap.docs[0].data(); if (new Date() < new Date("2026-01-10")) { lockedArea.classList.remove('hidden'); openArea.classList.add('hidden'); inputArea.classList.add('hidden'); } else { lockedArea.classList.add('hidden'); openArea.classList.remove('hidden'); inputArea.classList.add('hidden'); document.getElementById('capsuleContentText').innerText = data.content; } } else { inputArea.classList.remove('hidden'); lockedArea.classList.add('hidden'); openArea.classList.add('hidden'); } }); }
     window.saveFuture = async () => { const btn = document.getElementById('btnSaveFuture'); const msg = document.getElementById('futureMsg').value.trim(); if(!msg || msg.length < 10) return Swal.fire("Eksik Mesaj", "Lütfen en az bir cümlelik tam mesaj yazınız.", "warning"); btn.disabled = true; btn.innerText = "Mühürleniyor..."; try { const q = query(collection(db, "users", currentUser.uid, "timecapsule")); const snap = await getDocs(q); if (!snap.empty) { btn.disabled = false; btn.innerText = "MÜHÜRLE VE GÖNDER 🔒"; return Swal.fire("Zaten Var", "Sadece 1 kapsül hakkın var.", "warning"); } await addDoc(collection(db,"users",currentUser.uid,"timecapsule"), { content: msg, createdAt: serverTimestamp(), unlockDate: "2026-01-10", userId: currentUser.uid, userName: currentUser.displayName }); const reward = 50; await updateDoc(doc(db,"users",currentUser.uid), { xp: increment(reward), gold: increment(reward) }); Swal.fire("Mühürlendi", `Mesajın geleceğe yollandı! +${reward} Çalışma Yıldız Puanı kazandın!`, "success"); confetti(); } catch(e) { console.error(e); Swal.fire("Hata", "Kapsül oluşturulamadı.", "error"); btn.disabled = false; btn.innerText = "MÜHÜRLE VE GÖNDER 🔒"; } };
-    function listenStudentMessages(uid){ onSnapshot(query(collection(db, "messages"), where("toUid", "==", uid)), s=>{ let ur=0; const list=document.getElementById('msgList'); list.innerHTML=""; const msgs = []; s.forEach(d => msgs.push({id:d.id, ...d.data()})); msgs.sort((a,b)=>(b.createdAt?.seconds||0)-(a.createdAt?.seconds||0)); if (msgs.length === 0) list.innerHTML = "<div style='text-align:center; padding:20px; color:#aaa;'>Mesaj yok.</div>"; msgs.forEach(m => { if(!m.read) ur++; const msgType=m.type||'auto'; const icon=msgType==='admin'?'👨‍🏫':'🦉'; list.innerHTML += `<div style="padding:10px; border-bottom:1px solid #eee; background:${m.read?'white':'#f0fdf4'}; border-radius:10px; margin-bottom:5px;" onclick="readMsg('${m.id}')"><strong>${icon} ${msgType==='admin'?'Hakan':'Sistem'}</strong>: ${m.content} ${!m.read?'<span style="color:red; font-size:0.7rem;">(YENİ)</span>':''}</div>`; }); const bd = document.getElementById('coachBadge'); const av = document.getElementById('wiseAvatar'); bd.innerText = ur; if (ur > 0) { bd.classList.remove('hidden'); av.style.transform="scale(1.2)"; document.getElementById('coachBubble').classList.add('show'); setTimeout(()=>document.getElementById('coachBubble').classList.remove('show'),5000); } else { bd.classList.add('hidden'); av.style.transform="scale(1)"; } }); }
+    function listenStudentMessages(uid){ onSnapshot(query(collection(db, "messages"), where("toUid", "==", uid)), s=>{ let ur=0; const list=document.getElementById('msgList'); list.innerHTML=""; const msgs = []; s.forEach(d => msgs.push({id:d.id, ...d.data()})); msgs.sort((a,b)=>(b.createdAt?.seconds||0)-(a.createdAt?.seconds||0)); if (msgs.length === 0) list.innerHTML = "<div style='text-align:center; padding:20px; color:#aaa;'>Mesaj yok.</div>"; msgs.forEach(m => { if(!m.read) ur++; const msgType=m.type||'auto'; const icon=msgType==='admin'?'👨‍🏫':'🦉'; const sender=msgType==='admin'?'Hakan':'Sistem'; list.innerHTML += `<div style="padding:10px; border-bottom:1px solid #eee; background:${m.read?'white':'#f0fdf4'}; border-radius:10px; margin-bottom:5px;" onclick="readMsg('${m.id}')"><strong>${icon} ${sender}</strong>: ${m.content} ${!m.read?'<span style="color:red; font-size:0.7rem;">(YENİ)</span>':''}</div>`; }); const bd = document.getElementById('coachBadge'); const av = document.getElementById('wiseAvatar'); bd.innerText = ur; if (ur > 0) { bd.classList.remove('hidden'); av.style.transform="scale(1.2)"; document.getElementById('coachBubble').classList.add('show'); setTimeout(()=>document.getElementById('coachBubble').classList.remove('show'),5000); } else { bd.classList.add('hidden'); av.style.transform="scale(1)"; } }); }
     window.readMsg = async(id) => { await updateDoc(doc(db,"messages",id),{read:true}); }; window.openMsgModal = () => document.getElementById('modalMsg').classList.remove('hidden');
     window.changeStudentGoal = async () => { const currentGoal = document.getElementById('targetMins').innerText; const { value: newGoal } = await Swal.fire({ title: 'Haftalık Hedef', input: 'number', inputValue: currentGoal, inputLabel: 'Kaç dakika çalışacaksın?', showCancelButton: true, confirmButtonText: 'Güncelle', inputValidator: (v) => (!v || v < 500) && 'Hedef en az 500 dakika olmalıdır! Daha azı bir Alpe yakışmaz.' }); if (newGoal) { const goalInt = parseInt(newGoal); await updateDoc(doc(db, "users", currentUser.uid), { weeklyGoal: goalInt }); document.getElementById('targetMins').innerText = goalInt; Swal.fire("Hedef Güncellendi", `Yeni hedefin: ${goalInt} dk.`, "success"); } };
     window.switchTab=(t,el)=>{ if(el) { document.querySelectorAll('.mobile-bottom-nav .nav-item').forEach(e=>e.classList.remove('active')); el.classList.add('active'); } ['viewHome','viewPomo','viewStore','viewFuture','viewHistory', 'viewArena', 'viewClan', 'viewDesc'].forEach(x=>document.getElementById(x).classList.add('hidden')); document.getElementById('view'+t.charAt(0).toUpperCase()+t.slice(1)).classList.remove('hidden'); if(t === 'arena') listenArena(); };
