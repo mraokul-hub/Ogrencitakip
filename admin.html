@@ -9,7 +9,9 @@
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://code.highcharts.com/highcharts.js"></script>
+    <script src="https://code.highcharts.com/highcharts-3d.js"></script>
+    
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     
     <style>
@@ -52,11 +54,13 @@
         .modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 77, 64, 0.6); backdrop-filter: blur(8px); display: flex; justify-content: center; align-items: center; z-index: 2000; padding: 20px; }
         .modal-content { background: white; padding: 30px; border-radius: 30px; width: 100%; max-width: 800px; max-height: 85vh; overflow-y: auto; }
         
+        /* SWAL2 Z-INDEX AYARI */
+        .swal2-container { z-index: 10000 !important; }
+        
         .selector-item { display: flex; align-items: center; padding: 10px; border-bottom: 1px solid #eee; cursor: pointer; transition: background 0.2s; }
         .selector-item:hover { background: #f8fafc; }
         .chk-student { transform: scale(1.3); margin-right: 15px; accent-color: var(--primary); }
         
-        /* Mesaj Havuzu Stilleri */
         .msg-pool-container { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 10px; max-height: 250px; overflow-y: auto; border: 1px solid #e2e8f0; padding: 10px; border-radius: 15px; background: #fafafa; }
         .msg-pool-item { background: white; padding: 10px; border-radius: 10px; border: 1px solid #eee; font-size: 0.8rem; cursor: pointer; transition: 0.2s; display: flex; align-items: center; gap: 8px; }
         .msg-pool-item:hover { border-color: var(--primary); box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
@@ -121,7 +125,7 @@
             </div>
 
             <div class="card"><h4>🚀 YÜKSELEN YILDIZLAR</h4><div class="rising-stars" id="risingStarsContainer"><div style="text-align:center; color:#aaa; width:100%;">Analiz ediliyor...</div></div></div>
-            <div class="card"><h4>📈 GENEL PERFORMANS</h4><div style="height:300px;"><canvas id="adminLeaderboardChart"></canvas></div></div>
+            <div class="card"><h4>📈 GENEL PERFORMANS (3D)</h4><div style="height:400px;" id="adminLeaderboardChart"></div></div>
             
             <div class="card">
                 <h4>👥 ÖĞRENCİ LİSTESİ</h4>
@@ -178,7 +182,20 @@
         </div>
 
         <div id="adminPanelHistory" class="hidden"><div class="card"><h4>📜 GEÇMİŞ</h4><div id="adminMsgHistoryList" style="max-height:400px; overflow-y:auto;"></div></div></div>
-        <div id="adminPanelClan" class="hidden"><div class="card"><h4>⛺ İSTEKLER</h4><div id="adminClanRequestList"></div><hr><div id="adminMemberRequestList"></div></div><div class="card"><h4>🏕️ AKTİF OTAĞLAR</h4><div id="adminActiveClansList"></div></div></div>
+        
+        <div id="adminPanelClan" class="hidden">
+            <div class="card">
+                <h4>⛺ İSTEKLER</h4>
+                <div id="adminClanRequestList"></div>
+                <hr style="margin:15px 0;">
+                <div id="adminMemberRequestList"></div>
+            </div>
+            <div class="card">
+                <h4>🏕️ AKTİF OTAĞLAR</h4>
+                <div id="adminActiveClansList"></div>
+            </div>
+        </div>
+        
         <div id="adminPanelOwl" class="hidden"><div class="card"><h4>🦉 BAYKUŞ YÖNETİMİ</h4><div style="display:flex; gap:10px;"><input type="text" id="newOwlMsg" class="input-modern" placeholder="Yeni Söz..." style="flex:1;"><button class="btn-action" onclick="addOwlMessage()" style="width:auto;">EKLE</button></div></div><div class="card"><h4>📜 SÖZLER (<span id="owlMsgCount">0</span>)</h4><div id="adminOwlList" style="max-height:400px; overflow-y:auto;"></div></div></div>
         
         <div id="adminPanelCapsules" class="hidden">
@@ -245,10 +262,9 @@
     const app = initializeApp(firebaseConfig); const db = getFirestore(app); const auth = getAuth(app);
     const ADMIN_EMAIL = "mremzi@gmail.com";
 
-    let currentUser=null, adminChart=null, globalUserList=[], unsubAdminUsers = null, unsubAdminMessages=null, templateUnsub=null, unsubAdminCapsules=null, unsubAdminOwl=null;
+    let currentUser=null, globalUserList=[], unsubAdminUsers = null, unsubAdminMessages=null, templateUnsub=null, unsubAdminCapsules=null, unsubAdminOwl=null;
     let currentBatchType = "";
 
-    // HAZIR MESAJ HAVUZU (DATABASE)
     const PREDEFINED_MSGS = [
         {type:'Motive', text:'🚀 Başarı, her gün tekrarlanan küçük çabaların toplamıdır. Asla vazgeçme!'},
         {type:'Motive', text:'🌟 Potansiyelinin farkında mısın? Yapabileceklerinin sınırı yok!'},
@@ -293,7 +309,6 @@
         try { await signInWithEmailAndPassword(auth,e,p); } catch(err){ errDiv.style.display='block'; errDiv.innerText = "Hata: " + err.message; btn.innerText = "GİRİŞ YAP"; btn.disabled = false; }
     };
     
-    // ÇIKIŞ BUTONU: Index'e gitmez, Login ekranına döner
     window.handleLogout = () => { 
         if(unsubAdminUsers) unsubAdminUsers(); 
         signOut(auth).then(() => {
@@ -343,7 +358,19 @@
         renderRisingStars(globalUserList); renderAdminChart(globalUserList);
     }
     
-    function renderAdminChart(users) { const ctx = document.getElementById('adminLeaderboardChart').getContext('2d'); if(adminChart) adminChart.destroy(); const topUsers = users.slice(0, 15); adminChart = new Chart(ctx, { type: 'bar', data: { labels: topUsers.map(u => u.displayName), datasets: [{ label: 'Çalışma Süresi (Dakika)', data: topUsers.map(u => u.totalMinutes), backgroundColor: '#009688', borderRadius: 8 }] }, options: { responsive: true, maintainAspectRatio: false, scales: { y: { beginAtZero: true }, x: { grid: { display: false } } } } }); }
+    function renderAdminChart(users) {
+        const topUsers = users.slice(0, 15);
+        Highcharts.chart('adminLeaderboardChart', {
+            chart: { type: 'column', options3d: { enabled: true, alpha: 10, beta: 25, depth: 70 }, backgroundColor: null },
+            title: { text: null },
+            subtitle: { text: null },
+            xAxis: { categories: topUsers.map(u => u.displayName), labels: { skew3d: true, style: { fontSize: '12px', fontWeight: 'bold' } } },
+            yAxis: { title: { text: 'Dakika (dk)', skew3d: true }, min: 0 },
+            plotOptions: { column: { depth: 25, colorByPoint: true, borderRadius: 5 } }, 
+            credits: { enabled: false },
+            series: [{ name: 'Çalışma Süresi', data: topUsers.map(u => u.totalMinutes), showInLegend: false }]
+        });
+    }
 
     function listenTemplates() {
         if(templateUnsub) templateUnsub();
@@ -358,17 +385,15 @@
         });
     }
     
-    // --- KAPSÜL YÖNETİMİ (Güçlendirilmiş) ---
     function listenAdminCapsules() { 
         if(unsubAdminCapsules) unsubAdminCapsules(); 
-        const q = query(collectionGroup(db, 'timecapsule')); // Tüm kapsülleri getir
+        const q = query(collectionGroup(db, 'timecapsule')); 
         unsubAdminCapsules = onSnapshot(q, (snap) => { 
             const list = document.getElementById('adminCapsuleList'); list.innerHTML = ""; 
             if(snap.empty) { list.innerHTML = "<div style='text-align:center; color:#999; padding:20px;'>Henüz hiç kapsül yok.</div>"; return; } 
             
             const capsules = [];
             snap.forEach(d => capsules.push({path: d.ref.path, ...d.data()}));
-            // Tarihe göre sırala
             capsules.sort((a,b) => (b.createdAt?.seconds || 0) - (a.createdAt?.seconds || 0));
 
             capsules.forEach(data => { 
@@ -398,7 +423,6 @@
         }); 
     }
 
-    // --- ÖĞRENCİ DETAY (Genişletilmiş) ---
     window.openAdminStudentDetail = async (uid) => { 
         const user = globalUserList.find(x => x.id === uid); if(!user) return;
         document.getElementById('detailUid').value = uid; document.getElementById('detailNameTitle').innerText = user.displayName; document.getElementById('detailPoints').value = user.xp || 0; document.getElementById('detailMinutes').value = user.totalMinutes || 0; document.getElementById('detailGoal').value = user.weeklyGoal || 1000; 
@@ -410,7 +434,6 @@
         
         snap.forEach(d => { 
             const s = d.data(); 
-            // Türü Türkçeleştirme
             let typeLabel = "Ders"; let typeColor = "#e0e7ff"; let typeTextCol = "#4338ca";
             if(s.type === 'pomodoro') { typeLabel = "Sayaç"; typeColor = "#dcfce7"; typeTextCol = "#166534"; }
             else if(s.type === 'arena') { typeLabel = "Arena"; typeColor = "#fee2e2"; typeTextCol = "#991b1b"; }
@@ -434,7 +457,6 @@
         document.getElementById('modalAdminStudentDetail').classList.remove('hidden'); 
     };
 
-    // --- KAPSÜL İŞLEMLERİ ---
     window.toggleAllCapsules = (source) => { document.querySelectorAll('.chk-capsule').forEach(c => c.checked = source.checked); };
     window.adminDeleteSelectedCapsules = async () => {
         const selected = document.querySelectorAll('.chk-capsule:checked'); if(selected.length === 0) return Swal.fire("Seçim Yok", "", "warning");
@@ -452,7 +474,7 @@
         const { value: newDate } = await Swal.fire({ title: 'Yeni Tarih', input: 'date', showCancelButton: true }); 
         if (newDate) { 
             const batch = writeBatch(db);
-            const targets = selected.length > 0 ? selected : document.querySelectorAll('.chk-capsule'); // Seçim yoksa hepsini
+            const targets = selected.length > 0 ? selected : document.querySelectorAll('.chk-capsule'); 
             targets.forEach(chk => { const s = chk.value.split('/'); batch.update(doc(db, s[0], s[1], s[2], s[3]), { unlockDate: newDate }); });
             await batch.commit(); Swal.fire("Tarihler Güncellendi", "", "success");
         } 
@@ -461,7 +483,7 @@
     window.adminBulkLockCapsules = async () => { updateCapsuleLocks(true); };
     async function updateCapsuleLocks(lock) {
         const selected = document.querySelectorAll('.chk-capsule:checked');
-        const date = lock ? "2026-01-01" : "2023-01-01"; // Gelecek veya Geçmiş
+        const date = lock ? "2026-01-01" : "2023-01-01"; 
         const batch = writeBatch(db);
         const targets = selected.length > 0 ? selected : document.querySelectorAll('.chk-capsule');
         targets.forEach(chk => { const s = chk.value.split('/'); batch.update(doc(db, s[0], s[1], s[2], s[3]), { unlockDate: date }); });
@@ -472,7 +494,31 @@
     window.adminChangeCapsuleDate = async (path, cur) => { const {value:nD} = await Swal.fire({title:'Yeni Tarih', html:`<input type="date" id="swal-date" class="swal2-input" value="${cur}">`, preConfirm:()=>document.getElementById('swal-date').value}); if(nD) { const s=path.split('/'); await updateDoc(doc(db,s[0],s[1],s[2],s[3]),{unlockDate:nD}); } };
     window.adminSetCapsuleLock = async (path, lock) => { const d = lock ? "2026-01-10" : "2023-01-01"; const s=path.split('/'); await updateDoc(doc(db,s[0],s[1],s[2],s[3]),{unlockDate:d}); };
 
-    window.adminEditSession = async (uid, sid, oldDur, oldPts) => { const { value: formValues } = await Swal.fire({ title: 'Düzenle', html: `<input id="swal-input1" class="swal2-input" type="number" placeholder="Dakika" value="${oldDur}"><input id="swal-input2" class="swal2-input" type="number" placeholder="Puan" value="${oldPts}">`, focusConfirm: false, showCancelButton: true, preConfirm: () => [document.getElementById('swal-input1').value, document.getElementById('swal-input2').value] }); if (formValues) { const nD = parseInt(formValues[0]); const nP = parseInt(formValues[1]); await updateDoc(doc(db, "users", uid, "sessions", sid), { duration: nD, points: nP }); await updateDoc(doc(db, "users", uid), { totalMinutes: increment(nD-oldDur), xp: increment(nP-oldPts), gold: increment(nP-oldPts) }); Swal.fire("Güncellendi", "", "success"); openAdminStudentDetail(uid); } };
+    window.adminEditSession = async (uid, sid, oldDur, oldPts) => { 
+        const { value: formValues } = await Swal.fire({ 
+            title: 'Kayıt Düzenle', 
+            html: `
+                <div style="text-align:left; font-size:0.9rem; color:#555; margin-bottom:5px;">Süre (Dakika)</div>
+                <input id="swal-input1" class="swal2-input" type="number" placeholder="Dakika" value="${oldDur}" style="margin-top:0;">
+                <div style="text-align:left; font-size:0.9rem; color:#555; margin-bottom:5px; margin-top:15px;">Puan</div>
+                <input id="swal-input2" class="swal2-input" type="number" placeholder="Puan" value="${oldPts}" style="margin-top:0;">
+            `, 
+            focusConfirm: false, 
+            showCancelButton: true, 
+            confirmButtonText: 'KAYDET',
+            preConfirm: () => [document.getElementById('swal-input1').value, document.getElementById('swal-input2').value] 
+        }); 
+        
+        if (formValues) { 
+            const nD = parseInt(formValues[0]); 
+            const nP = parseInt(formValues[1]); 
+            await updateDoc(doc(db, "users", uid, "sessions", sid), { duration: nD, points: nP }); 
+            await updateDoc(doc(db, "users", uid), { totalMinutes: increment(nD-oldDur), xp: increment(nP-oldPts), gold: increment(nP-oldPts) }); 
+            Swal.fire("Güncellendi", "Puan ve süre başarıyla değiştirildi.", "success"); 
+            openAdminStudentDetail(uid); 
+        } 
+    };
+
     window.adminDeleteSession = async (uid, sid, dur, pts) => { if(!confirm("Kayıt silinecek ve puan düşülecek?")) return; await deleteDoc(doc(db, "users", uid, "sessions", sid)); await updateDoc(doc(db, "users", uid), { totalMinutes: increment(-dur), xp: increment(-pts), gold: increment(-pts) }); openAdminStudentDetail(uid); };
     window.adminDeleteStudent = async () => { const uid=document.getElementById('detailUid').value; if(!confirm("Öğrenciyi silmek üzeresin!")) return; await deleteDoc(doc(db,"users",uid)); Swal.fire("Silindi","","success"); document.getElementById('modalAdminStudentDetail').classList.add('hidden'); };
     window.saveAdminStudentDetail = async () => { const uid=document.getElementById('detailUid').value; await updateDoc(doc(db,"users",uid),{xp:parseInt(document.getElementById('detailPoints').value), gold:parseInt(document.getElementById('detailPoints').value), totalMinutes:parseInt(document.getElementById('detailMinutes').value), weeklyGoal:parseInt(document.getElementById('detailGoal').value)}); Swal.fire("Kaydedildi","","success"); document.getElementById('modalAdminStudentDetail').classList.add('hidden'); };
@@ -489,8 +535,39 @@
     window.handleTargetChange = () => { const isP = document.querySelector('input[value="parent"]').checked; const ta = document.getElementById('msgContent'); let v = ta.value; if(isP){ if(!v.startsWith("Kıymetli velimiz:")) ta.value="Kıymetli velimiz: "+v; } else { if(v.startsWith("Kıymetli velimiz: ")) ta.value=v.replace("Kıymetli velimiz: ", ""); } };
     async function seedDefaultTemplates() { const b = writeBatch(db); PREDEFINED_MSGS.forEach(x=>{ b.set(doc(collection(db,"msg_templates")),{...x,createdAt:serverTimestamp()}); }); await b.commit(); }
     function renderRisingStars(u) { const c=document.getElementById('risingStarsContainer'); c.innerHTML=""; u.filter(x=>x.lastStudyDate).sort((a,b)=>b.totalMinutes-a.totalMinutes).slice(0,5).forEach(x=>c.innerHTML+=`<div class="star-card" onclick="openAdminStudentDetail('${x.id}')">🚀 ${x.displayName}</div>`); }
-    function listenAdminClanRequests() { onSnapshot(collection(db,"clan_requests"), s=>{ document.getElementById('adminClanRequestList').innerHTML = s.docs.map(d=>`<div>${d.data().name} <button onclick="approveClan('${d.id}','${d.data().leader}','${d.data().name}','${d.data().icon}')">✓</button><button onclick="rejectRequest('clan_requests','${d.id}')">✕</button></div>`).join(''); }); onSnapshot(collection(db,"member_requests"), s=>{ document.getElementById('adminMemberRequestList').innerHTML = s.docs.map(d=>`<div>${d.data().userName}->${d.data().clanName} <button onclick="approveMember('${d.id}','${d.data().userId}','${d.data().clanId}')">✓</button><button onclick="rejectRequest('member_requests','${d.id}')">✕</button></div>`).join(''); }); 
-    onSnapshot(collection(db,"clans"), s=>{ document.getElementById('adminActiveClansList').innerHTML = s.docs.map(d=>`<div class="clan-admin-item"><div style="display:flex; justify-content:space-between; align-items:center;"><strong>${d.data().icon} ${d.data().name}</strong> <button onclick="deleteClan('${d.id}')" style="background:#fee2e2;color:red;border:none;padding:5px 10px;border-radius:5px;font-weight:bold;">SİL</button></div><div id="clan-members-${d.id}" style="margin-top:5px; padding:5px; background:#f8fafc; font-size:0.8rem; color:#666;">Yükleniyor...</div></div>`).join(''); s.docs.forEach(docSnap => loadClanMembersForAdmin(docSnap.id)); }); }
+    
+    // --- GÜNCELLENEN OTAG YONETIMI KISMI ---
+    function listenAdminClanRequests() { 
+        onSnapshot(collection(db,"clan_requests"), s=>{ 
+            document.getElementById('adminClanRequestList').innerHTML = s.docs.map(d=>`
+                <div>${d.data().name} <button onclick="approveClan('${d.id}','${d.data().leader}','${d.data().name}','${d.data().icon}')">✓</button>
+                <button onclick="rejectRequest('clan_requests','${d.id}')">✕</button></div>`
+            ).join(''); 
+        }); 
+        onSnapshot(collection(db,"member_requests"), s=>{ 
+            document.getElementById('adminMemberRequestList').innerHTML = s.docs.map(d=>`
+                <div>${d.data().userName}->${d.data().clanName} <button onclick="approveMember('${d.id}','${d.data().userId}','${d.data().clanId}')">✓</button>
+                <button onclick="rejectRequest('member_requests','${d.id}')">✕</button></div>`
+            ).join(''); 
+        }); 
+        
+        onSnapshot(collection(db,"clans"), s=>{ 
+            document.getElementById('adminActiveClansList').innerHTML = s.docs.map(d=>`
+                <div class="clan-admin-item">
+                    <div style="display:flex; justify-content:space-between; align-items:center;">
+                        <strong>
+                            ${d.data().icon} ${d.data().name} 
+                            <span style="color:#f59e0b; font-size:0.9rem; margin-left:10px;">⭐ ${d.data().totalScore || 0} Puan</span>
+                        </strong> 
+                        <button onclick="deleteClan('${d.id}')" style="background:#fee2e2;color:red;border:none;padding:5px 10px;border-radius:5px;font-weight:bold;">SİL</button>
+                    </div>
+                    <div id="clan-members-${d.id}" style="margin-top:5px; padding:5px; background:#f8fafc; font-size:0.8rem; color:#666;">Yükleniyor...</div>
+                </div>`
+            ).join(''); 
+            s.docs.forEach(docSnap => loadClanMembersForAdmin(docSnap.id)); 
+        }); 
+    }
+
     async function loadClanMembersForAdmin(clanId) { const q = query(collection(db, "users"), where("clanId", "==", clanId)); const snap = await getDocs(q); let html = ""; snap.forEach(u => { html += `<div style="display:flex; justify-content:space-between; align-items:center; margin-top:2px;"><span>👤 ${u.data().displayName}</span><button onclick="kickMember('${u.id}', '${clanId}')" style="color:red; background:none; border:none; cursor:pointer; font-weight:bold;">[AT]</button></div>`; }); const el = document.getElementById(`clan-members-${clanId}`); if(el) el.innerHTML = html || "<i>Üye yok.</i>"; }
     window.kickMember = async (uid, cid) => { if(!confirm("Üyeyi otağdan atmak istiyor musun?")) return; await updateDoc(doc(db, "users", uid), { clanId: deleteField() }); await updateDoc(doc(db, "clans", cid), { memberCount: increment(-1) }); loadClanMembersForAdmin(cid); Swal.fire("Atıldı", "", "success"); };
     window.deleteClan = async (cid) => { if(!confirm("Otağı tamamen silmek istiyor musun?")) return; await deleteDoc(doc(db, "clans", cid)); };
