@@ -66,7 +66,6 @@
         /* Balon Stili */
         .coach-bubble { background: white; padding: 15px 25px 15px 15px; border-radius: 20px 20px 4px 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.15); margin-bottom: 10px; max-width: 250px; font-size: 0.9rem; color: var(--text-main); border: 2px solid #e0e7ff; opacity: 0; transform: translateY(20px) scale(0.9); transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); pointer-events: auto; position: absolute; bottom: 70px; right: 0; width: max-content; font-weight: 700; z-index: 1000; cursor: pointer; position: relative; }
         .coach-bubble.show { opacity: 1; transform: translateY(0) scale(1); }
-        /* X butonu stilini kaldırdım, tıklama ile kapanacak */
 
         @keyframes excited { 0% { transform: scale(1) rotate(0deg); } 25% { transform: scale(1.1) rotate(-5deg); } 50% { transform: scale(1.1) rotate(5deg); } 75% { transform: scale(1.1) rotate(-5deg); } 100% { transform: scale(1) rotate(0deg); } }
         .owl-excited { animation: excited 0.8s infinite; }
@@ -200,6 +199,9 @@
             </div>
             <div id="noClanSection" class="card" style="text-align:center;">
                 <h4>HENÜZ BİR OTAĞIN YOK</h4>
+                <div style="font-size:0.8rem; color:var(--warning); margin-bottom:15px; font-weight:bold; background:#fffbeb; padding:8px; border-radius:10px;">
+                    ⚠️ Kural: Her Otağ, sınıf mevcudunun en fazla 1/5'i kadar Alp barındırabilir.
+                </div>
                 <button class="btn-action" onclick="openCreateClanModal()">Otağ Kurma İsteği Gönder</button>
                 <hr style="margin:20px 0; border-top:1px solid #f1f5f9;">
                 <h5 style="text-align:left;">Katılabileceğin Otağlar</h5>
@@ -291,6 +293,10 @@
                 <div class="desc-box" style="border-bottom:none;">
                     <span class="desc-title" style="display:flex; align-items:center; gap:8px; font-size:1rem;">⛺ Otağ (Klan) Mantığı</span>
                     <p class="desc-text">Arkadaşlarınla bir Otağ kur veya katıl. Kazandığın her puan Otağına eklenir. En çok çalışan Otağ zirveye oturur.</p>
+                    <div style="margin-top:10px; background:#fffbeb; padding:10px; border-radius:10px; border:1px solid #fcd34d; font-size:0.85rem; color:#92400e;">
+                        <strong>⚖️ ADALET KURALI (1/5):</strong><br>
+                        Güç dengesini korumak için, bir Otağ en fazla sınıf mevcudunun <strong>5'te 1'i</strong> kadar Alp alabilir. Kontenjan dolarsa başka bir Otağ seçmelisin.
+                    </div>
                 </div>
             </div>
         </div>
@@ -344,7 +350,8 @@
     const app = initializeApp(firebaseConfig); const db = getFirestore(app); const auth = getAuth(app);
     const ADMIN_EMAIL = "mremzi@gmail.com";
     const SUBJECTS = ['Matematik','Türkçe','Fen','Sosyal','İngilizce','Din','Kitap','Diğer'];
-    const AVATAR_SHOP = [ { icon: '🐺', name: 'Bozkurt', cost: 500 }, { icon: '🏹', name: 'Kemankeş', cost: 600 }, { icon: '⚔️', name: 'Alp', cost: 700 }, { icon: '🦅', name: 'Gökdoğan', cost: 800 }, { icon: '🐎', name: 'Süvari', cost: 900 }, { icon: '🛡️', name: 'Muhafız', cost: 1000 }, { icon: '⚓', name: 'Levent', cost: 1200 }, { icon: '🗡️', name: 'Akıncı', cost: 1300 }, { icon: '📜', name: 'Bilge', cost: 1500 }, { icon: '🔭', name: 'Gökbilimci', cost: 1800 }, { icon: '🐉', name: 'Ejderha', cost: 2000 }, { icon: '🐦‍🔥', name: 'Anka Kuşu', cost: 2000 }, { icon: '🥋', name: 'Pehlivan', cost: 2200 }, { icon: '👑', name: 'Hakan', cost: 5000 } ];
+    // 2. STRATEJİ: ANKA KUŞU İÇİN FONT AWESOME KULLANILDI (TURUNCU RENK)
+    const AVATAR_SHOP = [ { icon: '🐺', name: 'Bozkurt', cost: 500 }, { icon: '🏹', name: 'Kemankeş', cost: 600 }, { icon: '⚔️', name: 'Alp', cost: 700 }, { icon: '🦅', name: 'Gökdoğan', cost: 800 }, { icon: '🐎', name: 'Süvari', cost: 900 }, { icon: '🛡️', name: 'Muhafız', cost: 1000 }, { icon: '⚓', name: 'Levent', cost: 1200 }, { icon: '🗡️', name: 'Akıncı', cost: 1300 }, { icon: '📜', name: 'Bilge', cost: 1500 }, { icon: '🔭', name: 'Gökbilimci', cost: 1800 }, { icon: '🐉', name: 'Ejderha', cost: 2000 }, { icon: '<i class="fa-solid fa-dragon" style="color:#d97706;"></i>', name: 'Anka Kuşu', cost: 2000 }, { icon: '🥋', name: 'Pehlivan', cost: 2200 }, { icon: '👑', name: 'Hakan', cost: 5000 } ];
     const CLAN_ICONS = [ {i:'🐺',n:'Bozkurt'}, {i:'🦅',n:'Kartal'}, {i:'🏹',n:'Ok&Yay'}, {i:'⚔️',n:'Kılıçlar'}, {i:'🐎',n:'At'}, {i:'⛺',n:'Otağ'}, {i:'🛡️',n:'Kalkan'}, {i:'☀️',n:'Güneş'}, {i:'🌙',n:'Hilal'}, {i:'🔥',n:'Ateş'}, {i:'🏔️',n:'Dağ'}, {i:'🌊',n:'Deniz'} ];
     const RANKS = [ { name: "Çırak 🪵", threshold: 0 }, { name: "Kalfa 🔨", threshold: 500 }, { name: "Savaşçı ⚔️", threshold: 1500 }, { name: "Komutan 🛡️", threshold: 3000 }, { name: "Bilge 📜", threshold: 5000 }, { name: "Hakan 👑", threshold: 10000 } ];
     const OWL_MESSAGES = [ "Hoş geldin Bilgi Avcısı! 🏹", "Gözlerim yollarda kaldı! 👀", "Çalışkanların kralı burada! 👑", "Bugün rekor kıracak mıyız? 🚀", "Uçuşa hazır mısın? 🦉", "Seni görmek ne güzel! 🌟", "Kitapların seni özledi! 📚", "Sıcak bir kahve ve ders? ☕", "Zamanı bükmeye hazır ol! ⏳", "Sahne senin, göster kendini! 🎤" ];
@@ -415,7 +422,7 @@
         checkClanStatus(uid); renderChips(); renderAvatarShop(); renderClanIcons(); listenStudentData(uid); checkTimeCapsule(uid); listenStudentMessages(uid); showWiseOwlWelcome();
     }
     
-    // YENİ BAYKUŞ KUYRUK VE KAPATMA SİSTEMİ (X Butonu Yok, Tıklama ile Geçiş/Kapanma)
+    // YENİ BAYKUŞ KUYRUK VE KAPATMA SİSTEMİ
     function addToOwlQueue(msg) {
         if(owlQueue.length > 0 && owlQueue[owlQueue.length-1] === msg) return;
         owlQueue.push(msg);
@@ -423,7 +430,6 @@
         if (!bubble.classList.contains('show')) showNextMessage();
     }
 
-    // Tıklayınca sıradakini göster veya kapat
     window.showNextMessage = () => {
         const bubble = document.getElementById('coachBubble');
         const avatar = document.getElementById('wiseAvatar');
@@ -435,7 +441,6 @@
             bubble.classList.add('show');
             avatar.classList.add('owl-excited');
         } else {
-            // Kuyruk bittiyse kapat
             bubble.classList.remove('show');
             avatar.classList.remove('owl-excited');
         }
@@ -449,10 +454,7 @@
             else msg = OWL_MESSAGES[Math.floor(Math.random() * OWL_MESSAGES.length)]; 
         } catch (e) { msg = OWL_MESSAGES[Math.floor(Math.random() * OWL_MESSAGES.length)]; } 
         addToOwlQueue(msg);
-
-        // SERİ HATIRLATMASI (2. Gün Kuralı)
-        const d = new Date();
-        const day = d.getDay(); // 2=Salı
+        const d = new Date(); const day = d.getDay(); 
         const userRef = await getDoc(doc(db,"users",currentUser.uid));
         const userData = userRef.data();
         if(day >= 2 && userData.streak > 0 && userData.streak < 7) {
@@ -475,7 +477,7 @@
 
     window.buyAvatar = async (icon, cost, btn) => { btn.disabled = true; try { const currentGold = parseInt(document.getElementById('stGold').innerText); if(currentGold < cost) { Swal.fire("Yetersiz Altın", "Daha çok çalışmalısın!", "error"); return; } if(confirm("Bu çıkartmayı satın alıp hemen kullanmak istiyor musun? (" + cost + " Altın)")){ await updateDoc(doc(db,"users",currentUser.uid), { gold: increment(-cost), avatar: icon }); const avatarEl = document.getElementById('userAvatar'); avatarEl.innerHTML = icon; avatarEl.style.transform = "scale(1.5) rotate(-10deg)"; setTimeout(() => { avatarEl.style.transform = "scale(1) rotate(0deg)"; }, 400); Swal.fire({ title: "Hayırlı Olsun!", text: "Yeni çıkartman rütbenle beraber parlıyor.", icon: "success", timer: 1500, showConfirmButton: false }); confetti(); } } catch(e) { console.error(e); Swal.fire("Hata", "İşlem sırasında bir sorun oluştu.", "error"); } finally { btn.disabled = false; } };
     
-    // HAFTALIK BONUS (500)
+    // HAFTALIK BONUS
     window.claimWeeklyBonus = async () => { const btn = document.getElementById('btnClaimWeekly'); btn.disabled = true; try { await updateDoc(doc(db,"users",currentUser.uid), { xp: increment(500), gold: increment(500), lastBonusDate: serverTimestamp() }); window.lastBonusDate = { toDate: () => new Date() }; checkBonusButtonVisibility(); Swal.fire("Tebrikler!", "+500 Çalışma Yıldız Puanı", "success"); confetti(); } catch(e) { btn.disabled = false; } };
     function checkBonusButtonVisibility() { if(!window.currentWeeklyTotal) return; const goal = parseInt(document.getElementById('targetMins').innerText)||1000; const btn = document.getElementById('btnClaimWeekly'); let alreadyClaimed = false; if(window.lastBonusDate) { const last = window.lastBonusDate.toDate(); const now = new Date(); const diffTime = Math.abs(now - last); const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)); if(diffDays < 7) alreadyClaimed = true; } if (window.currentWeeklyTotal >= goal && !alreadyClaimed) { btn.classList.remove('hidden'); } else { btn.classList.add('hidden'); } }
 
@@ -503,7 +505,7 @@
     }
     function updateStudentChart(val, goal){ const ctx = document.getElementById('weeklyChart').getContext('2d'); if(myChart) myChart.destroy(); myChart = new Chart(ctx, { type: 'doughnut', data: { labels: ['Yapılan', 'Kalan'], datasets: [{ data: [val, Math.max(0, goal-val)], backgroundColor: ['#009688', '#e2e8f0'], borderWidth: 0 }] }, options: { cutout: '80%', maintainAspectRatio: false, plugins: { legend: { display: false } } } }); }
     
-    // GİRİŞ KAYDETME (Anti-Hile: 10dk + Seri Kontrolü)
+    // GİRİŞ KAYDETME
     window.saveEntry = async () => { const btn = document.getElementById('btnSaveEntry'); if(btn.disabled) return; const sub = document.getElementById('selectedSubject').value; const dur = parseInt(document.getElementById('entryDur').value); if(!sub || !dur) return Swal.fire("Eksik Bilgi", "", "warning"); 
     if(dur < 10) return Swal.fire("Çok Kısa", "En az 10 dakika girmelisin.", "warning");
     btn.disabled = true; btn.innerText = "İşleniyor..."; try { const offset = parseInt(document.getElementById('entryDate').value) || 0; const recordDate = new Date(); recordDate.setDate(recordDate.getDate() - offset); recordDate.setHours(12,0,0,0); let multiplier = 1.0; let bonusText = ""; if (window.userClanId) { multiplier += 0.5; bonusText = " (Otağ Bonusu Aktif 🔥)"; } const points = Math.ceil(dur * multiplier); await addDoc(collection(db,"users",currentUser.uid,"sessions"), { subject: sub, duration: dur, points: points, createdAt: recordDate, dateStr: recordDate.toLocaleDateString('tr-TR'), type: 'manual' }); await updateDoc(doc(db,"users",currentUser.uid), { totalMinutes: increment(dur), xp: increment(points), gold: increment(points), lastStudyDate: serverTimestamp() }); await addClanPoints(currentUser.uid, points); await checkStreakAndAward(currentUser.uid); Swal.fire("Kaydedildi!", `+${points} Çalışma Yıldız Puanı${bonusText}`, "success"); confetti(); } catch(e) { Swal.fire("Hata", e.message, "error"); } finally { setTimeout(() => { btn.disabled = false; btn.innerText = "KAYDET (+Puan) ✅"; }, 1000); } };
@@ -511,32 +513,22 @@
     window.startPomoTimer = async () => { if(isPomoRunning) return; const sub = document.getElementById('pomoSubject').value; if(!sub) return Swal.fire("Ders Seç", "", "warning"); isPomoRunning = true; pomoTotalDuration = parseInt(document.getElementById('timerSet').value) * 60; pomoEndTime = Date.now() + (pomoTotalDuration * 1000); document.getElementById('btnStartPomo').innerText = "⏳"; document.getElementById('btnStartPomo').disabled = true; try { if ('wakeLock' in navigator) { wakeLock = await navigator.wakeLock.request('screen'); } } catch (err) {} pomoInterval = setInterval(() => { const rem = Math.ceil((pomoEndTime - Date.now()) / 1000); if(rem <= 0) { document.getElementById('timerDisplay').innerText = "00:00"; clearInterval(pomoInterval); finishPomo(true); } else { const m = Math.floor(rem / 60); const s = rem % 60; document.getElementById('timerDisplay').innerText = `${m}:${s.toString().padStart(2,'0')}`; } }, 1000); };
     window.requestStopPomo = () => { if(isPomoRunning) Swal.fire({ title: 'Durdur?', showCancelButton: true }).then((r) => { if (r.isConfirmed) { clearInterval(pomoInterval); finishPomo(false); } }); };
     
-    // POMODORO BİTİŞ (Anti-Hile: 5dk)
     async function finishPomo(completed) { if(wakeLock) { wakeLock.release(); wakeLock = null; } const sub = document.getElementById('pomoSubject').value; const spent = completed ? pomoTotalDuration : Math.ceil((pomoTotalDuration - (pomoEndTime - Date.now())/1000)); const mins = Math.floor(spent / 60); isPomoRunning = false; document.getElementById('btnStartPomo').innerText = "BAŞLAT ▶"; document.getElementById('btnStartPomo').disabled = false; document.getElementById('timerDisplay').innerText = `${document.getElementById('timerSet').value}:00`; 
     if(mins < 5) return Swal.fire("Çok Kısa", "En az 5 dakika odaklanmalısın.", "info"); 
     let multiplier = 1.5; if (window.userClanId) multiplier += 0.5; const pts = Math.ceil(mins * multiplier); await addDoc(collection(db,"users",currentUser.uid,"sessions"), { subject: sub, duration: mins, points: pts, createdAt: serverTimestamp(), type: 'pomodoro', completed: completed }); await updateDoc(doc(db,"users",currentUser.uid), { totalMinutes: increment(mins), xp: increment(pts), gold: increment(pts), lastStudyDate: serverTimestamp() }); Swal.fire("Bitti!", `${mins} dk çalıştın. +${pts} Çalışma Yıldız Puanı`, "success"); confetti(); await addClanPoints(currentUser.uid, pts); await checkStreakAndAward(currentUser.uid); }
     
-    // SERİ VE BONUS SİSTEMİ (7 GÜN = 400 PUAN)
     async function checkStreakAndAward(uid) {
-        const uSnap = await getDoc(doc(db, "users", uid));
-        const u = uSnap.data();
-        const lastDate = u.lastStudyDate ? u.lastStudyDate.toDate() : new Date(0);
-        const now = new Date();
-        
+        const uSnap = await getDoc(doc(db, "users", uid)); const u = uSnap.data();
+        const lastDate = u.lastStudyDate ? u.lastStudyDate.toDate() : new Date(0); const now = new Date();
         const isSameDay = lastDate.toDateString() === now.toDateString();
         const yesterday = new Date(); yesterday.setDate(yesterday.getDate() - 1);
         const isYesterday = lastDate.toDateString() === yesterday.toDateString();
-        
         let newStreak = u.streak || 0;
-        
         if (!isSameDay) {
-            if (isYesterday) { newStreak++; } else { newStreak = 1; } // Devam ediyor veya yeni başladı
-            
+            if (isYesterday) { newStreak++; } else { newStreak = 1; }
             if (newStreak >= 7) {
-                newStreak = 0; // Seri tamamlandı, sıfırla ve ödül ver
-                await updateDoc(doc(db, "users", uid), { xp: increment(400), gold: increment(400) });
-                addToOwlQueue("SERİ TAMAMLANDI! 🔥 7 gün aralıksız çalıştın ve 400 Puan kazandın!");
-                confetti();
+                newStreak = 0; await updateDoc(doc(db, "users", uid), { xp: increment(400), gold: increment(400) });
+                addToOwlQueue("SERİ TAMAMLANDI! 🔥 7 gün aralıksız çalıştın ve 400 Puan kazandın!"); confetti();
             }
             await updateDoc(doc(db, "users", uid), { streak: newStreak });
         }
@@ -552,11 +544,9 @@
     document.addEventListener("visibilitychange", async () => { if (document.visibilityState === 'visible') { if (isPomoRunning && pomoEndTime > 0 && Date.now() >= pomoEndTime) { clearInterval(pomoInterval); await finishPomo(true); } if (isArenaRunning && arenaEndTime > 0 && Date.now() >= arenaEndTime) { clearInterval(arenaInterval); await finishArena(true); } try { if ('wakeLock' in navigator && (isPomoRunning || isArenaRunning)) { wakeLock = await navigator.wakeLock.request('screen'); } } catch(e){} } });
     async function checkClanStatus(uid) { const u = (await getDoc(doc(db, "users", uid))).data(); window.userClanId = u.clanId || null; if (u.clanId) { const c = (await getDoc(doc(db, "clans", u.clanId))).data(); document.getElementById('noClanSection').classList.add('hidden'); document.getElementById('myClanSection').classList.remove('hidden'); document.getElementById('myClanName').innerText = c.name; document.getElementById('myClanIcon').innerText = c.icon; document.getElementById('myClanScore').innerText = c.totalScore || 0; loadMyClanMembers(u.clanId); } else { document.getElementById('noClanSection').classList.remove('hidden'); document.getElementById('myClanSection').classList.add('hidden'); loadJoinableClans(); } loadClanLeaderboard(); }
     async function loadMyClanMembers(cid) { const q = query(collection(db, "users"), where("clanId", "==", cid)); const snap = await getDocs(q); document.getElementById('myClanMembers').innerText = snap.size; let html = ""; snap.forEach(d => { html += `<div style="padding:5px 0; border-bottom:1px solid #f1f5f9; font-size:0.9rem;">👤 ${d.data().displayName} <span style="float:right; font-weight:bold; color:#cbd5e1;">${d.data().totalMinutes || 0}dk</span></div>`; }); document.getElementById('myClanMemberList').innerHTML = html || "<small>Kimse yok.</small>"; }
-    async function loadJoinableClans() { const list = document.getElementById('clanJoinList'); list.innerHTML = ""; const q = query(collection(db, "clans"), orderBy("totalScore", "desc"), limit(5)); (await getDocs(q)).forEach(d=>{ list.innerHTML+=`<div>${d.data().icon} ${d.data().name} <button onclick="joinClanRequest('${d.id}','${d.data().name}')">Katıl</button></div>`; }); }
     async function loadClanLeaderboard() { const list = document.getElementById('clanLeaderboard'); list.innerHTML=""; const q = query(collection(db, "clans"), orderBy("totalScore", "desc"), limit(5)); const snap = await getDocs(q); if(currentUser) { const uSnap = await getDoc(doc(db, "users", currentUser.uid)); const myClanId = uSnap.data()?.clanId; if(myClanId) { const allClansQ = query(collection(db, "clans"), orderBy("totalScore", "desc")); const allClansSnap = await getDocs(allClansQ); let myRank = 0; allClansSnap.docs.forEach((d, i) => { if(d.id === myClanId) myRank = i + 1; }); const rankDisplay = document.getElementById('myClanRankDisplay'); if(rankDisplay) rankDisplay.innerText = `#${myRank}`; } } snap.docs.forEach((d,i)=>{ const data = d.data(); list.innerHTML += `<div style="margin-bottom:5px; font-weight:600;">#${i+1} ${data.icon} ${data.name} (${data.totalScore || 0})</div>`; }); }
     async function addClanPoints(uid, points) { const u = (await getDoc(doc(db, "users", uid))).data(); if(u.clanId) await updateDoc(doc(db,"clans",u.clanId), { totalScore: increment(points) }); }
     window.createClanRequest = async () => { const btn = document.querySelector('#modalCreateClan .btn-action'); if(btn) btn.disabled = true; try { const q1 = query(collection(db, "clan_requests"), where("leader", "==", currentUser.uid)); const snap1 = await getDocs(q1); if (!snap1.empty) return Swal.fire("Sabırlı Ol", "Zaten Hakan'a ilettiğin bir otağ kurma isteğin var.", "warning"); const q2 = query(collection(db, "member_requests"), where("userId", "==", currentUser.uid)); const snap2 = await getDocs(q2); if (!snap2.empty) return Swal.fire("Karar Ver", "Şu an başka bir otağa katılma isteğin beklemede.", "warning"); await addDoc(collection(db,"clan_requests"), { name: document.getElementById('newClanName').value, icon: document.getElementById('selectedClanIcon').value, leader: currentUser.uid, leaderName: currentUser.displayName }); Swal.fire("Arz Edildi", "Otağ kurma isteğin Hakan'a iletildi.", "success"); document.getElementById('modalCreateClan').classList.add('hidden'); } catch (error) { console.error(error); Swal.fire("Hata", "İstek gönderilirken sorun oluştu.", "error"); } finally { if(btn) btn.disabled = false; } }; 
-    window.joinClanRequest = async (cid, cname) => { try { const q1 = query(collection(db, "member_requests"), where("userId", "==", currentUser.uid)); const snap1 = await getDocs(q1); if (!snap1.empty) { const pending = snap1.docs[0].data(); if(pending.clanId === cid) return Swal.fire("Zaten Sıradasın", "Zaten haber gönderdin. Bekle.", "info"); else return Swal.fire("Sadakat Önemlidir", "Şu an '" + pending.clanName + "' için bekliyorsun. Aynı anda iki kapı çalınmaz.", "warning"); } const q2 = query(collection(db, "clan_requests"), where("leader", "==", currentUser.uid)); const snap2 = await getDocs(q2); if (!snap2.empty) return Swal.fire("Çelişki", "Kendi otağını kurmak için başvurmuşsun. Başkasına giremezsin.", "warning"); await addDoc(collection(db,"member_requests"), { clanId: cid, clanName: cname, userId: currentUser.uid, userName: currentUser.displayName }); Swal.fire("Haber Salındı", cname + " otağına katılma isteğin iletildi.", "success"); } catch (error) { console.error(error); Swal.fire("Hata", "İstek gönderilemedi.", "error"); } }; 
     window.leaveClan=async()=>{const u=(await getDoc(doc(db,"users",currentUser.uid))).data(); await updateDoc(doc(db,"clans",u.clanId),{memberCount:increment(-1)}); await updateDoc(doc(db,"users",currentUser.uid),{clanId:deleteField()}); checkClanStatus(currentUser.uid);};
     function checkTimeCapsule(uid) { const q = query(collection(db, "users", uid, "timecapsule"), orderBy("createdAt", "desc"), limit(1)); onSnapshot(q, (snap) => { const inputArea = document.getElementById('capsuleInputArea'); const lockedArea = document.getElementById('capsuleLocked'); const openArea = document.getElementById('capsuleOpen'); if (!snap.empty) { const data = snap.docs[0].data(); if (new Date() < new Date("2026-01-10")) { lockedArea.classList.remove('hidden'); openArea.classList.add('hidden'); inputArea.classList.add('hidden'); } else { lockedArea.classList.add('hidden'); openArea.classList.remove('hidden'); inputArea.classList.add('hidden'); document.getElementById('capsuleContentText').innerText = data.content; } } else { inputArea.classList.remove('hidden'); lockedArea.classList.add('hidden'); openArea.classList.add('hidden'); } }); }
     window.saveFuture = async () => { const btn = document.getElementById('btnSaveFuture'); const msg = document.getElementById('futureMsg').value.trim(); if(!msg || msg.length < 10) return Swal.fire("Eksik Mesaj", "Lütfen en az bir cümlelik tam mesaj yazınız.", "warning"); btn.disabled = true; btn.innerText = "Mühürleniyor..."; try { const q = query(collection(db, "users", currentUser.uid, "timecapsule")); const snap = await getDocs(q); if (!snap.empty) { btn.disabled = false; btn.innerText = "MÜHÜRLE VE GÖNDER 🔒"; return Swal.fire("Zaten Var", "Sadece 1 kapsül hakkın var.", "warning"); } await addDoc(collection(db,"users",currentUser.uid,"timecapsule"), { content: msg, createdAt: serverTimestamp(), unlockDate: "2026-01-10", userId: currentUser.uid, userName: currentUser.displayName }); const reward = 50; await updateDoc(doc(db,"users",currentUser.uid), { xp: increment(reward), gold: increment(reward) }); Swal.fire("Mühürlendi", `Mesajın geleceğe yollandı! +${reward} Çalışma Yıldız Puanı kazandın!`, "success"); confetti(); } catch(e) { console.error(e); Swal.fire("Hata", "Kapsül oluşturulamadı.", "error"); btn.disabled = false; btn.innerText = "MÜHÜRLE VE GÖNDER 🔒"; } };
@@ -567,7 +557,75 @@
     window.openProfileModal=()=>{document.getElementById('editProfileName').value=currentUser.displayName||"";document.getElementById('modalProfile').classList.remove('hidden')}; window.saveUserProfile=async()=>{await updateProfile(currentUser,{displayName:document.getElementById('editProfileName').value}); await updateDoc(doc(db,"users",currentUser.uid),{displayName:document.getElementById('editProfileName').value}); location.reload();};
     window.openCreateClanModal=window.openCreateClanModal; window.selectClanIcon=(el)=>{document.querySelectorAll('#clanIconSelect .chip-modern').forEach(e=>e.classList.remove('active')); el.classList.add('active'); document.getElementById('selectedClanIcon').value=el.querySelector('span').innerText;}; 
     document.addEventListener('contextmenu', event => event.preventDefault()); document.onkeydown = function(e) { if(e.keyCode == 123) return false; if(e.ctrlKey && e.shiftKey && e.keyCode == 'I'.charCodeAt(0)) return false; if(e.ctrlKey && e.shiftKey && e.keyCode == 'C'.charCodeAt(0)) return false; if(e.ctrlKey && e.shiftKey && e.keyCode == 'J'.charCodeAt(0)) return false; if(e.ctrlKey && e.keyCode == 'U'.charCodeAt(0)) return false; }
-    window.createClanRequest=window.createClanRequest; window.joinClanRequest=window.joinClanRequest; window.leaveClan=window.leaveClan; window.deleteDoc=deleteDoc; window.doc=doc; window.db=db; window.readMsg=window.readMsg; window.openMsgModal=window.openMsgModal;
+    window.createClanRequest=window.createClanRequest; window.leaveClan=window.leaveClan; window.deleteDoc=deleteDoc; window.doc=doc; window.db=db; window.readMsg=window.readMsg; window.openMsgModal=window.openMsgModal;
+
+    // --- YENİ EKLENEN FONKSİYONLAR: 1/5 KURALI ---
+    async function getClanLimit() {
+        // Tüm öğrencileri say
+        const snap = await getDocs(collection(db, "users"));
+        const total = snap.size;
+        // 1/5 kuralı (Yukarı yuvarla), minimum 2 kişi
+        return Math.max(2, Math.ceil(total / 5));
+    }
+
+    async function loadJoinableClans() { 
+        const list = document.getElementById('clanJoinList'); list.innerHTML = ""; 
+        const q = query(collection(db, "clans"), orderBy("totalScore", "desc"), limit(5)); 
+        const querySnapshot = await getDocs(q);
+        const limitCount = await getClanLimit();
+
+        querySnapshot.forEach(d => { 
+            const data = d.data();
+            const count = data.memberCount || 1; // Üye sayısı (yoksa 1 varsay)
+            const isFull = count >= limitCount;
+            
+            let btnHtml = '';
+            if (isFull) {
+                btnHtml = `<button disabled style="background:#e2e8f0; color:#94a3b8; cursor:not-allowed;">DOLU (${count}/${limitCount})</button>`;
+            } else {
+                btnHtml = `<button onclick="joinClanRequest('${d.id}','${data.name}')">Katıl (${count}/${limitCount})</button>`;
+            }
+
+            list.innerHTML += `<div>${data.icon} ${data.name} ${btnHtml}</div>`; 
+        }); 
+    }
+    
+    window.joinClanRequest = async (cid, cname) => { 
+        try { 
+            // 1. Kontrol: Bekleyen istek var mı?
+            const q1 = query(collection(db, "member_requests"), where("userId", "==", currentUser.uid)); 
+            const snap1 = await getDocs(q1); 
+            if (!snap1.empty) { 
+                const pending = snap1.docs[0].data(); 
+                if(pending.clanId === cid) return Swal.fire("Zaten Sıradasın", "Zaten haber gönderdin. Bekle.", "info"); 
+                else return Swal.fire("Sadakat Önemlidir", "Şu an '" + pending.clanName + "' için bekliyorsun. Aynı anda iki kapı çalınmaz.", "warning"); 
+            } 
+            
+            // 2. Kontrol: Kendi otağı var mı?
+            const q2 = query(collection(db, "clan_requests"), where("leader", "==", currentUser.uid)); 
+            const snap2 = await getDocs(q2); 
+            if (!snap2.empty) return Swal.fire("Çelişki", "Kendi otağını kurmak için başvurmuşsun. Başkasına giremezsin.", "warning"); 
+            
+            // 3. Kontrol: OTAĞ DOLU MU? (Güvenlik Kontrolü)
+            const clanSnap = await getDoc(doc(db, "clans", cid));
+            if (!clanSnap.exists()) return Swal.fire("Hata", "Böyle bir otağ yok.", "error");
+            
+            const clanData = clanSnap.data();
+            const currentCount = clanData.memberCount || 1;
+            const maxLimit = await getClanLimit();
+            
+            if (currentCount >= maxLimit) {
+                return Swal.fire("Otağ Dolu", `Bu otağ maksimum kapasiteye (${maxLimit} Alp) ulaşmış. Başka bir otağ seçmelisin.`, "error");
+            }
+
+            // Her şey yolundaysa isteği gönder
+            await addDoc(collection(db,"member_requests"), { clanId: cid, clanName: cname, userId: currentUser.uid, userName: currentUser.displayName }); 
+            Swal.fire("Haber Salındı", cname + " otağına katılma isteğin iletildi.", "success"); 
+        } catch (error) { 
+            console.error(error); Swal.fire("Hata", "İstek gönderilemedi.", "error"); 
+        } 
+    }; 
+    window.joinClanRequest = window.joinClanRequest; // Global scope'a ata
 </script>
 </body>
 </html>
