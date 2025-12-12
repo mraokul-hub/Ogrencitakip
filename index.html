@@ -362,6 +362,7 @@
     let wakeLock = null;
     let previousRank = null; 
     let owlQueue = []; 
+    let activeGladiators = 0; // YENİ: Arenadaki aktif kişi sayısı
 
     onAuthStateChanged(auth, async(user)=>{
         if(user){
@@ -405,9 +406,10 @@
             const newRankObj = updatePlayerRank(userMinutes);
             if(previousRank && previousRank !== newRankObj.name) {
                 if (userMinutes > 0) {
+                    // YENİ: GÜNCELLENMİŞ TÜRKÇE RÜTBE MESAJI
                     Swal.fire({
-                        title: 'RÜTBE ATLADIN!',
-                        text: `Tebrikler Alp! Artık bir "${newRankObj.name}" oldun!`,
+                        title: 'RÜTBEN YÜKSELDİ YİĞİDİM! 🎉',
+                        html: `Gösterdiğin azim ve gayret ile <span style="color:#4f46e5; font-weight:bold;">${newRankObj.name}</span> mertebesine eriştin.<br>Otağ seninle gurur duyuyor. Fetihlerine devam et!`,
                         icon: 'success',
                         background: '#fff url(https://media.giphy.com/media/26tOZ42Mg6pbTUPvy/giphy.gif)',
                         backdrop: `rgba(0,0,123,0.4)`
@@ -481,26 +483,44 @@
     window.claimWeeklyBonus = async () => { const btn = document.getElementById('btnClaimWeekly'); btn.disabled = true; try { await updateDoc(doc(db,"users",currentUser.uid), { xp: increment(500), gold: increment(500), lastBonusDate: serverTimestamp() }); window.lastBonusDate = { toDate: () => new Date() }; checkBonusButtonVisibility(); Swal.fire("Tebrikler!", "+500 Çalışma Yıldız Puanı", "success"); confetti(); } catch(e) { btn.disabled = false; } };
     function checkBonusButtonVisibility() { if(!window.currentWeeklyTotal) return; const goal = parseInt(document.getElementById('targetMins').innerText)||1000; const btn = document.getElementById('btnClaimWeekly'); let alreadyClaimed = false; if(window.lastBonusDate) { const last = window.lastBonusDate.toDate(); const now = new Date(); const diffTime = Math.abs(now - last); const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)); if(diffDays < 7) alreadyClaimed = true; } if (window.currentWeeklyTotal >= goal && !alreadyClaimed) { btn.classList.remove('hidden'); } else { btn.classList.add('hidden'); } }
 
+    // GÜNCELLENMİŞ LISTEN STUDENT DATA (Haftalık Hedef Fix)
     function listenStudentData(uid){
         if(unsubStudentData) unsubStudentData();
-        const q = query(collection(db,"users",uid,"sessions"), orderBy("createdAt", "desc"), limit(20));
+        const q = query(collection(db,"users",uid,"sessions"), orderBy("createdAt", "desc"), limit(50));
+        
         unsubStudentData = onSnapshot(q, (snap)=>{
-            let tw=0; const list=document.getElementById('historyListContainer'); list.innerHTML="";
-            const wa = new Date(Date.now()-7*24*60*60*1000);
-            if(snap.empty) { list.innerHTML="<div style='text-align:center; padding:20px; color:#94a3b8; font-style:italic;'>Henüz kayıtlı çalışma yok.</div>"; }
-            else {
+            let tw=0; 
+            const list=document.getElementById('historyListContainer'); 
+            list.innerHTML="";
+            
+            // Son 7 günü hesapla
+            const wa = new Date();
+            wa.setDate(wa.getDate() - 7);
+
+            if(snap.empty) { 
+                list.innerHTML="<div style='text-align:center; padding:20px; color:#94a3b8; font-style:italic;'>Henüz kayıtlı çalışma yok.</div>"; 
+            } else {
                 snap.forEach(d=>{ 
-                    const dt = d.data(); const cr = dt.createdAt ? dt.createdAt.toDate() : new Date();
-                    if(cr > wa) tw += dt.duration;
-                    list.innerHTML += `<div style="display:flex; justify-content:space-between; align-items:center; padding:15px 0; border-bottom:1px solid #f1f5f9;">
+                    const dt = d.data(); 
+                    const cr = dt.createdAt ? dt.createdAt.toDate() : new Date();
+                    
+                    if(cr > wa) {
+                        tw += (parseInt(dt.duration) || 0);
+                    }
+
+                    if(list.children.length < 20) {
+                        list.innerHTML += `<div style="display:flex; justify-content:space-between; align-items:center; padding:15px 0; border-bottom:1px solid #f1f5f9;">
                         <div style="display:flex; flex-direction:column;"><span style="font-weight:800; color:#0f172a; font-size:1rem; margin-bottom:2px;">${dt.subject}</span><span style="font-size:0.85rem; color:#64748b;">${cr.toLocaleDateString('tr-TR')}</span></div>
                         <span style="font-weight:800; color:#6366f1; font-size:1.1rem;">+${dt.points || dt.duration} ✨</span></div>`;
+                    }
                 }); 
             }
+            
             window.currentWeeklyTotal = tw;
             const goal = parseInt(document.getElementById('targetMins').innerText) || 1000;
             document.getElementById('progVal').innerText = Math.min(100, Math.round((tw/goal)*100));
-            updateStudentChart(tw, goal); checkBonusButtonVisibility(); 
+            updateStudentChart(tw, goal); 
+            checkBonusButtonVisibility(); 
         });
     }
     function updateStudentChart(val, goal){ const ctx = document.getElementById('weeklyChart').getContext('2d'); if(myChart) myChart.destroy(); myChart = new Chart(ctx, { type: 'doughnut', data: { labels: ['Yapılan', 'Kalan'], datasets: [{ data: [val, Math.max(0, goal-val)], backgroundColor: ['#009688', '#e2e8f0'], borderWidth: 0 }] }, options: { cutout: '80%', maintainAspectRatio: false, plugins: { legend: { display: false } } } }); }
@@ -510,7 +530,44 @@
     if(dur < 10) return Swal.fire("Çok Kısa", "En az 10 dakika girmelisin.", "warning");
     btn.disabled = true; btn.innerText = "İşleniyor..."; try { const offset = parseInt(document.getElementById('entryDate').value) || 0; const recordDate = new Date(); recordDate.setDate(recordDate.getDate() - offset); recordDate.setHours(12,0,0,0); let multiplier = 1.0; let bonusText = ""; if (window.userClanId) { multiplier += 0.5; bonusText = " (Otağ Bonusu Aktif 🔥)"; } const points = Math.ceil(dur * multiplier); await addDoc(collection(db,"users",currentUser.uid,"sessions"), { subject: sub, duration: dur, points: points, createdAt: recordDate, dateStr: recordDate.toLocaleDateString('tr-TR'), type: 'manual' }); await updateDoc(doc(db,"users",currentUser.uid), { totalMinutes: increment(dur), xp: increment(points), gold: increment(points), lastStudyDate: serverTimestamp() }); await addClanPoints(currentUser.uid, points); await checkStreakAndAward(currentUser.uid); Swal.fire("Kaydedildi!", `+${points} Çalışma Yıldız Puanı${bonusText}`, "success"); confetti(); } catch(e) { Swal.fire("Hata", e.message, "error"); } finally { setTimeout(() => { btn.disabled = false; btn.innerText = "KAYDET (+Puan) ✅"; }, 1000); } };
     window.updateTimerSet=()=>{ if(!isPomoRunning){ const v = parseInt(document.getElementById('timerSet').value); document.getElementById('timerDisplay').innerText=`${v}:00`; } }; 
-    window.startPomoTimer = async () => { if(isPomoRunning) return; const sub = document.getElementById('pomoSubject').value; if(!sub) return Swal.fire("Ders Seç", "", "warning"); isPomoRunning = true; pomoTotalDuration = parseInt(document.getElementById('timerSet').value) * 60; pomoEndTime = Date.now() + (pomoTotalDuration * 1000); document.getElementById('btnStartPomo').innerText = "⏳"; document.getElementById('btnStartPomo').disabled = true; try { if ('wakeLock' in navigator) { wakeLock = await navigator.wakeLock.request('screen'); } } catch (err) {} pomoInterval = setInterval(() => { const rem = Math.ceil((pomoEndTime - Date.now()) / 1000); if(rem <= 0) { document.getElementById('timerDisplay').innerText = "00:00"; clearInterval(pomoInterval); finishPomo(true); } else { const m = Math.floor(rem / 60); const s = rem % 60; document.getElementById('timerDisplay').innerText = `${m}:${s.toString().padStart(2,'0')}`; } }, 1000); };
+    
+    // GÜNCELLENMİŞ POMO TIMER (Arena Kontrol + Wake Lock)
+    window.startPomoTimer = async () => { 
+        if(isArenaRunning) {
+            addToOwlQueue("Hakanım! Meydanda cenk ederken sayacı açamazsın! Önce savaşı bitir. ⚔️");
+            return;
+        }
+        
+        if(isPomoRunning) return; 
+        const sub = document.getElementById('pomoSubject').value; 
+        if(!sub) return Swal.fire("Ders Seç", "", "warning"); 
+        
+        isPomoRunning = true; 
+        pomoTotalDuration = parseInt(document.getElementById('timerSet').value) * 60; 
+        pomoEndTime = Date.now() + (pomoTotalDuration * 1000); 
+        document.getElementById('btnStartPomo').innerText = "⏳"; 
+        document.getElementById('btnStartPomo').disabled = true; 
+        
+        try { 
+            if ('wakeLock' in navigator) { 
+                wakeLock = await navigator.wakeLock.request('screen'); 
+            } 
+        } catch (err) {} 
+        
+        pomoInterval = setInterval(() => { 
+            const rem = Math.ceil((pomoEndTime - Date.now()) / 1000); 
+            if(rem <= 0) { 
+                document.getElementById('timerDisplay').innerText = "00:00"; 
+                clearInterval(pomoInterval); 
+                finishPomo(true); 
+            } else { 
+                const m = Math.floor(rem / 60); 
+                const s = rem % 60; 
+                document.getElementById('timerDisplay').innerText = `${m}:${s.toString().padStart(2,'0')}`; 
+            } 
+        }, 1000); 
+    };
+
     window.requestStopPomo = () => { if(isPomoRunning) Swal.fire({ title: 'Durdur?', showCancelButton: true }).then((r) => { if (r.isConfirmed) { clearInterval(pomoInterval); finishPomo(false); } }); };
     
     async function finishPomo(completed) { if(wakeLock) { wakeLock.release(); wakeLock = null; } const sub = document.getElementById('pomoSubject').value; const spent = completed ? pomoTotalDuration : Math.ceil((pomoTotalDuration - (pomoEndTime - Date.now())/1000)); const mins = Math.floor(spent / 60); isPomoRunning = false; document.getElementById('btnStartPomo').innerText = "BAŞLAT ▶"; document.getElementById('btnStartPomo').disabled = false; document.getElementById('timerDisplay').innerText = `${document.getElementById('timerSet').value}:00`; 
@@ -534,14 +591,93 @@
         }
     }
 
-    function listenArena() { const q = query(collection(db, "arena"), where("isActive", "==", true)); onSnapshot(q, (snap) => { const list = document.getElementById('arenaList'); list.innerHTML = ""; if(snap.empty) { list.innerHTML = "<div style='text-align:center; padding:20px; color:#999;'>Arenada kimse yok.</div>"; return; } snap.forEach(d => { const data = d.data(); const lastBeat = data.lastHeartbeat ? data.lastHeartbeat.toDate().getTime() : 0; const now = new Date().getTime(); if (now - lastBeat > 3 * 60 * 1000) return; if(d.id !== currentUser.uid) { list.innerHTML += `<div style="display:flex; justify-content:space-between; padding:10px; border-bottom:1px solid #eee;"><span>${data.avatar} ${data.name.split(' ')[0]}</span><span style="font-weight:bold; color:var(--primary);">${data.duration} dk</span></div>`; } }); }); }
+    // GÜNCELLENMİŞ LISTEN ARENA (Kişi Sayısı Takibi)
+    function listenArena() { 
+        const q = query(collection(db, "arena"), where("isActive", "==", true)); 
+        onSnapshot(q, (snap) => { 
+            const list = document.getElementById('arenaList'); 
+            list.innerHTML = ""; 
+            activeGladiators = 0; 
+
+            if(snap.empty) { 
+                list.innerHTML = "<div style='text-align:center; padding:20px; color:#999;'>Arenada kimse yok.</div>"; 
+                return; 
+            } 
+            
+            snap.forEach(d => { 
+                const data = d.data(); 
+                const lastBeat = data.lastHeartbeat ? data.lastHeartbeat.toDate().getTime() : 0; 
+                const now = new Date().getTime(); 
+                if (now - lastBeat > 3 * 60 * 1000) return; 
+                
+                if(d.id !== currentUser.uid) { 
+                    activeGladiators++; 
+                    list.innerHTML += `<div style="display:flex; justify-content:space-between; padding:10px; border-bottom:1px solid #eee;"><span>${data.avatar} ${data.name.split(' ')[0]}</span><span style="font-weight:bold; color:var(--primary);">${data.duration} dk</span></div>`; 
+                } 
+            }); 
+        }); 
+    }
     window.listenArena = listenArena;
-    window.startArenaSession = async () => { if(!currentUser) return; isArenaRunning = true; arenaTotalDuration = 30 * 60; arenaEndTime = Date.now() + (arenaTotalDuration * 1000); document.getElementById('arenaStartBtn').classList.add('hidden'); document.getElementById('arenaControls').classList.remove('hidden'); await setDoc(doc(db, "arena", currentUser.uid), { name: currentUser.displayName, subject: "Genel", startTime: serverTimestamp(), duration: 30, isActive: true, avatar: document.getElementById('userAvatar').innerText, lastHeartbeat: serverTimestamp() }); try { if ('wakeLock' in navigator) { wakeLock = await navigator.wakeLock.request('screen'); } } catch (err) {} arenaInterval = setInterval(async () => { const rem = Math.ceil((arenaEndTime - Date.now()) / 1000); if(rem % 60 === 0) { updateDoc(doc(db, "arena", currentUser.uid), { lastHeartbeat: serverTimestamp() }).catch(()=>{}); } if(rem <= 0) { document.getElementById('arenaTimerDisplay').innerText = "00:00"; clearInterval(arenaInterval); finishArena(true); } else { const m = Math.floor(rem / 60); const s = rem % 60; document.getElementById('arenaTimerDisplay').innerText = `${m}:${s.toString().padStart(2,'0')}`; } }, 1000); };
+
+    // GÜNCELLENMİŞ ARENA BASLATMA (Pomo Kontrol + Boş Arena Kontrol + Wake Lock)
+    window.startArenaSession = async () => { 
+        if(!currentUser) return; 
+        
+        if(isPomoRunning) {
+            addToOwlQueue("Bilge! Odaklanma sürerken savaşa giremezsin! Önce süreni tamamla. 🍅");
+            return;
+        }
+
+        if(activeGladiators < 1) {
+            addToOwlQueue("Meydan boş Hakanım! Rakip olmadan cenk olmaz. Birinin gelmesini bekle. 🛡️");
+            return;
+        }
+
+        isArenaRunning = true; 
+        arenaTotalDuration = 30 * 60; 
+        arenaEndTime = Date.now() + (arenaTotalDuration * 1000); 
+        document.getElementById('arenaStartBtn').classList.add('hidden'); 
+        document.getElementById('arenaControls').classList.remove('hidden'); 
+        
+        await setDoc(doc(db, "arena", currentUser.uid), { name: currentUser.displayName, subject: "Genel", startTime: serverTimestamp(), duration: 30, isActive: true, avatar: document.getElementById('userAvatar').innerText, lastHeartbeat: serverTimestamp() }); 
+        
+        try { if ('wakeLock' in navigator) { wakeLock = await navigator.wakeLock.request('screen'); } } catch (err) {} 
+        
+        arenaInterval = setInterval(async () => { 
+            const rem = Math.ceil((arenaEndTime - Date.now()) / 1000); 
+            if(rem % 60 === 0) { updateDoc(doc(db, "arena", currentUser.uid), { lastHeartbeat: serverTimestamp() }).catch(()=>{}); } 
+            if(rem <= 0) { 
+                document.getElementById('arenaTimerDisplay').innerText = "00:00"; 
+                clearInterval(arenaInterval); 
+                finishArena(true); 
+            } else { 
+                const m = Math.floor(rem / 60); 
+                const s = rem % 60; 
+                document.getElementById('arenaTimerDisplay').innerText = `${m}:${s.toString().padStart(2,'0')}`; 
+            } 
+        }, 1000); 
+    };
+    
     window.boostArenaTime = () => { if(isArenaRunning) { arenaEndTime += 600000; arenaTotalDuration += 600; Swal.fire("+10 Dk", "", "success"); updateDoc(doc(db,"arena",currentUser.uid),{duration:increment(10)}); } };
     window.requestStopArena = () => { if(isArenaRunning) Swal.fire({ title: 'Çıkış?', showCancelButton: true }).then((r) => { if (r.isConfirmed) { clearInterval(arenaInterval); finishArena(false); } }); };
     async function finishArena(completed) { if(wakeLock) { wakeLock.release(); wakeLock = null; } const spent = Math.floor((completed ? arenaTotalDuration : (arenaTotalDuration - (arenaEndTime-Date.now())/1000)) / 60); isArenaRunning = false; clearInterval(arenaInterval); document.getElementById('arenaStartBtn').classList.remove('hidden'); document.getElementById('arenaControls').classList.add('hidden'); document.getElementById('arenaTimerDisplay').innerText = "00:00"; try{ await updateDoc(doc(db, "arena", currentUser.uid), { isActive: false }); }catch(e){} if(spent < 5) return Swal.fire("Çok Kısa", "En az 5 dakika durmalısın.", "info"); let multiplier = 2.0; if (window.userClanId) multiplier += 0.5; const pts = Math.ceil(spent * multiplier); await addDoc(collection(db,"users",currentUser.uid,"sessions"), { subject: "Arena", duration: spent, points: pts, createdAt: serverTimestamp(), type: 'arena', completed: completed }); await updateDoc(doc(db,"users",currentUser.uid), { totalMinutes: increment(spent), xp: increment(pts), gold: increment(pts) }); Swal.fire("Bitti!", `${spent} dk, +${pts} Çalışma Yıldız Puanı`, "success"); await addClanPoints(currentUser.uid, pts); await checkStreakAndAward(currentUser.uid); }
     
-    document.addEventListener("visibilitychange", async () => { if (document.visibilityState === 'visible') { if (isPomoRunning && pomoEndTime > 0 && Date.now() >= pomoEndTime) { clearInterval(pomoInterval); await finishPomo(true); } if (isArenaRunning && arenaEndTime > 0 && Date.now() >= arenaEndTime) { clearInterval(arenaInterval); await finishArena(true); } try { if ('wakeLock' in navigator && (isPomoRunning || isArenaRunning)) { wakeLock = await navigator.wakeLock.request('screen'); } } catch(e){} } });
+    // GÜNCELLENMİŞ VISIBILITY CHANGE (Wake Lock Tazeleme)
+    document.addEventListener("visibilitychange", async () => { 
+        if (document.visibilityState === 'visible') { 
+            if (isPomoRunning && pomoEndTime > 0 && Date.now() >= pomoEndTime) { clearInterval(pomoInterval); await finishPomo(true); } 
+            if (isArenaRunning && arenaEndTime > 0 && Date.now() >= arenaEndTime) { clearInterval(arenaInterval); await finishArena(true); } 
+            
+            try { 
+                if ('wakeLock' in navigator && (isPomoRunning || isArenaRunning)) { 
+                     if (wakeLock === null || wakeLock.released) {
+                        wakeLock = await navigator.wakeLock.request('screen');
+                    }
+                } 
+            } catch(e){} 
+        } 
+    });
+
     async function checkClanStatus(uid) { const u = (await getDoc(doc(db, "users", uid))).data(); window.userClanId = u.clanId || null; if (u.clanId) { const c = (await getDoc(doc(db, "clans", u.clanId))).data(); document.getElementById('noClanSection').classList.add('hidden'); document.getElementById('myClanSection').classList.remove('hidden'); document.getElementById('myClanName').innerText = c.name; document.getElementById('myClanIcon').innerText = c.icon; document.getElementById('myClanScore').innerText = c.totalScore || 0; loadMyClanMembers(u.clanId); } else { document.getElementById('noClanSection').classList.remove('hidden'); document.getElementById('myClanSection').classList.add('hidden'); loadJoinableClans(); } loadClanLeaderboard(); }
     async function loadMyClanMembers(cid) { const q = query(collection(db, "users"), where("clanId", "==", cid)); const snap = await getDocs(q); document.getElementById('myClanMembers').innerText = snap.size; let html = ""; snap.forEach(d => { html += `<div style="padding:5px 0; border-bottom:1px solid #f1f5f9; font-size:0.9rem;">👤 ${d.data().displayName} <span style="float:right; font-weight:bold; color:#cbd5e1;">${d.data().totalMinutes || 0}dk</span></div>`; }); document.getElementById('myClanMemberList').innerHTML = html || "<small>Kimse yok.</small>"; }
     async function loadClanLeaderboard() { const list = document.getElementById('clanLeaderboard'); list.innerHTML=""; const q = query(collection(db, "clans"), orderBy("totalScore", "desc"), limit(5)); const snap = await getDocs(q); if(currentUser) { const uSnap = await getDoc(doc(db, "users", currentUser.uid)); const myClanId = uSnap.data()?.clanId; if(myClanId) { const allClansQ = query(collection(db, "clans"), orderBy("totalScore", "desc")); const allClansSnap = await getDocs(allClansQ); let myRank = 0; allClansSnap.docs.forEach((d, i) => { if(d.id === myClanId) myRank = i + 1; }); const rankDisplay = document.getElementById('myClanRankDisplay'); if(rankDisplay) rankDisplay.innerText = `#${myRank}`; } } snap.docs.forEach((d,i)=>{ const data = d.data(); list.innerHTML += `<div style="margin-bottom:5px; font-weight:600;">#${i+1} ${data.icon} ${data.name} (${data.totalScore || 0})</div>`; }); }
@@ -559,12 +695,9 @@
     document.addEventListener('contextmenu', event => event.preventDefault()); document.onkeydown = function(e) { if(e.keyCode == 123) return false; if(e.ctrlKey && e.shiftKey && e.keyCode == 'I'.charCodeAt(0)) return false; if(e.ctrlKey && e.shiftKey && e.keyCode == 'C'.charCodeAt(0)) return false; if(e.ctrlKey && e.shiftKey && e.keyCode == 'J'.charCodeAt(0)) return false; if(e.ctrlKey && e.keyCode == 'U'.charCodeAt(0)) return false; }
     window.createClanRequest=window.createClanRequest; window.leaveClan=window.leaveClan; window.deleteDoc=deleteDoc; window.doc=doc; window.db=db; window.readMsg=window.readMsg; window.openMsgModal=window.openMsgModal;
 
-    // --- YENİ EKLENEN FONKSİYONLAR: 1/5 KURALI ---
     async function getClanLimit() {
-        // Tüm öğrencileri say
         const snap = await getDocs(collection(db, "users"));
         const total = snap.size;
-        // 1/5 kuralı (Yukarı yuvarla), minimum 2 kişi
         return Math.max(2, Math.ceil(total / 5));
     }
 
@@ -576,7 +709,7 @@
 
         querySnapshot.forEach(d => { 
             const data = d.data();
-            const count = data.memberCount || 1; // Üye sayısı (yoksa 1 varsay)
+            const count = data.memberCount || 1;
             const isFull = count >= limitCount;
             
             let btnHtml = '';
@@ -592,7 +725,6 @@
     
     window.joinClanRequest = async (cid, cname) => { 
         try { 
-            // 1. Kontrol: Bekleyen istek var mı?
             const q1 = query(collection(db, "member_requests"), where("userId", "==", currentUser.uid)); 
             const snap1 = await getDocs(q1); 
             if (!snap1.empty) { 
@@ -601,12 +733,10 @@
                 else return Swal.fire("Sadakat Önemlidir", "Şu an '" + pending.clanName + "' için bekliyorsun. Aynı anda iki kapı çalınmaz.", "warning"); 
             } 
             
-            // 2. Kontrol: Kendi otağı var mı?
             const q2 = query(collection(db, "clan_requests"), where("leader", "==", currentUser.uid)); 
             const snap2 = await getDocs(q2); 
             if (!snap2.empty) return Swal.fire("Çelişki", "Kendi otağını kurmak için başvurmuşsun. Başkasına giremezsin.", "warning"); 
             
-            // 3. Kontrol: OTAĞ DOLU MU? (Güvenlik Kontrolü)
             const clanSnap = await getDoc(doc(db, "clans", cid));
             if (!clanSnap.exists()) return Swal.fire("Hata", "Böyle bir otağ yok.", "error");
             
@@ -618,14 +748,13 @@
                 return Swal.fire("Otağ Dolu", `Bu otağ maksimum kapasiteye (${maxLimit} Alp) ulaşmış. Başka bir otağ seçmelisin.`, "error");
             }
 
-            // Her şey yolundaysa isteği gönder
             await addDoc(collection(db,"member_requests"), { clanId: cid, clanName: cname, userId: currentUser.uid, userName: currentUser.displayName }); 
             Swal.fire("Haber Salındı", cname + " otağına katılma isteğin iletildi.", "success"); 
         } catch (error) { 
             console.error(error); Swal.fire("Hata", "İstek gönderilemedi.", "error"); 
         } 
     }; 
-    window.joinClanRequest = window.joinClanRequest; // Global scope'a ata
+    window.joinClanRequest = window.joinClanRequest;
 </script>
 </body>
 </html>
