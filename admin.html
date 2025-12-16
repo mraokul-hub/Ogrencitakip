@@ -76,6 +76,21 @@
             <div class="tab-admin" onclick="switchAdminTab('capsules', this)">⏳ Kapsüller</div>
         </div>
         <div id="adminPanelDashboard">
+            
+            <div class="card" style="background:#f0fdf4; border:2px solid #10b981;">
+                <h4 style="color:#166534; margin:0 0 10px 0;">🎁 TÜM ÖĞRENCİLERE HEDİYE PUAN DAĞIT</h4>
+                <div style="display:flex; gap:10px; align-items:center;">
+                    <div style="flex:1;">
+                        <input type="number" id="bulkGiftPoints" placeholder="Puan (örn: 100)" class="input-modern" style="margin:0;">
+                    </div>
+                    <div style="flex:3;">
+                        <input type="text" id="bulkGiftReason" placeholder="Açıklama (örn: Bayram Hediyesi, Telafi Bonusu)" class="input-modern" style="margin:0;">
+                    </div>
+                    <button onclick="sendBulkGift()" class="btn-action" style="width:auto; margin:0; padding:12px 20px;">GÖNDER 🚀</button>
+                </div>
+                <small style="color:#166534; display:block; margin-top:5px;">* Bu işlem tüm öğrencilere puan ekler, işlem geçmişine yazar ve Baykuş ile duyurur.</small>
+            </div>
+
             <div class="card" style="background:#ecfdf5; border:2px solid #10b981; display:flex; align-items:center; gap:20px;">
                 <div style="font-size:3rem;">🦉</div>
                 <div>
@@ -190,6 +205,12 @@
             <button class="btn-action" onclick="saveAdminStudentDetail()" style="margin-bottom:25px; padding:12px;">GÜNCELLE ✅</button>
             <input type="hidden" id="detailUid">
             <h4 style="border-bottom:1px solid #eee; padding-bottom:10px; margin-bottom:10px;">📋 Hareket Geçmişi</h4>
+            <div id="sessionBulkActions" style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px; padding:5px; background:#e2e8f0; border-radius:8px;">
+                <label style="font-size:0.8rem; font-weight:bold; cursor:pointer; display:flex; align-items:center;">
+                    <input type="checkbox" onchange="toggleAllSessions(this)" style="transform:scale(1.2); margin-right:5px; accent-color: var(--primary);"> Tümünü Seç
+                </label>
+                <button onclick="deleteSelectedSessions()" style="background:#ef4444; color:white; border:none; padding:5px 10px; border-radius:5px; font-weight:bold; cursor:pointer; font-size:0.8rem;">Seçilenleri Sil 🗑️</button>
+            </div>
             <div id="detailSessionList" style="max-height:300px; overflow-y:auto; background:#f8fafc; padding:10px; border-radius:15px; border:1px solid #e2e8f0;">Yükleniyor...</div>
             <button onclick="document.getElementById('modalAdminStudentDetail').classList.add('hidden')" style="margin-top:15px; width:100%; padding:12px; background:#e2e8f0; border:none; border-radius:12px; font-weight:bold; color:#475569; cursor:pointer;">Kapat</button>
         </div>
@@ -214,7 +235,10 @@
     const app = initializeApp(firebaseConfig); const db = getFirestore(app); const auth = getAuth(app);
     const ADMIN_EMAIL = "mremzi@gmail.com";
     let currentUser=null, globalUserList=[], unsubAdminUsers = null, unsubAdminMessages=null, templateUnsub=null, unsubAdminCapsules=null, unsubAdminOwl=null; let currentBatchType = "";
+    
+    // --- TÜRKİYE SAATİ AYARI ---
     function formatDateTR(timestamp) { if (!timestamp) return 'Tarih Yok'; const date = timestamp.toDate ? timestamp.toDate() : new Date(timestamp); return date.toLocaleString('tr-TR', { timeZone: 'Europe/Istanbul', day: 'numeric', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit' }); }
+    
     const PREDEFINED_MSGS = [ {type:'Motive', text:'Canım öğrencim, biliyorum yoruldun ama içindeki o ışığı görüyorum. Pes etme! 🌟'}, {type:'Motive', text:'Sana inanıyorum! Bugün attığın küçük bir adım, yarın büyük bir zafer olacak. 💪'}, {type:'Tebrik', text:'Vay canına! Bu ne müthiş bir performans! Seninle gurur duyuyorum. 🏆'}, {type:'Tebrik', text:'Efsane geri döndü! Harika bir çalışma çıkardın, tebrikler şampiyon! 👏'}, {type:'Uyari', text:'Seni biraz durgun gördüm. Gel beraber toparlayalım, sana güvenim tam. ⚓'}, {type:'Uyari', text:'Dikkat kaptan! Gemi yavaşlıyor. Hadi yeniden rüzgarı arkamıza alalım. ⚠️'}, {type:'Veli', text:'Kıymetli Velimiz, evladımızın çabası takdire şayan. Desteğiniz için teşekkürler.'}, {type:'Veli', text:'Kıymetli Velimiz, öğrenciniz bu hafta harikalar yarattı. Tebrik ederiz.'} ];
     onAuthStateChanged(auth, async(user)=>{ if(user){ if(user.email !== ADMIN_EMAIL){ await signOut(auth); Swal.fire({ title: "Yetkisiz Giriş", text: "Burası Yönetici Kulesidir!", icon: "error", confirmButtonText: "Tamam" }); return; } currentUser=user; document.getElementById('authScreen').classList.add('hidden'); document.getElementById('adminScreen').classList.remove('hidden'); try { initAdmin(); } catch (err) { console.error(err); } } else { currentUser=null; document.getElementById('adminScreen').classList.add('hidden'); document.getElementById('authScreen').classList.remove('hidden'); document.getElementById('authLog').innerText = ""; } });
     window.handleLogin = async () => { const btn = document.querySelector('#authScreen .btn-action'); const errDiv = document.getElementById('authError'); btn.innerText = "Kontrol Ediliyor..."; btn.disabled = true; document.getElementById('authLog').style.display='block'; document.getElementById('authLog').innerText="Bağlanıyor..."; const e = document.getElementById('email').value.trim(); const p = document.getElementById('password').value; try { await signInWithEmailAndPassword(auth,e,p); } catch(err){ errDiv.style.display='block'; errDiv.innerText = "Hata: " + err.message; btn.innerText = "GİRİŞ YAP"; btn.disabled = false; } };
@@ -225,7 +249,86 @@
     function renderAdminChart(users) { const topUsers = users.slice(0, 15); Highcharts.chart('adminLeaderboardChart', { chart: { type: 'column', options3d: { enabled: true, alpha: 10, beta: 25, depth: 70 }, backgroundColor: null }, title: { text: null }, subtitle: { text: null }, xAxis: { categories: topUsers.map(u => u.displayName), labels: { skew3d: true, style: { fontSize: '12px', fontWeight: 'bold' } } }, yAxis: { title: { text: 'Dakika (dk)', skew3d: true }, min: 0 }, plotOptions: { column: { depth: 25, colorByPoint: true, borderRadius: 5 } }, credits: { enabled: false }, series: [{ name: 'Çalışma Süresi', data: topUsers.map(u => u.totalMinutes), showInLegend: false }] }); }
     function listenTemplates() { if(templateUnsub) templateUnsub(); templateUnsub = onSnapshot(query(collection(db, "msg_templates"), orderBy("createdAt", "desc")), (snap) => { const area = document.getElementById('templateButtonsArea'); area.innerHTML = ""; if(snap.empty) { seedDefaultTemplates(); return; } snap.forEach(d => { const t = d.data(); let color = "#e2e8f0"; if(t.type === 'Motive') color = "#10b981"; else if(t.type === 'Tebrik') color = "#f59e0b"; else if(t.type === 'Uyari') color = "#f97316"; else if(t.type === 'Veli') color = "#3b82f6"; const btn = document.createElement('button'); btn.className = 'btn-lib'; btn.style.borderLeft = `4px solid ${color}`; btn.innerHTML = `${t.text.substring(0, 30)}...`; btn.onclick = () => setMsgFromTemplate(t.text, t.type); btn.oncontextmenu = (e) => { e.preventDefault(); deleteTemplate(d.id); }; area.appendChild(btn); }); }); }
     function listenAdminCapsules() { if(unsubAdminCapsules) unsubAdminCapsules(); const q = query(collectionGroup(db, 'timecapsule')); unsubAdminCapsules = onSnapshot(q, (snap) => { const list = document.getElementById('adminCapsuleList'); list.innerHTML = ""; if(snap.empty) { list.innerHTML = "<div style='text-align:center; color:#999; padding:20px;'>Henüz hiç kapsül yok.</div>"; return; } const capsules = []; snap.forEach(d => capsules.push({path: d.ref.path, ...d.data()})); capsules.sort((a,b) => (b.createdAt?.seconds || 0) - (a.createdAt?.seconds || 0)); capsules.forEach(data => { const isLocked = new Date() < new Date(data.unlockDate); const statusIcon = isLocked ? "🔒 KİLİTLİ" : "🔓 AÇIK"; const statusClass = isLocked ? "color:#b91c1c; background:#fee2e2;" : "color:#15803d; background:#dcfce7;"; let stName = data.userName; if(!stName || stName === "Öğrenci") { const u = globalUserList.find(x => x.id === data.userId); if(u) stName = u.displayName; else stName = "Bilinmeyen (" + data.userId.substring(0,4) + ")"; } list.innerHTML += `<div style="background:white; border:1px solid #e2e8f0; border-radius:16px; padding:15px; margin-bottom:15px; display:flex; gap:10px;"><div style="display:flex; align-items:center;"><input type="checkbox" class="chk-capsule" value="${data.path}" data-uid="${data.userId}" style="transform:scale(1.3); cursor:pointer;"></div><div style="flex:1;"><div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;"><div style="font-weight:800; color:var(--primary); font-size:1rem;">👤 ${stName}<span style="font-size:0.75rem; color:#64748b; font-weight:normal; margin-left:5px;">📅 Açılış: ${data.unlockDate}</span></div><span style="padding:2px 8px; border-radius:8px; font-size:0.7rem; font-weight:bold; ${statusClass}">${statusIcon}</span></div><div style="background:#f8fafc; padding:10px; border-radius:8px; margin-bottom:10px; font-style:italic; color:#334155; font-size:0.9rem;">"${data.content}"</div><div style="display:flex; gap:5px; justify-content:flex-end;"><button onclick="adminChangeCapsuleDate('${data.path}', '${data.unlockDate}')" class="btn-smart" style="background:#e0e7ff; color:#4338ca;">📅 Tarih</button><button onclick="adminSetCapsuleLock('${data.path}', false)" class="btn-smart" style="background:#dbeafe; color:#1e40af;">🔓 Aç</button><button onclick="adminSetCapsuleLock('${data.path}', true)" class="btn-smart" style="background:#fff7ed; color:#c2410c;">🔒 Kilitle</button><button onclick="adminDeleteCapsule('${data.path}', '${data.userId}')" class="btn-smart" style="background:#fee2e2; color:#991b1b;">🗑️ Sil</button></div></div></div>`; }); }); }
-    window.openAdminStudentDetail = async (uid) => { const user = globalUserList.find(x => x.id === uid); if(!user) return; document.getElementById('detailUid').value = uid; document.getElementById('detailNameTitle').innerText = user.displayName; document.getElementById('detailPoints').value = user.xp || 0; document.getElementById('detailMinutes').value = user.totalMinutes || 0; document.getElementById('detailGoal').value = user.weeklyGoal || 1000; const list = document.getElementById('detailSessionList'); list.innerHTML = "<div style='text-align:center; color:#999;'>Geçmiş Yükleniyor...</div>"; const q = query(collection(db, "users", uid, "sessions"), orderBy("createdAt", "desc"), limit(50)); const snap = await getDocs(q); list.innerHTML = ""; if(snap.empty) { list.innerHTML = "<div style='text-align:center;'>Kayıt yok.</div>"; } snap.forEach(d => { const s = d.data(); const subName = s.subject || ""; let typeLabel = "Ders"; let typeColor = "#e0e7ff"; let typeTextCol = "#4338ca"; let rowBg = "white"; let rowBorder = "1px solid #eee"; let displayPoints = s.points || 0; if(s.type === 'bonus' || /Hafta|Hedef|Seri|Kapsül/i.test(subName)) { typeLabel = "🎁 ÖDÜL"; typeColor = "#fef3c7"; typeTextCol = "#b45309"; rowBg = "#fffbeb"; rowBorder = "1px solid #fcd34d"; if(/Hafta|Hedef/i.test(subName)) displayPoints = 500; else if(/Seri/i.test(subName) && displayPoints < 400) displayPoints = 400; else if(/Kapsül/i.test(subName)) displayPoints = 200; } else if(s.type === 'pomodoro') { typeLabel = "Sayaç"; typeColor = "#dcfce7"; typeTextCol = "#166534"; rowBg = "#f0fdf4"; rowBorder = "1px solid #86efac"; } else if(s.type === 'arena') { typeLabel = "Arena"; typeColor = "#fee2e2"; typeTextCol = "#991b1b"; rowBg = "#fef2f2"; rowBorder = "1px solid #fca5a5"; } else if(s.type === 'penalty') { typeLabel = "Ceza"; typeColor = "#f3f4f6"; typeTextCol = "#1f2937"; } const formattedDate = formatDateTR(s.createdAt); list.innerHTML += `<div style="display:flex; justify-content:space-between; align-items:center; background:${rowBg}; padding:10px; margin-bottom:8px; border-radius:10px; border:${rowBorder};"><div><div style="font-weight:bold; color:var(--text-main); font-size:0.9rem;"><span style="background:${typeColor}; color:${typeTextCol}; padding:2px 6px; border-radius:4px; font-size:0.7rem; margin-right:5px;">${typeLabel}</span>${subName || 'Genel'} (${s.duration || 0} dk)</div><div style="font-size:0.75rem; color:#94a3b8;">${formattedDate} • Puan: <strong>${displayPoints}</strong></div></div><div style="display:flex; gap:5px;"><button onclick="adminEditSession('${uid}', '${d.id}', '${s.duration||0}', '${s.points||0}')" style="background:#e0e7ff; color:#4338ca; border:none; padding:5px 10px; border-radius:6px; cursor:pointer; font-size:0.75rem; font-weight:bold;">✏️</button><button onclick="adminDeleteSession('${uid}', '${d.id}', '${s.duration||0}', '${s.points||0}')" style="background:#fee2e2; color:#b91c1c; border:none; padding:5px 10px; border-radius:6px; cursor:pointer; font-size:0.75rem; font-weight:bold;">🗑️</button></div></div>`; }); document.getElementById('modalAdminStudentDetail').classList.remove('hidden'); };
+    
+    // --- YENİ EKLENEN: TÜM ÖĞRENCİLERE TOPLU HEDİYE VE BAYKUŞ DUYURUSU ---
+    window.sendBulkGift = async () => {
+        const points = parseInt(document.getElementById('bulkGiftPoints').value);
+        const reason = document.getElementById('bulkGiftReason').value.trim();
+
+        if(!points || !reason) return Swal.fire("Eksik", "Lütfen puan ve açıklama giriniz.", "warning");
+        if(globalUserList.length === 0) return Swal.fire("Öğrenci Yok", "Kayıtlı öğrenci bulunamadı.", "info");
+
+        if(!confirm(`${globalUserList.length} öğrenciye ${points} Puan hediye edilecek.\nSebep: ${reason}\n\nBu işlem geri alınamaz. Onaylıyor musunuz?`)) return;
+
+        const btn = document.querySelector('#adminPanelDashboard .btn-action');
+        btn.innerText = "Dağıtılıyor...";
+        btn.disabled = true;
+
+        try {
+            const batch = writeBatch(db);
+            const today = new Date();
+            const dateStr = today.toLocaleDateString('tr-TR');
+
+            globalUserList.forEach(user => {
+                const userRef = doc(db, "users", user.id);
+                // 1. Puan Ekle
+                batch.update(userRef, { xp: increment(points), gold: increment(points) });
+                
+                // 2. Hareket Geçmişine Ekle (Yeni ID üreterek)
+                const newSessionRef = doc(collection(db, "users", user.id, "sessions"));
+                batch.set(newSessionRef, {
+                    subject: `🎁 ${reason}`,
+                    duration: 0,
+                    points: points,
+                    type: 'bonus',
+                    createdAt: serverTimestamp(),
+                    dateStr: dateStr
+                });
+
+                // 3. Akıllı Baykuş Mesajı Gönder
+                const newMsgRef = doc(collection(db, "messages"));
+                batch.set(newMsgRef, {
+                    toUid: user.id,
+                    content: `Hakan'dan sana bir hediye var! 🎁 "${reason}" sebebiyle ${points} puan kazandın. Harikasın! 🦉`,
+                    read: false,
+                    type: 'auto',
+                    createdAt: serverTimestamp()
+                });
+            });
+
+            await batch.commit();
+            Swal.fire("Tamamlandı", `Tüm öğrencilere ${points} puan ve baykuş mesajı gönderildi.`, "success");
+            
+            // Temizle
+            document.getElementById('bulkGiftPoints').value = "";
+            document.getElementById('bulkGiftReason').value = "";
+
+        } catch(e) {
+            console.error(e);
+            Swal.fire("Hata", "Dağıtım sırasında bir sorun oluştu: " + e.message, "error");
+        } finally {
+            btn.innerText = "GÖNDER 🚀";
+            btn.disabled = false;
+        }
+    };
+
+    window.openAdminStudentDetail = async (uid) => { const user = globalUserList.find(x => x.id === uid); if(!user) return; document.getElementById('detailUid').value = uid; document.getElementById('detailNameTitle').innerText = user.displayName; document.getElementById('detailPoints').value = user.xp || 0; document.getElementById('detailMinutes').value = user.totalMinutes || 0; document.getElementById('detailGoal').value = user.weeklyGoal || 1000; const list = document.getElementById('detailSessionList'); list.innerHTML = "<div style='text-align:center; color:#999;'>Geçmiş Yükleniyor...</div>"; const q = query(collection(db, "users", uid, "sessions"), orderBy("createdAt", "desc"), limit(50)); const snap = await getDocs(q); list.innerHTML = ""; if(snap.empty) { list.innerHTML = "<div style='text-align:center;'>Kayıt yok.</div>"; } snap.forEach(d => { const s = d.data(); const subName = s.subject || ""; let typeLabel = "Ders"; let typeColor = "#e0e7ff"; let typeTextCol = "#4338ca"; let rowBg = "white"; let rowBorder = "1px solid #eee"; let displayPoints = s.points || 0; if(s.type === 'bonus' || /Hafta|Hedef|Seri|Kapsül/i.test(subName)) { typeLabel = "🎁 ÖDÜL"; typeColor = "#fef3c7"; typeTextCol = "#b45309"; rowBg = "#fffbeb"; rowBorder = "1px solid #fcd34d"; if(/Hafta|Hedef/i.test(subName)) displayPoints = 500; else if(/Seri/i.test(subName) && displayPoints < 400) displayPoints = 400; else if(/Kapsül/i.test(subName)) displayPoints = 200; } else if(s.type === 'pomodoro') { typeLabel = "Sayaç"; typeColor = "#dcfce7"; typeTextCol = "#166534"; rowBg = "#f0fdf4"; rowBorder = "1px solid #86efac"; } else if(s.type === 'arena') { typeLabel = "Arena"; typeColor = "#fee2e2"; typeTextCol = "#991b1b"; rowBg = "#fef2f2"; rowBorder = "1px solid #fca5a5"; } else if(s.type === 'penalty') { typeLabel = "Ceza"; typeColor = "#f3f4f6"; typeTextCol = "#1f2937"; } const formattedDate = formatDateTR(s.createdAt); list.innerHTML += `
+            <div style="display:flex; align-items:center; background:${rowBg}; padding:10px; margin-bottom:8px; border-radius:10px; border:${rowBorder};">
+                <input type="checkbox" class="chk-session" value="${d.id}" data-dur="${s.duration||0}" data-pts="${s.points||0}" style="transform:scale(1.5); margin-right:15px; cursor:pointer;">
+                <div style="flex:1;">
+                    <div style="font-weight:bold; color:var(--text-main); font-size:0.9rem;"><span style="background:${typeColor}; color:${typeTextCol}; padding:2px 6px; border-radius:4px; font-size:0.7rem; margin-right:5px;">${typeLabel}</span>${subName || 'Genel'} (${s.duration || 0} dk)</div>
+                    <div style="font-size:0.75rem; color:#94a3b8;">${formattedDate} • Puan: <strong>${displayPoints}</strong></div>
+                </div>
+                <div style="display:flex; gap:5px;">
+                    <button onclick="adminEditSession('${uid}', '${d.id}', '${s.duration||0}', '${s.points||0}')" style="background:#e0e7ff; color:#4338ca; border:none; padding:5px 10px; border-radius:6px; cursor:pointer; font-size:0.75rem; font-weight:bold;">✏️</button>
+                    <button onclick="adminDeleteSession('${uid}', '${d.id}', '${s.duration||0}', '${s.points||0}')" style="background:#fee2e2; color:#b91c1c; border:none; padding:5px 10px; border-radius:6px; cursor:pointer; font-size:0.75rem; font-weight:bold;">🗑️</button>
+                </div>
+            </div>`; }); document.getElementById('modalAdminStudentDetail').classList.remove('hidden'); };
+    
+    // --- YENİ EKLENEN TOPLU SEÇİM VE SİLME FONKSİYONLARI ---
+    window.toggleAllSessions = (source) => { document.querySelectorAll('.chk-session').forEach(c => c.checked = source.checked); };
+    window.deleteSelectedSessions = async () => { const checkboxes = document.querySelectorAll('.chk-session:checked'); if (checkboxes.length === 0) return Swal.fire("Seçim Yok", "Lütfen silinecek kayıtları seçin.", "warning"); if(!confirm(`Seçilen ${checkboxes.length} kaydı silmek ve puan/sürelerini öğrenciden düşmek istiyor musun?`)) return; const uid = document.getElementById('detailUid').value; const batch = writeBatch(db); let totalDur = 0; let totalPts = 0; checkboxes.forEach(chk => { const sid = chk.value; const dur = parseInt(chk.dataset.dur) || 0; const pts = parseInt(chk.dataset.pts) || 0; totalDur += dur; totalPts += pts; batch.delete(doc(db, "users", uid, "sessions", sid)); }); batch.update(doc(db, "users", uid), { totalMinutes: increment(-totalDur), xp: increment(-totalPts), gold: increment(-totalPts) }); try { await batch.commit(); Swal.fire("Temizlendi", "Seçilen kayıtlar başarıyla silindi.", "success"); openAdminStudentDetail(uid); } catch(e) { console.error(e); Swal.fire("Hata", "Toplu silme işlemi başarısız.", "error"); } };
+
     window.toggleAllCapsules = (source) => { document.querySelectorAll('.chk-capsule').forEach(c => c.checked = source.checked); };
     window.adminDeleteSelectedCapsules = async () => { const selected = document.querySelectorAll('.chk-capsule:checked'); if(selected.length === 0) return Swal.fire("Seçim Yok", "", "warning"); if(!confirm(`${selected.length} kapsülü silmek ve 200'er puan ceza kesmek üzeresin?`)) return; const batch = writeBatch(db); selected.forEach(chk => { const path = chk.value; const uid = chk.dataset.uid; const segments = path.split('/'); batch.delete(doc(db, segments[0], segments[1], segments[2], segments[3])); batch.update(doc(db, "users", uid), { xp: increment(-200), gold: increment(-200) }); }); await batch.commit(); Swal.fire("İşlem Tamam", "", "success"); };
     window.adminBulkUpdateCapsuleDate = async () => { const selected = document.querySelectorAll('.chk-capsule:checked'); const { value: newDate } = await Swal.fire({ title: 'Yeni Tarih', input: 'date', showCancelButton: true }); if (newDate) { const batch = writeBatch(db); const targets = selected.length > 0 ? selected : document.querySelectorAll('.chk-capsule'); targets.forEach(chk => { const s = chk.value.split('/'); batch.update(doc(db, s[0], s[1], s[2], s[3]), { unlockDate: newDate }); }); await batch.commit(); Swal.fire("Tarihler Güncellendi", "", "success"); } };
@@ -251,21 +354,32 @@
     async function seedDefaultTemplates() { const b = writeBatch(db); PREDEFINED_MSGS.forEach(x=>{ b.set(doc(collection(db,"msg_templates")),{...x,createdAt:serverTimestamp()}); }); await b.commit(); }
     function renderRisingStars(u) { const c=document.getElementById('risingStarsContainer'); c.innerHTML=""; u.filter(x=>x.lastStudyDate).sort((a,b)=>b.totalMinutes-a.totalMinutes).slice(0,5).forEach(x=>c.innerHTML+=`<div class="star-card" onclick="openAdminStudentDetail('${x.id}')">🚀 ${x.displayName}</div>`); }
     function listenAdminClanRequests() { 
-        onSnapshot(collection(db,"clan_requests"), s=>{ document.getElementById('adminClanRequestList').innerHTML = s.docs.map(d=>`<div>${d.data().name} <button onclick="approveClan('${d.id}','${d.data().leader}','${d.data().name}','${d.data().icon}')">✓</button><button onclick="rejectRequest('clan_requests','${d.id}')">✕</button></div>`).join(''); }); 
+        onSnapshot(collection(db,"clan_requests"), s=>{ 
+            document.getElementById('adminClanRequestList').innerHTML = s.docs.map(d=> {
+                const req = d.data();
+                return `<div style="display:flex; justify-content:space-between; align-items:center; padding:10px; border-bottom:1px solid #eee;">
+                    <span>
+                        <strong>${req.icon} ${req.name}</strong>
+                        <br>
+                        <small style="color:#666;">Talep Eden: <span style="color:#009688; font-weight:bold;">${req.leaderName || 'Bilinmiyor'}</span></small>
+                    </span>
+                    <div>
+                        <button onclick="approveClan('${d.id}','${req.leader}','${req.name}','${req.icon}')" style="background:#dcfce7; color:#166534; border:none; padding:5px 10px; border-radius:5px; margin-right:5px; cursor:pointer;">✓ ONAYLA</button>
+                        <button onclick="rejectRequest('clan_requests','${d.id}')" style="background:#fee2e2; color:#991b1b; border:none; padding:5px 10px; border-radius:5px; cursor:pointer;">✕ REDDET</button>
+                    </div>
+                </div>`;
+            }).join(''); 
+        }); 
         onSnapshot(collection(db,"member_requests"), s=>{ document.getElementById('adminMemberRequestList').innerHTML = s.docs.map(d=>`<div>${d.data().userName}->${d.data().clanName} <button onclick="approveMember('${d.id}','${d.data().userId}','${d.data().clanId}')">✓</button><button onclick="rejectRequest('member_requests','${d.id}')">✕</button></div>`).join(''); }); 
         onSnapshot(collection(db,"clans"), s=>{ document.getElementById('adminActiveClansList').innerHTML = s.docs.map(d=>`<div class="clan-admin-item"><div style="display:flex; justify-content:space-between; align-items:center;"><strong>${d.data().icon} ${d.data().name} <span style="color:#f59e0b; font-size:0.9rem; margin-left:10px;">⭐ ${d.data().totalScore || 0} Puan</span></strong> <button onclick="deleteClan('${d.id}')" style="background:#fee2e2;color:red;border:none;padding:5px 10px;border-radius:5px;font-weight:bold;">SİL</button></div><div id="clan-members-${d.id}" style="margin-top:5px; padding:5px; background:#f8fafc; font-size:0.8rem; color:#666;">Yükleniyor...</div></div>`).join(''); s.docs.forEach(docSnap => loadClanMembersForAdmin(docSnap.id)); }); 
     }
-    
-    // --- GÜNCELLENEN KISIM: Üyelerin puanlarını göster ve Kurucuyu ilk üye yap ---
     async function loadClanMembersForAdmin(clanId) { 
         const q = query(collection(db, "users"), where("clanId", "==", clanId)); 
         const snap = await getDocs(q); 
         let html = ""; 
-        // Puan Sıralaması
         const members = [];
         snap.forEach(d => members.push({id: d.id, ...d.data()}));
         members.sort((a,b) => (b.xp||0) - (a.xp||0));
-
         members.forEach(u => { 
             html += `<div style="display:flex; justify-content:space-between; align-items:center; margin-top:2px;">
                 <span>👤 ${u.displayName} <span style="font-weight:bold; color:#f59e0b;">(${u.xp || 0} p)</span></span>
@@ -275,7 +389,6 @@
         const el = document.getElementById(`clan-members-${clanId}`); 
         if(el) el.innerHTML = html || "<i>Üye yok.</i>"; 
     }
-
     window.kickMember = async (uid, cid) => { if(!confirm("Üyeyi otağdan atmak istiyor musun?")) return; await updateDoc(doc(db, "users", uid), { clanId: deleteField() }); await updateDoc(doc(db, "clans", cid), { memberCount: increment(-1) }); loadClanMembersForAdmin(cid); Swal.fire("Atıldı", "", "success"); };
     window.deleteClan = async (cid) => { if(!confirm("Otağı tamamen silmek istiyor musun?")) return; await deleteDoc(doc(db, "clans", cid)); };
     function listenAdminMessages() { onSnapshot(query(collection(db,"messages"), orderBy("createdAt","desc"), limit(100)), s=>{ document.getElementById('adminMsgHistoryList').innerHTML = s.docs.map(d=>{ const m = d.data(); const msgType = m.type || 'admin'; const senderIcon = msgType === 'admin' ? '👨‍🏫 Hakan' : '🦉 Bilge Baykuş'; const dateStr = formatDateTR(m.createdAt); return `<div style="border-bottom:1px solid #eee; padding:10px; display:flex; justify-content:space-between; align-items:center;"><div style="flex:1;"><small style="color:#999; font-size:0.7rem;">${dateStr} | ${senderIcon}</small><br><strong>${globalUserList.find(u=>u.id===m.toUid)?.displayName||'??'}</strong>: ${m.content}</div><button onclick="adminDeleteMsg('${d.id}')" style="background:#fee2e2; color:red; border:none; padding:5px 10px; border-radius:5px; cursor:pointer; font-size:0.7rem; margin-left:10px;">Sil</button></div>`; }).join(''); }); }
@@ -285,35 +398,7 @@
     window.sendAdminMessage = async () => { const uid = document.getElementById('msgStudentSelect').value; const msg = document.getElementById('msgContent').value; if(!uid || !msg) return Swal.fire("Eksik", "", "warning"); await addDoc(collection(db,"messages"),{ toUid:uid, content:msg, read:false, type:'admin', createdAt:serverTimestamp() }); Swal.fire("Gönderildi", "", "success"); };
     window.addOwlMessage = async () => { const t=document.getElementById('newOwlMsg').value; if(t) await addDoc(collection(db,"owl_messages"),{text:t,createdAt:serverTimestamp()}); }; window.deleteOwlMessage = async(id)=>await deleteDoc(doc(db,"owl_messages",id));
     window.rejectRequest=async(c,id)=>await deleteDoc(doc(db,c,id)); 
-    
-    // --- GÜNCELLENEN OTAĞ ONAYLAMA (Kurucuyu Üye Yap + Puan Ekle) ---
-    window.approveClan = async (r, l, n, i) => {
-        try {
-            // Liderin güncel puanını al
-            const leaderSnap = await getDoc(doc(db, "users", l));
-            const leaderData = leaderSnap.data();
-            const startScore = leaderData.xp || 0; 
-
-            // Otağı kur (Puan ve Üye Sayısı dahil)
-            const c = await addDoc(collection(db, "clans"), {
-                name: n,
-                icon: i,
-                leader: l,
-                memberCount: 1, // İlk üye kurucudur
-                totalScore: startScore // Puan kurucunun puanıdır
-            });
-
-            // Lideri otağa ata
-            await updateDoc(doc(db, "users", l), { clanId: c.id });
-            await deleteDoc(doc(db, "clan_requests", r));
-            
-            Swal.fire("Onaylandı", `${n} otağı kuruldu ve lider atandı.`, "success");
-        } catch (e) {
-            console.error(e);
-            Swal.fire("Hata", "Otağ kurulurken hata oluştu.", "error");
-        }
-    }; 
-    
+    window.approveClan = async (r, l, n, i) => { try { const leaderSnap = await getDoc(doc(db, "users", l)); const leaderData = leaderSnap.data(); const startScore = leaderData.xp || 0; const c = await addDoc(collection(db, "clans"), { name: n, icon: i, leader: l, memberCount: 1, totalScore: startScore }); await updateDoc(doc(db, "users", l), { clanId: c.id }); await deleteDoc(doc(db, "clan_requests", r)); Swal.fire("Onaylandı", `${n} otağı kuruldu ve lider atandı.`, "success"); } catch (e) { console.error(e); Swal.fire("Hata", "Otağ kurulurken hata oluştu.", "error"); } }; 
     window.approveMember=async(r,u,c)=>{await runTransaction(db,async(t)=>{const cd=(await t.get(doc(db,"clans",c))).data();const ud=(await t.get(doc(db,"users",u))).data();t.update(doc(db,"clans",c),{memberCount:(cd.memberCount||0)+1,totalScore:(cd.totalScore||0)+(ud.xp||0)});t.update(doc(db,"users",u),{clanId:c});t.delete(doc(db,"member_requests",r));});};
     window.seedNewQuotes = async () => { const quotes = [ "Sorgulanmamış hayat yaşamaya değmez. (Sokrates)", "Bilim, bilgi değil, eleştirel düşünme yöntemidir.", "Düşünüyorum, öyleyse varım. (Descartes)", "En büyük bilgelik, neyi bilmediğini bilmektir.", "Kuşkudan gerçeğe ulaşılır. (Descartes)", "Başkalarının bilgisiyle bilgin olsak bile, ancak kendi aklımızla akıllı olabiliriz. (Montaigne)", "Önyargıları parçalamak, atomu parçalamaktan zordur. (Einstein)", "Akıllı insan düşündüğü her şeyi söylemez, fakat söylediği her şeyi düşünür. (Aristoteles)", "Yanlış bildiklerini atmadan, doğruları koyamazsın zihnine." ]; const batch = writeBatch(db); quotes.forEach(q => { const ref = doc(collection(db, "owl_messages")); batch.set(ref, { text: q, createdAt: serverTimestamp() }); }); await batch.commit(); Swal.fire("Başarılı", "Sözler hazinesi zenginleştirildi Hakanım!", "success"); }
 </script>
