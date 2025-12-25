@@ -13,53 +13,79 @@
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     
     <style>
+        /* --- TEMEL STİLLER --- */
         .hidden { display: none !important; visibility: hidden !important; opacity: 0 !important; }
         :root { --primary: #009688; --primary-dark: #004d40; --warning: #f59e0b; --danger: #ef4444; --bg-gradient: linear-gradient(135deg, #e0f2f1 0%, #f0fdf4 100%); --text-main: #0f172a; --text-sub: #475569; --bottom-nav-height: 80px; }
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; user-select: none; }
         input, textarea { user-select: text !important; }
-        body { font-family: 'Outfit', sans-serif; background: var(--bg-gradient); margin: 0; padding: 15px; min-height: 100vh; color: var(--text-main); padding-bottom: 100px;}
+        body { font-family: 'Outfit', sans-serif; background: var(--bg-gradient); margin: 0; padding: 15px; min-height: 100vh; color: var(--text-main); padding-bottom: 100px; overflow-x: hidden; }
+        
+        /* --- KARTLAR & UI --- */
         .container { width: 100%; max-width: 480px; margin: 0 auto; }
         .card { background: #ffffff; border-radius: 30px; box-shadow: 0 10px 30px -10px rgba(0,0,0,0.08); padding: 24px; margin-bottom: 24px; position: relative; border: 1px solid #f1f5f9; }
         h2, h3 { margin: 0 0 10px 0; color: var(--primary-dark); letter-spacing: -0.5px; }
         h4 { margin: 0 0 20px 0; font-weight: 800; color: var(--text-sub); font-size: 0.9rem; text-transform: uppercase; letter-spacing: 1px; border-bottom: 1px solid #f1f5f9; padding-bottom: 15px; }
+        
+        /* --- GİRİŞ EKRANI --- */
         .auth-tabs { display: flex; background: #f1f5f9; padding: 5px; border-radius: 18px; margin-bottom: 25px; }
         .auth-tab { flex: 1; text-align: center; padding: 12px; border-radius: 14px; font-weight: 700; color: var(--text-sub); cursor: pointer; transition: 0.3s; }
         .auth-tab.active { background: white; color: var(--primary); box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
         .input-group { display: flex; gap: 15px; margin-top: 20px; }
         .input-modern { background: #f1f5f9; border: none; border-radius: 16px; padding: 15px; font-size: 1rem; font-weight: 700; width: 100%; text-align: center; outline: none; margin-bottom: 10px; }
         .input-modern:focus { box-shadow: 0 0 0 2px var(--primary); background: white; }
+        
+        /* --- BUTONLAR --- */
         button { cursor: pointer; border: none; font-family: inherit; transition: 0.2s; } button:active { transform: scale(0.96); } button:disabled { opacity: 0.6; cursor: not-allowed; }
         .btn-action { width: 100%; padding: 18px; border-radius: 20px; font-size: 1.1rem; font-weight: 800; color: white; background: var(--primary); margin-top: 15px; }
         .btn-logout-header { background: #fee2e2; color: var(--danger); padding: 8px 12px; border-radius: 12px; font-weight: 700; font-size: 0.8rem; margin-left: 10px; border: 1px solid #fca5a5; }
+        
+        /* --- CHIPS & SEÇİMLER --- */
         .chips { display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; margin-bottom: 10px; }
         .chip-modern { background: #ffffff; border: 1px solid #e2e8f0; border-radius: 25px; padding: 10px 20px; font-weight: 600; color: var(--text-sub); cursor: pointer; transition: 0.2s; }
         .chip-modern.active { border-color: var(--primary); color: var(--primary); background: #f0fdf4; box-shadow: 0 0 0 2px rgba(0, 150, 136, 0.1); }
-        .timer-display { font-size: 4.5rem; font-weight: 800; text-align: center; color: var(--primary); margin: 20px 0; }
-        .pomo-controls { display: flex; gap: 15px; justify-content: center; margin-bottom: 20px; }
-        .btn-pomo { padding: 15px 30px; border-radius: 16px; font-weight: 700; color: white; flex: 1; max-width: 140px; }
+        
+        /* --- POMODORO --- */
+        .timer-display { font-size: 4.5rem; font-weight: 800; text-align: center; color: var(--primary); margin: 20px 0; line-height: 1; }
+        .pomo-controls { display: flex; gap: 15px; justify-content: center; margin-bottom: 20px; flex-wrap: wrap; }
+        .btn-pomo { padding: 15px 30px; border-radius: 16px; font-weight: 700; color: white; flex: 1; min-width: 120px; }
+        .btn-timer-adj { width: 50px; height: 50px; border-radius: 15px; background: #e0f2f1; color: var(--primary-dark); font-size: 1.5rem; font-weight: bold; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: 0.2s; }
+        .btn-timer-adj:active { transform: scale(0.9); background: #b2dfdb; }
+
+        /* --- MAĞAZA --- */
         .store-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
         .store-card { background: white; border: 1px solid #e2e8f0; border-radius: 24px; padding: 20px; text-align: center; }
         .store-icon { font-size: 3rem; margin-bottom: 10px; display: flex; align-items: center; justify-content: center; }
         .store-name { font-weight: 800; color: var(--text-main); display: block; margin-bottom: 5px; }
         .store-price { font-weight: 700; color: var(--warning); font-size: 0.9rem; margin-bottom: 15px; display: block; }
         .btn-store { background: #f1f5f9; color: var(--text-sub); padding: 10px; width: 100%; border-radius: 12px; font-weight: 700; }
+        
+        /* --- OTAĞ (KLAN) --- */
         .clan-card-modern { background: linear-gradient(135deg, #e0f2f1, #fff); border: 2px solid var(--primary); text-align: center; padding: 30px 20px; border-radius: 24px; }
         .clan-banner-modern { font-size: 4rem; margin-bottom: 10px; }
         .tore-box-modern { background: #fffbeb; border: 1px solid #fcd34d; padding: 20px; border-radius: 20px; margin-bottom: 20px; font-size: 0.95rem; color: #92400e; font-style: italic; text-align: left; }
+        
+        /* --- ALT MENÜ & FOOTER --- */
         .app-footer { text-align: center; font-size: 0.8rem; color: var(--text-sub); padding: 20px 0; border-top: 1px solid rgba(0,0,0,0.05); margin-top: 30px; }
         .mobile-bottom-nav { position: fixed; bottom: 0; left: 0; width: 100%; height: var(--bottom-nav-height); background: rgba(255, 255, 255, 0.98); backdrop-filter: blur(20px); border-top: 1px solid rgba(178, 223, 219, 0.6); display: flex; justify-content: space-around; align-items: center; padding-bottom: 15px; z-index: 1000; box-shadow: 0 -5px 20px rgba(0, 150, 136, 0.08); border-top-left-radius: 20px; border-top-right-radius: 20px; overflow-x: auto; padding: 0 5px; }
         .nav-item { display: flex; flex-direction: column; align-items: center; justify-content: center; font-size: 0.6rem; color: #94a3b8; background: none; border: none; cursor: pointer; transition: all 0.3s; flex: 1; height: 100%; padding: 5px 0; min-width: 50px; }
         .nav-icon { font-size: 1.4rem; margin-bottom: 4px; transition: transform 0.2s; }
         .nav-item.active { color: var(--primary); font-weight: 800; }
         .nav-item.active .nav-icon { transform: translateY(-5px); }
+        
+        /* --- MODAL --- */
         .modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 77, 64, 0.6); backdrop-filter: blur(8px); display: flex; justify-content: center; align-items: center; z-index: 2000; padding: 20px; }
         .modal-content { background: white; padding: 30px; border-radius: 30px; width: 100%; max-width: 500px; max-height: 85vh; overflow-y: auto; }
+        
+        /* --- PROGRESS BAR & LEVEL --- */
         .level-container { margin-top: 5px; width: 100%; }
         .xp-track { width: 100%; background: rgba(0, 0, 0, 0.1); height: 6px; border-radius: 10px; overflow: hidden; position: relative; margin-top: 4px; }
         .xp-fill { height: 100%; background: linear-gradient(90deg, #FFD700, #FFA500); width: 0%; transition: width 1s cubic-bezier(0.4, 0, 0.2, 1); }
         .rank-badge { font-size: 0.75rem; font-weight: 800; color: #fff; background: rgba(0,0,0,0.2); padding: 2px 8px; border-radius: 12px; margin-left: 6px; }
+        
+        /* --- ANİMASYONLAR --- */
         .fade-in { animation: fadeIn 0.5s cubic-bezier(0.4, 0, 0.2, 1); } @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
         
+        /* --- BİLGE BAYKUŞ --- */
         .wise-coach-container { position: fixed; bottom: 90px; right: 10px; z-index: 999; display: flex; flex-direction: column; align-items: flex-end; }
         .wise-avatar { width: 60px; height: 60px; background: linear-gradient(135deg, #4f46e5, #9333ea); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 2rem; box-shadow: 0 10px 25px rgba(79, 70, 229, 0.4); cursor: pointer; border: 3px solid #fff; position: relative; transition: transform 0.3s; }
         .coach-badge { position: absolute; top: 0; right: 0; background: #ef4444; color: white; font-size: 0.75rem; width: 22px; height: 22px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; border: 2px solid white; animation: pulseBadge 2s infinite; }
@@ -68,8 +94,30 @@
         @keyframes excited { 0% { transform: scale(1) rotate(0deg); } 25% { transform: scale(1.1) rotate(-5deg); } 50% { transform: scale(1.1) rotate(5deg); } 75% { transform: scale(1.1) rotate(-5deg); } 100% { transform: scale(1) rotate(0deg); } }
         .owl-excited { animation: excited 0.8s infinite; }
         @keyframes pulseBadge { 0% { transform: scale(1); } 50% { transform: scale(1.1); } 100% { transform: scale(1); } }
+        
         .points-table { width:100%; border-collapse: collapse; margin-top:10px; font-size:0.85rem;} .points-table td { padding:8px; border-bottom:1px solid #eee; }
         .swal2-container { z-index: 10000 !important; }
+
+        /* --- MOBİL UYUMLULUK (RESPONSIVE) ZIRHI --- */
+        @media (max-width: 480px) {
+            body { padding: 10px; padding-bottom: 90px; }
+            .container { width: 100%; }
+            .card { padding: 15px; border-radius: 20px; }
+            h2 { font-size: 1.3rem; }
+            .btn-logout-header { padding: 5px 8px; font-size: 0.7rem; }
+            #userAvatar { font-size: 2rem !important; margin-right: 10px !important; }
+            #stName { font-size: 1rem !important; }
+            .timer-display, #arenaTimerDisplay { font-size: 3.5rem !important; margin: 15px 0 !important; }
+            .pomo-controls, #arenaControls { flex-direction: row; flex-wrap: wrap; gap: 10px; }
+            #arenaControls { flex-direction: column; } 
+            #arenaControls button, .btn-pomo { width: 100%; margin: 0; min-width: auto; max-width: none; }
+            .store-grid { gap: 10px; }
+            .store-card { padding: 15px 10px; }
+            .modal-content { padding: 20px; width: 95%; max-height: 80vh; }
+            .mobile-bottom-nav { height: 70px; }
+            .nav-icon { font-size: 1.2rem; }
+            .nav-item span { font-size: 0.55rem; }
+        }
     </style>
 </head>
 <body oncontextmenu="return false;">
@@ -167,8 +215,15 @@
                     <button class="btn-pomo" style="background:#10b981;" onclick="startPomoTimer()" id="btnStartPomo">BAŞLAT ▶</button>
                     <button class="btn-pomo" style="background:#ef4444;" onclick="requestStopPomo()">DURDUR ⏹</button>
                 </div>
-                <label style="font-size:0.8rem; color:var(--text-sub); font-weight:bold; display:block; margin-bottom:5px;">Süre Ayarla (dk):</label>
-                <input type="number" id="timerSet" value="30" oninput="updateTimerSet()" class="input-modern" style="width:100px; margin:0 auto; padding:10px;">
+                
+                <div style="margin-top:20px; border-top:1px solid #f1f5f9; padding-top:15px;">
+                    <label style="font-size:0.9rem; color:var(--text-sub); font-weight:bold; display:block; margin-bottom:10px;">Süre Ayarla (dk)</label>
+                    <div style="display:flex; justify-content:center; align-items:center; gap:15px;">
+                        <div class="btn-timer-adj" onclick="adjustTimer(-5)">-</div>
+                        <input type="number" id="timerSet" value="30" oninput="updateTimerSet()" class="input-modern" style="width:80px; margin:0; padding:15px; text-align:center; font-size:1.5rem; font-weight:800; color:var(--primary);">
+                        <div class="btn-timer-adj" onclick="adjustTimer(5)">+</div>
+                    </div>
+                </div>
             </div>
         </div>
 
@@ -198,8 +253,8 @@
             </div>
             <div id="noClanSection" class="card" style="text-align:center;">
                 <h4>HENÜZ BİR OTAĞIN YOK</h4>
-                <div style="font-size:0.8rem; color:var(--warning); margin-bottom:15px; font-weight:bold; background:#fffbeb; padding:8px; border-radius:10px;">
-                    ⚠️ Kural: Her Otağ, sınıf mevcudunun en fazla 1/5'i kadar Alp barındırabilir.
+                <div style="font-size:0.9rem; color:var(--warning); margin-bottom:15px; font-weight:bold; background:#fffbeb; padding:10px; border-radius:12px; border:1px solid #fcd34d;">
+                    ⚠️ Kural: Her Otağ en fazla 5 Alp barındırabilir. Kontenjan dolarsa başka Otağ seç.
                 </div>
                 <button id="btnCreateClan" class="btn-action" onclick="window.openCreateClanModal()">Otağ Kurma İsteği Gönder</button>
                 <hr style="margin:20px 0; border-top:1px solid #f1f5f9;">
@@ -297,7 +352,7 @@
                     <p class="desc-text">Arkadaşlarınla bir Otağ kur veya katıl. Kazandığın her puan Otağına eklenir. En çok çalışan Otağ zirveye oturur.</p>
                     <div style="margin-top:10px; background:#fffbeb; padding:10px; border-radius:10px; border:1px solid #fcd34d; font-size:0.85rem; color:#92400e;">
                         <strong>⚖️ ADALET KURALI (1/5):</strong><br>
-                        Güç dengesini korumak için, bir Otağ en fazla sınıf mevcudunun <strong>5'te 1'i</strong> kadar Alp barındırabilir. Kontenjan dolarsa başka bir Otağ seçmelisin.
+                        Güç dengesini korumak için, bir Otağ en fazla 5 Alp barındırabilir. Kontenjan dolarsa başka bir Otağ seçmelisin.
                     </div>
                 </div>
             </div>
@@ -339,6 +394,7 @@
             <button onclick="document.getElementById('modalCreateClan').classList.add('hidden')" style="margin-top:10px; width:100%; padding:10px; background:#fee2e2; color:red; border-radius:10px;">İptal</button>
         </div>
     </div>
+    
     <div id="modalProfile" class="modal hidden fade-in"><div class="modal-content"><h3>Profil</h3><input type="text" id="editProfileName" class="input-modern"><button class="btn-action" onclick="saveUserProfile()" style="margin-top:10px;">Kaydet</button><button onclick="handleLogout()" style="margin-top:10px; width:100%; padding:10px; background:#fee2e2; color:red; border-radius:10px;">ÇIKIŞ YAP</button><button onclick="document.getElementById('modalProfile').classList.add('hidden')" style="margin-top:10px; width:100%; padding:10px;">Kapat</button></div></div>
 </div>
 
@@ -557,7 +613,19 @@
         } catch(e) { Swal.fire("Hata", e.message, "error"); } finally { setTimeout(() => { btn.disabled = false; btn.innerText = "KAYDET (+Puan) ✅"; }, 1000); } 
     };
     
+    // --- GÜNCELLENMİŞ SAYAÇ AYARLARI ---
     window.updateTimerSet = () => { if(!isPomoRunning){ let v = parseInt(document.getElementById('timerSet').value); if (isNaN(v) || v < 1) v = 30; document.getElementById('timerDisplay').innerText = `${v}:00`; } };
+    window.adjustTimer = (val) => {
+        if(isPomoRunning) return;
+        const inp = document.getElementById('timerSet');
+        let current = parseInt(inp.value) || 30;
+        let next = current + val;
+        if(next < 5) next = 5;
+        if(next > 120) next = 120;
+        inp.value = next;
+        updateTimerSet();
+    };
+
     window.startPomoTimer = async () => { 
         if(isArenaRunning) { addToOwlQueue("Hakanım! Meydanda cenk ederken sayacı açamazsın! Önce savaşı bitir. ⚔️"); return; }
         if(isPomoRunning) return; const sub = document.getElementById('pomoSubject').value; if(!sub) return Swal.fire("Ders Seç", "", "warning"); 
@@ -784,8 +852,8 @@
                 createBtn.disabled = false;
                 createBtn.innerHTML = `Otağ Kurma İsteği Gönder`;
                 createBtn.style.background = "var(--primary)";
-                // BURASI DÜZELTİLDİ: ARTIK PENCEREYİ AÇIYOR
-                createBtn.onclick = window.openCreateClanModal;
+                // DÜZELTİLDİ: Artık tanımlanmış fonksiyonu çağırıyor
+                createBtn.onclick = () => window.openCreateClanModal();
             }
 
             loadJoinableClans(); 
@@ -807,6 +875,22 @@
     async function loadClanLeaderboard() { const list = document.getElementById('clanLeaderboard'); list.innerHTML=""; const q = query(collection(db, "clans"), orderBy("totalScore", "desc"), limit(5)); const snap = await getDocs(q); if(currentUser) { const uSnap = await getDoc(doc(db, "users", currentUser.uid)); const myClanId = uSnap.data()?.clanId; if(myClanId) { const allClansQ = query(collection(db, "clans"), orderBy("totalScore", "desc")); const allClansSnap = await getDocs(allClansQ); let myRank = 0; allClansSnap.docs.forEach((d, i) => { if(d.id === myClanId) myRank = i + 1; }); const rankDisplay = document.getElementById('myClanRankDisplay'); if(rankDisplay) rankDisplay.innerText = `#${myRank}`; } } snap.docs.forEach((d,i)=>{ const data = d.data(); list.innerHTML += `<div style="margin-bottom:5px; font-weight:600;">#${i+1} ${data.icon} ${data.name} (${data.totalScore || 0})</div>`; }); }
     async function addClanPoints(uid, points) { const u = (await getDoc(doc(db, "users", uid))).data(); if(u.clanId) await updateDoc(doc(db,"clans",u.clanId), { totalScore: increment(points) }); }
     
+    // --- DÜZELTİLEN BÖLÜMLER BURADA BAŞLIYOR ---
+
+    // 1. Otağ Kurma Modalını Açan Fonksiyon (Artık tanımlı)
+    window.openCreateClanModal = () => {
+        document.getElementById('newClanName').value = "";
+        document.getElementById('modalCreateClan').classList.remove('hidden');
+    };
+
+    // 2. Otağ Simgesi Seçimi (Global Scope'a ekledim)
+    window.selectClanIcon = (el) => {
+        document.querySelectorAll('#clanIconSelect .chip-modern').forEach(e => e.classList.remove('active'));
+        el.classList.add('active');
+        const iconChar = el.querySelector('span').innerText;
+        document.getElementById('selectedClanIcon').value = iconChar;
+    };
+
     window.createClanRequest = async () => { 
         if (!currentUser) return Swal.fire("Hata", "Oturum bilgisi alınamadı. Lütfen sayfayı yenileyip tekrar giriş yap.", "error");
 
@@ -863,7 +947,6 @@
             
             Swal.fire("Arz Edildi", "Otağ kurma isteğin ve yeminin Hakan'a iletildi.", "success"); 
             document.getElementById('modalCreateClan').classList.add('hidden'); 
-            document.getElementById('newClanName').value = ""; 
             checkClanStatus(currentUser.uid); // Ekranı güncelle
         } catch (error) { 
             console.error(error); 
@@ -924,11 +1007,13 @@
     window.changeStudentGoal = async () => { const currentGoal = document.getElementById('targetMins').innerText; const { value: newGoal } = await Swal.fire({ title: 'Haftalık Hedef', input: 'number', inputValue: currentGoal, inputLabel: 'Kaç dakika çalışacaksın?', showCancelButton: true, confirmButtonText: 'Güncelle', inputValidator: (v) => (!v || v < 500) && 'Hedef en az 500 dakika olmalıdır! Daha azı bir Alpe yakışmaz.' }); if (newGoal) { const goalInt = parseInt(newGoal); await updateDoc(doc(db, "users", currentUser.uid), { weeklyGoal: goalInt }); document.getElementById('targetMins').innerText = goalInt; Swal.fire("Hedef Güncellendi", `Yeni hedefin: ${goalInt} dk.`, "success"); } };
     window.switchTab=(t,el)=>{ if(el) { document.querySelectorAll('.mobile-bottom-nav .nav-item').forEach(e=>e.classList.remove('active')); el.classList.add('active'); } ['viewHome','viewPomo','viewStore','viewFuture','viewHistory', 'viewArena', 'viewClan', 'viewDesc'].forEach(x=>document.getElementById(x).classList.add('hidden')); document.getElementById('view'+t.charAt(0).toUpperCase()+t.slice(1)).classList.remove('hidden'); if(t === 'arena') listenArena(); };
     window.openProfileModal=()=>{document.getElementById('editProfileName').value=currentUser.displayName||"";document.getElementById('modalProfile').classList.remove('hidden')}; window.saveUserProfile=async()=>{await updateProfile(currentUser,{displayName:document.getElementById('editProfileName').value}); await updateDoc(doc(db,"users",currentUser.uid),{displayName:document.getElementById('editProfileName').value}); location.reload();};
-    window.openCreateClanModal=window.openCreateClanModal; window.selectClanIcon=(el)=>{document.querySelectorAll('#clanIconSelect .chip-modern').forEach(e=>e.classList.remove('active')); el.classList.add('active'); document.getElementById('selectedClanIcon').value=el.querySelector('span').innerText;}; 
+    
+    // Geriye kalan tanımlamalar ve tuş engellemeleri
     document.addEventListener('contextmenu', event => event.preventDefault()); document.onkeydown = function(e) { if(e.keyCode == 123) return false; if(e.ctrlKey && e.shiftKey && e.keyCode == 'I'.charCodeAt(0)) return false; if(e.ctrlKey && e.shiftKey && e.keyCode == 'C'.charCodeAt(0)) return false; if(e.ctrlKey && e.shiftKey && e.keyCode == 'J'.charCodeAt(0)) return false; if(e.ctrlKey && e.keyCode == 'U'.charCodeAt(0)) return false; }
-    window.leaveClan=window.leaveClan; window.deleteDoc=deleteDoc; window.doc=doc; window.db=db; window.readMsg=window.readMsg; window.openMsgModal=window.openMsgModal;
+    window.deleteDoc=deleteDoc; window.doc=doc; window.db=db; window.readMsg=window.readMsg; window.openMsgModal=window.openMsgModal;
 
-    async function getClanLimit() { const snap = await getDocs(collection(db, "users")); const total = snap.size; return Math.max(2, Math.ceil(total / 5)); }
+    // --- SABİT LİMİT ---
+    async function getClanLimit() { return 5; }
 
     window.loadJoinableClans = async () => { 
         const list = document.getElementById('clanJoinList'); list.innerHTML = "Yükleniyor..."; 
