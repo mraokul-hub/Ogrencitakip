@@ -316,89 +316,93 @@
                 </div>
             </div>`; }); document.getElementById('modalAdminStudentDetail').classList.remove('hidden'); };
     
-    // --- GÜNCELLENMİŞ TOPLU SİLME (OTAĞ SENKRONLU) ---
-    window.deleteSelectedSessions = async () => { 
-        const checkboxes = document.querySelectorAll('.chk-session:checked'); 
-        if (checkboxes.length === 0) return Swal.fire("Seçim Yok", "Lütfen silinecek kayıtları seçin.", "warning"); 
-        if(!confirm(`Seçilen ${checkboxes.length} kaydı silmek ve puan/sürelerini öğrenciden düşmek istiyor musun?`)) return; 
-        
-        const uid = document.getElementById('detailUid').value; 
-        const batch = writeBatch(db); 
-        let totalDur = 0; let totalPts = 0; 
-        
-        checkboxes.forEach(chk => { 
-            const sid = chk.value; 
-            const dur = parseInt(chk.dataset.dur) || 0; 
-            const pts = parseInt(chk.dataset.pts) || 0; 
-            totalDur += dur; 
-            totalPts += pts; 
-            batch.delete(doc(db, "users", uid, "sessions", sid)); 
+    // --- GÜNCELLENMİŞ TEKLİ DÜZENLEME (OTAĞ SENKRONLU & GÜVENLİ) ---
+    // DÜZELTME: Okuma işlemleri transaction içinde en başa alındı.
+    window.adminEditSession = async (uid, sid, oldDur, oldPts) => { 
+        const { value: formValues } = await Swal.fire({ 
+            title: 'Kayıt Düzenle', 
+            html: `<div style="text-align:left; font-size:0.9rem; color:#555; margin-bottom:5px;">Süre (Dakika)</div><input id="swal-input1" class="swal2-input" type="number" placeholder="Dakika" value="${oldDur}" style="margin-top:0;"><div style="text-align:left; font-size:0.9rem; color:#555; margin-bottom:5px; margin-top:15px;">Puan</div><input id="swal-input2" class="swal2-input" type="number" placeholder="Puan" value="${oldPts}" style="margin-top:0;">`, 
+            focusConfirm: false, 
+            showCancelButton: true, 
+            confirmButtonText: 'KAYDET', 
+            preConfirm: () => [document.getElementById('swal-input1').value, document.getElementById('swal-input2').value] 
         }); 
         
-        const userRef = doc(db, "users", uid);
-        batch.update(userRef, { totalMinutes: increment(-totalDur), xp: increment(-totalPts), gold: increment(-totalPts) }); 
-        
-        // Otağdan da düş
-        getDoc(userRef).then(async (snap) => {
-            if(snap.exists() && snap.data().clanId) {
-                const clanRef = doc(db, "clans", snap.data().clanId);
-                await updateDoc(clanRef, { totalScore: increment(-totalPts) });
-            }
-            try { 
-                await batch.commit(); 
-                Swal.fire("Temizlendi", "Seçilen kayıtlar başarıyla silindi ve puanlar otağdan da düşüldü.", "success"); 
-                openAdminStudentDetail(uid); 
-            } catch(e) { console.error(e); Swal.fire("Hata", "Toplu silme işlemi başarısız.", "error"); } 
-        });
-    };
+        if (formValues) { 
+            const nD = parseInt(formValues[0]) || 0; 
+            const nP = parseInt(formValues[1]) || 0; 
+            const diffP = nP - (parseInt(oldPts) || 0); 
+            const diffD = nD - (parseInt(oldDur) || 0);
+            
+            try {
+                await runTransaction(db, async(t) => {
+                    // 1. ÖNCE TÜM OKUMALARI YAP (Reads before writes)
+                    const uRef = doc(db, "users", uid);
+                    const uDoc = await t.get(uRef);
+                    if (!uDoc.exists()) throw "Kullanıcı bulunamadı!";
+                    const uData = uDoc.data();
+                    
+                    let clanRef = null;
+                    let clanDoc = null;
+                    if(uData.clanId) {
+                        clanRef = doc(db, "clans", uData.clanId);
+                        clanDoc = await t.get(clanRef);
+                    }
 
-    window.toggleAllCapsules = (source) => { document.querySelectorAll('.chk-capsule').forEach(c => c.checked = source.checked); };
-    window.adminDeleteSelectedCapsules = async () => { const selected = document.querySelectorAll('.chk-capsule:checked'); if(selected.length === 0) return Swal.fire("Seçim Yok", "", "warning"); if(!confirm(`${selected.length} kapsülü silmek ve 200'er puan ceza kesmek üzeresin?`)) return; const batch = writeBatch(db); selected.forEach(chk => { const path = chk.value; const uid = chk.dataset.uid; const segments = path.split('/'); batch.delete(doc(db, segments[0], segments[1], segments[2], segments[3])); batch.update(doc(db, "users", uid), { xp: increment(-200), gold: increment(-200) }); }); await batch.commit(); Swal.fire("İşlem Tamam", "", "success"); };
-    window.adminBulkUpdateCapsuleDate = async () => { const selected = document.querySelectorAll('.chk-capsule:checked'); const { value: newDate } = await Swal.fire({ title: 'Yeni Tarih', input: 'date', showCancelButton: true }); if (newDate) { const batch = writeBatch(db); const targets = selected.length > 0 ? selected : document.querySelectorAll('.chk-capsule'); targets.forEach(chk => { const s = chk.value.split('/'); batch.update(doc(db, s[0], s[1], s[2], s[3]), { unlockDate: newDate }); }); await batch.commit(); Swal.fire("Tarihler Güncellendi", "", "success"); } };
-    window.adminBulkUnlockCapsules = async () => { updateCapsuleLocks(false); }; window.adminBulkLockCapsules = async () => { updateCapsuleLocks(true); };
-    async function updateCapsuleLocks(lock) { const selected = document.querySelectorAll('.chk-capsule:checked'); const date = lock ? "2026-01-01" : "2023-01-01"; const batch = writeBatch(db); const targets = selected.length > 0 ? selected : document.querySelectorAll('.chk-capsule'); targets.forEach(chk => { const s = chk.value.split('/'); batch.update(doc(db, s[0], s[1], s[2], s[3]), { unlockDate: date }); }); await batch.commit(); Swal.fire(lock ? "Kilitlendi" : "Kilitler Açıldı", "", "success"); }
-    window.adminDeleteCapsule = async (path, uid) => { if(!confirm("Kapsülü silmek ve verilen ödülü (200 Puan) geri almak istiyor musun?")) return; const s=path.split('/'); await deleteDoc(doc(db,s[0],s[1],s[2],s[3])); await updateDoc(doc(db,"users",uid),{xp:increment(-200),gold:increment(-200)}); Swal.fire("Silindi", "Kapsül yok edildi ve puan geri alındı.", "success"); };
-    window.adminChangeCapsuleDate = async (path, cur) => { const {value:nD} = await Swal.fire({title:'Yeni Tarih', html:`<input type="date" id="swal-date" class="swal2-input" value="${cur}">`, preConfirm:()=>document.getElementById('swal-date').value}); if(nD) { const s=path.split('/'); await updateDoc(doc(db,s[0],s[1],s[2],s[3]),{unlockDate:nD}); } };
-    window.adminSetCapsuleLock = async (path, lock) => { const d = lock ? "2026-01-10" : "2023-01-01"; const s=path.split('/'); await updateDoc(doc(db,s[0],s[1],s[2],s[3]),{unlockDate:d}); };
+                    // 2. SONRA TÜM YAZMALARI YAP (Writes)
+                    t.update(doc(db, "users", uid, "sessions", sid), { duration: nD, points: nP });
+                    t.update(uRef, { totalMinutes: increment(diffD), xp: increment(diffP), gold: increment(diffP) });
+                    
+                    if(clanDoc && clanDoc.exists()) {
+                        t.update(clanRef, { totalScore: increment(diffP) });
+                    }
+                });
+                Swal.fire("Güncellendi", "Puan ve süre başarıyla değiştirildi (Otağ senkronize edildi).", "success"); 
+                openAdminStudentDetail(uid); 
+            } catch(e) {
+                console.error(e);
+                Swal.fire("Hata", "Güncelleme sırasında hata: " + e, "error");
+            }
+        } 
+    };
     
-    // --- GÜNCELLENMİŞ TEKLİ DÜZENLEME (OTAĞ SENKRONLU) ---
-    window.adminEditSession = async (uid, sid, oldDur, oldPts) => { const { value: formValues } = await Swal.fire({ title: 'Kayıt Düzenle', html: `<div style="text-align:left; font-size:0.9rem; color:#555; margin-bottom:5px;">Süre (Dakika)</div><input id="swal-input1" class="swal2-input" type="number" placeholder="Dakika" value="${oldDur}" style="margin-top:0;"><div style="text-align:left; font-size:0.9rem; color:#555; margin-bottom:5px; margin-top:15px;">Puan</div><input id="swal-input2" class="swal2-input" type="number" placeholder="Puan" value="${oldPts}" style="margin-top:0;">`, focusConfirm: false, showCancelButton: true, confirmButtonText: 'KAYDET', preConfirm: () => [document.getElementById('swal-input1').value, document.getElementById('swal-input2').value] }); 
-        if (formValues) { const nD = parseInt(formValues[0]); const nP = parseInt(formValues[1]); const diffP = nP - parseInt(oldPts); const diffD = nD - parseInt(oldDur);
-            await runTransaction(db, async(t) => {
-                const uRef = doc(db, "users", uid);
-                const uDoc = await t.get(uRef);
-                const uData = uDoc.data();
-                
-                t.update(doc(db, "users", uid, "sessions", sid), { duration: nD, points: nP });
-                t.update(uRef, { totalMinutes: increment(diffD), xp: increment(diffP), gold: increment(diffP) });
-                
-                // Otağ güncelleme
-                if(uData.clanId) {
-                    const clanRef = doc(db, "clans", uData.clanId);
-                    t.update(clanRef, { totalScore: increment(diffP) });
-                }
-            });
-            Swal.fire("Güncellendi", "Puan ve süre başarıyla değiştirildi (Otağ senkronize edildi).", "success"); openAdminStudentDetail(uid); } };
-    
-    // --- GÜNCELLENMİŞ TEKLİ SİLME (OTAĞ SENKRONLU) ---
+    // --- GÜNCELLENMİŞ TEKLİ SİLME (OTAĞ SENKRONLU & GÜVENLİ) ---
+    // DÜZELTME: Okuma işlemleri transaction içinde en başa alındı.
     window.adminDeleteSession = async (uid, sid, dur, pts) => { 
         if(!confirm("Kayıt silinecek ve puan hem öğrenciden hem otağdan düşülecek?")) return; 
         
-        await runTransaction(db, async(t)=>{
-            const uRef = doc(db, "users", uid);
-            const uDoc = await t.get(uRef);
-            const uData = uDoc.data();
-            
-            t.delete(doc(db, "users", uid, "sessions", sid));
-            t.update(uRef, { totalMinutes: increment(-parseInt(dur)), xp: increment(-parseInt(pts)), gold: increment(-parseInt(pts)) });
-            
-            // Otağ güncelleme
-            if(uData.clanId) {
-                const clanRef = doc(db, "clans", uData.clanId);
-                t.update(clanRef, { totalScore: increment(-parseInt(pts)) });
-            }
-        });
-        openAdminStudentDetail(uid); 
+        const durVal = parseInt(dur) || 0;
+        const ptsVal = parseInt(pts) || 0;
+
+        try {
+            await runTransaction(db, async(t)=>{
+                // 1. ÖNCE OKUMA
+                const uRef = doc(db, "users", uid);
+                const uDoc = await t.get(uRef);
+                if (!uDoc.exists()) throw "Kullanıcı bulunamadı!";
+                const uData = uDoc.data();
+                
+                let clanRef = null;
+                let clanDoc = null;
+                if(uData.clanId) {
+                    clanRef = doc(db, "clans", uData.clanId);
+                    clanDoc = await t.get(clanRef);
+                }
+
+                // 2. SONRA YAZMA
+                t.delete(doc(db, "users", uid, "sessions", sid));
+                t.update(uRef, { totalMinutes: increment(-durVal), xp: increment(-ptsVal), gold: increment(-ptsVal) });
+                
+                if(clanDoc && clanDoc.exists()) {
+                    t.update(clanRef, { totalScore: increment(-ptsVal) });
+                }
+            });
+            openAdminStudentDetail(uid); 
+            Swal.fire("Silindi", "Kayıt başarıyla silindi.", "success");
+        } catch(e) {
+            console.error(e);
+            Swal.fire("Hata", "Silme işlemi başarısız: " + e, "error");
+        }
     };
 
     window.adminDeleteStudent = async () => { const uid=document.getElementById('detailUid').value; if(!confirm("Öğrenciyi silmek üzeresin!")) return; await deleteDoc(doc(db,"users",uid)); Swal.fire("Silindi","","success"); document.getElementById('modalAdminStudentDetail').classList.add('hidden'); };
@@ -643,7 +647,7 @@
     window.adminDeleteSession = window.adminDeleteSession;
     window.toggleAllCheckboxes = window.toggleAllCheckboxes;
     window.sendBatchSelection = window.sendBatchSelection;
-    window.auditClans = window.auditClans; // Yeni eklenen
+    window.auditClans = window.auditClans; 
 </script>
 </body>
 </html>
