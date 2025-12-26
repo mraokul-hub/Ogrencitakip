@@ -187,7 +187,7 @@
                         <option value="1">⏪ Dün</option>
                         <option value="2">⏮️ 2 Gün Önce</option>
                     </select>
-                    <input type="number" id="entryDur" value="40" class="input-modern" style="flex:1;" placeholder="40">
+                    <input type="number" id="entryDur" value="40" class="input-modern" style="flex:1;" placeholder="40" inputmode="numeric">
                 </div>
                 <button class="btn-action" id="btnSaveEntry" onclick="saveEntry()">KAYDET (+Puan) ✅</button>
             </div>
@@ -220,7 +220,7 @@
                     <label style="font-size:0.9rem; color:var(--text-sub); font-weight:bold; display:block; margin-bottom:10px;">Süre Ayarla (dk)</label>
                     <div style="display:flex; justify-content:center; align-items:center; gap:15px;">
                         <div class="btn-timer-adj" onclick="adjustTimer(-5)">-</div>
-                        <input type="number" id="timerSet" value="30" oninput="updateTimerSet()" class="input-modern" style="width:80px; margin:0; padding:15px; text-align:center; font-size:1.5rem; font-weight:800; color:var(--primary);">
+                        <input type="number" id="timerSet" value="30" oninput="updateTimerSet()" class="input-modern" style="width:80px; margin:0; padding:15px; text-align:center; font-size:1.5rem; font-weight:800; color:var(--primary);" inputmode="numeric">
                         <div class="btn-timer-adj" onclick="adjustTimer(5)">+</div>
                     </div>
                 </div>
@@ -550,19 +550,43 @@
     
     window.buyAvatar = async (idx, cost, btn) => { 
         if(!currentUser) return Swal.fire("Hata", "Oturum açık değil.", "error");
+        
+        // DÜZELTME: Mobilde butona çift tıklamayı engelle
         btn.disabled = true; 
+        
         try { 
             const currentGold = parseInt(document.getElementById('stGold').innerText) || 0; 
-            if(currentGold < cost) { Swal.fire("Yetersiz Altın", `Bu simge ${cost} altın değerinde.`, "error"); return; } 
+            if(currentGold < cost) { 
+                Swal.fire("Yetersiz Altın", `Bu simge ${cost} altın değerinde.`, "error"); 
+                btn.disabled = false;
+                return; 
+            } 
             
             const item = AVATAR_SHOP[idx];
+            
             if(confirm(`"${item.name}" simgesini ${cost} Altın karşılığında satın alıp hemen kullanmak istiyor musun?`)){ 
-                await updateDoc(doc(db,"users",currentUser.uid), { gold: increment(-cost), avatar: item.icon }); 
-                const avatarEl = document.getElementById('userAvatar'); avatarEl.innerHTML = item.icon; 
-                document.getElementById('stGold').innerText = currentGold - cost;
-                Swal.fire({ title: "Hayırlı Olsun!", text: "Yeni simgen rütbenle beraber parlıyor.", icon: "success", timer: 2000, showConfirmButton: false }); confetti(); 
-            } 
-        } catch(e) { Swal.fire("Hata", "Satın alma işleminde bir sorun oluştu: " + e.message, "error"); } finally { btn.disabled = false; } 
+                // DÜZELTME: Integere zorla (Güvenlik)
+                const costInt = parseInt(cost);
+                await updateDoc(doc(db,"users",currentUser.uid), { 
+                    gold: increment(-costInt), 
+                    avatar: item.icon 
+                }); 
+                
+                const avatarEl = document.getElementById('userAvatar'); 
+                avatarEl.innerHTML = item.icon; 
+                document.getElementById('stGold').innerText = currentGold - costInt;
+                
+                Swal.fire({ title: "Hayırlı Olsun!", text: "Yeni simgen rütbenle beraber parlıyor.", icon: "success", timer: 2000, showConfirmButton: false }); 
+                confetti(); 
+            } else {
+                // İptal ederse butonu aç
+                btn.disabled = false;
+            }
+        } catch(e) { 
+            Swal.fire("Hata", "Satın alma işleminde bir sorun oluştu: " + e.message, "error"); 
+            btn.disabled = false;
+        } 
+        // Not: Başarılı olursa buton disabled kalabilir (zaten alındı)
     };
 
     function renderClanIcons() { const c=document.getElementById('clanIconSelect'); c.innerHTML = ""; CLAN_ICONS.forEach(i => { c.innerHTML += `<div class="chip-modern" onclick="selectClanIcon(this)" style="display:flex; flex-direction:column; align-items:center; padding:10px;"><span>${i.i}</span><span style="font-size:0.7rem;">${i.n}</span></div>`; }); }
@@ -597,20 +621,60 @@
 
     function updateStudentChart(val, goal){ const ctx = document.getElementById('weeklyChart').getContext('2d'); if(myChart) myChart.destroy(); myChart = new Chart(ctx, { type: 'doughnut', data: { labels: ['Yapılan', 'Kalan'], datasets: [{ data: [val, Math.max(0, goal-val)], backgroundColor: ['#009688', '#e2e8f0'], borderWidth: 0 }] }, options: { cutout: '80%', maintainAspectRatio: false, plugins: { legend: { display: false } } } }); }
     
+    // --- GÜNCELLENMİŞ KAYDETME FONKSİYONU (MOBİL DÜZELTME) ---
     window.saveEntry = async () => { 
-        const btn = document.getElementById('btnSaveEntry'); if(btn.disabled) return; 
-        const sub = document.getElementById('selectedSubject').value; const dur = parseInt(document.getElementById('entryDur').value); 
-        if(!sub || !dur) return Swal.fire("Eksik Bilgi", "", "warning"); if(dur < 10) return Swal.fire("Çok Kısa", "En az 10 dakika girmelisin.", "warning");
+        const btn = document.getElementById('btnSaveEntry'); 
+        if(btn.disabled) return; 
+        
+        const sub = document.getElementById('selectedSubject').value; 
+        // DÜZELTME: parseInt ile 10'luk tabanda sayıya zorluyoruz. Mobil klavye sorunlarını engeller.
+        const durInput = document.getElementById('entryDur').value;
+        const dur = parseInt(durInput, 10); 
+        
+        if(!sub) return Swal.fire("Eksik Bilgi", "Lütfen bir ders seç.", "warning");
+        if(!dur || isNaN(dur)) return Swal.fire("Hata", "Lütfen geçerli bir süre gir.", "warning");
+        if(dur < 10) return Swal.fire("Çok Kısa", "En az 10 dakika girmelisin.", "warning");
+
         btn.disabled = true; btn.innerText = "İşleniyor..."; 
         try { 
-            const offset = parseInt(document.getElementById('entryDate').value) || 0; const recordDate = new Date(); recordDate.setDate(recordDate.getDate() - offset); recordDate.setHours(12,0,0,0); 
-            let multiplier = 1.0; let bonusText = ""; if (window.userClanId) { multiplier += 0.5; bonusText = " (Otağ Bonusu Aktif 🔥)"; } 
+            const offset = parseInt(document.getElementById('entryDate').value) || 0; 
+            const recordDate = new Date(); 
+            recordDate.setDate(recordDate.getDate() - offset); 
+            recordDate.setHours(12,0,0,0); 
+            
+            let multiplier = 1.0; 
+            let bonusText = ""; 
+            if (window.userClanId) { multiplier += 0.5; bonusText = " (Otağ Bonusu Aktif 🔥)"; } 
+            
             const points = Math.ceil(dur * multiplier); 
-            await addDoc(collection(db,"users",currentUser.uid,"sessions"), { subject: sub, duration: dur, points: points, createdAt: recordDate, dateStr: recordDate.toLocaleDateString('tr-TR'), type: 'manual' }); 
-            await updateDoc(doc(db,"users",currentUser.uid), { totalMinutes: increment(dur), xp: increment(points), gold: increment(points), lastStudyDate: serverTimestamp() }); 
-            await addClanPoints(currentUser.uid, points); await checkStreakAndAward(currentUser.uid); 
-            Swal.fire("Kaydedildi!", `+${points} Çalışma Yıldız Puanı${bonusText}`, "success"); confetti(); 
-        } catch(e) { Swal.fire("Hata", e.message, "error"); } finally { setTimeout(() => { btn.disabled = false; btn.innerText = "KAYDET (+Puan) ✅"; }, 1000); } 
+            
+            await addDoc(collection(db,"users",currentUser.uid,"sessions"), { 
+                subject: sub, 
+                duration: dur, 
+                points: points, 
+                createdAt: recordDate, 
+                dateStr: recordDate.toLocaleDateString('tr-TR'), 
+                type: 'manual' 
+            }); 
+            
+            await updateDoc(doc(db,"users",currentUser.uid), { 
+                totalMinutes: increment(dur), 
+                xp: increment(points), 
+                gold: increment(points), 
+                lastStudyDate: serverTimestamp() 
+            }); 
+            
+            await addClanPoints(currentUser.uid, points); 
+            await checkStreakAndAward(currentUser.uid); 
+            
+            Swal.fire("Kaydedildi!", `+${points} Çalışma Yıldız Puanı${bonusText}`, "success"); 
+            confetti(); 
+        } catch(e) { 
+            console.error(e);
+            Swal.fire("Hata", e.message, "error"); 
+        } finally { 
+            setTimeout(() => { btn.disabled = false; btn.innerText = "KAYDET (+Puan) ✅"; }, 1000); 
+        } 
     };
     
     // --- GÜNCELLENMİŞ SAYAÇ AYARLARI ---
