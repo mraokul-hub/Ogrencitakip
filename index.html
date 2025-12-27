@@ -15,10 +15,10 @@
     <style>
         /* --- TEMEL STİLLER --- */
         .hidden { display: none !important; visibility: hidden !important; opacity: 0 !important; }
-        :root { --primary: #009688; --primary-dark: #004d40; --warning: #f59e0b; --danger: #ef4444; --bg-gradient: linear-gradient(135deg, #e0f2f1 0%, #f0fdf4 100%); --text-main: #0f172a; --text-sub: #475569; --bottom-nav-height: 80px; }
+        :root { --primary: #009688; --primary-dark: #004d40; --warning: #f59e0b; --danger: #ef4444; --bg-gradient: linear-gradient(135deg, #e0f2f1 0%, #f0fdf4 100%); --text-main: #0f172a; --text-sub: #475569; --bottom-nav-height: 90px; }
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; user-select: none; }
         input, textarea { user-select: text !important; }
-        body { font-family: 'Outfit', sans-serif; background: var(--bg-gradient); margin: 0; padding: 15px; min-height: 100vh; color: var(--text-main); padding-bottom: 100px; overflow-x: hidden; }
+        body { font-family: 'Outfit', sans-serif; background: var(--bg-gradient); margin: 0; padding: 15px; min-height: 100vh; color: var(--text-main); padding-bottom: 110px; overflow-x: hidden; }
         
         /* --- KARTLAR & UI --- */
         .container { width: 100%; max-width: 480px; margin: 0 auto; }
@@ -35,13 +35,15 @@
         .input-modern:focus { box-shadow: 0 0 0 2px var(--primary); background: white; }
         
         /* --- BUTONLAR --- */
-        button { cursor: pointer; border: none; font-family: inherit; transition: 0.2s; } button:active { transform: scale(0.96); } button:disabled { opacity: 0.6; cursor: not-allowed; }
+        button { cursor: pointer; border: none; font-family: inherit; transition: 0.2s; touch-action: manipulation; } 
+        button:active { transform: scale(0.96); } 
+        button:disabled { opacity: 0.6; cursor: not-allowed; }
         .btn-action { width: 100%; padding: 18px; border-radius: 20px; font-size: 1.1rem; font-weight: 800; color: white; background: var(--primary); margin-top: 15px; }
         .btn-logout-header { background: #fee2e2; color: var(--danger); padding: 8px 12px; border-radius: 12px; font-weight: 700; font-size: 0.8rem; margin-left: 10px; border: 1px solid #fca5a5; }
         
         /* --- CHIPS & SEÇİMLER --- */
         .chips { display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; margin-bottom: 10px; }
-        .chip-modern { background: #ffffff; border: 1px solid #e2e8f0; border-radius: 25px; padding: 10px 20px; font-weight: 600; color: var(--text-sub); cursor: pointer; transition: 0.2s; }
+        .chip-modern { background: #ffffff; border: 1px solid #e2e8f0; border-radius: 25px; padding: 12px 24px; font-weight: 600; color: var(--text-sub); cursor: pointer; transition: 0.2s; -webkit-tap-highlight-color: transparent; }
         .chip-modern.active { border-color: var(--primary); color: var(--primary); background: #f0fdf4; box-shadow: 0 0 0 2px rgba(0, 150, 136, 0.1); }
         
         /* --- POMODORO --- */
@@ -49,15 +51,14 @@
         .pomo-controls { display: flex; gap: 15px; justify-content: center; margin-bottom: 20px; flex-wrap: wrap; }
         .btn-pomo { padding: 15px 30px; border-radius: 16px; font-weight: 700; color: white; flex: 1; min-width: 120px; }
         .btn-timer-adj { width: 50px; height: 50px; border-radius: 15px; background: #e0f2f1; color: var(--primary-dark); font-size: 1.5rem; font-weight: bold; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: 0.2s; }
-        .btn-timer-adj:active { transform: scale(0.9); background: #b2dfdb; }
-
+        
         /* --- MAĞAZA --- */
         .store-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
         .store-card { background: white; border: 1px solid #e2e8f0; border-radius: 24px; padding: 20px; text-align: center; }
         .store-icon { font-size: 3rem; margin-bottom: 10px; display: flex; align-items: center; justify-content: center; }
         .store-name { font-weight: 800; color: var(--text-main); display: block; margin-bottom: 5px; }
         .store-price { font-weight: 700; color: var(--warning); font-size: 0.9rem; margin-bottom: 15px; display: block; }
-        .btn-store { background: #f1f5f9; color: var(--text-sub); padding: 10px; width: 100%; border-radius: 12px; font-weight: 700; }
+        .btn-store { background: #f1f5f9; color: var(--text-sub); padding: 12px; width: 100%; border-radius: 12px; font-weight: 700; }
         
         /* --- OTAĞ (KLAN) --- */
         .clan-card-modern { background: linear-gradient(135deg, #e0f2f1, #fff); border: 2px solid var(--primary); text-align: center; padding: 30px 20px; border-radius: 24px; }
@@ -67,8 +68,8 @@
         /* --- ALT MENÜ & FOOTER --- */
         .app-footer { text-align: center; font-size: 0.8rem; color: var(--text-sub); padding: 20px 0; border-top: 1px solid rgba(0,0,0,0.05); margin-top: 30px; }
         .mobile-bottom-nav { position: fixed; bottom: 0; left: 0; width: 100%; height: var(--bottom-nav-height); background: rgba(255, 255, 255, 0.98); backdrop-filter: blur(20px); border-top: 1px solid rgba(178, 223, 219, 0.6); display: flex; justify-content: space-around; align-items: center; padding-bottom: 15px; z-index: 1000; box-shadow: 0 -5px 20px rgba(0, 150, 136, 0.08); border-top-left-radius: 20px; border-top-right-radius: 20px; overflow-x: auto; padding: 0 5px; }
-        .nav-item { display: flex; flex-direction: column; align-items: center; justify-content: center; font-size: 0.6rem; color: #94a3b8; background: none; border: none; cursor: pointer; transition: all 0.3s; flex: 1; height: 100%; padding: 5px 0; min-width: 50px; }
-        .nav-icon { font-size: 1.4rem; margin-bottom: 4px; transition: transform 0.2s; }
+        .nav-item { display: flex; flex-direction: column; align-items: center; justify-content: center; font-size: 0.7rem; color: #94a3b8; background: none; border: none; cursor: pointer; transition: all 0.3s; flex: 1; height: 100%; padding: 5px 0; min-width: 60px; touch-action: manipulation; }
+        .nav-icon { font-size: 1.6rem; margin-bottom: 6px; transition: transform 0.2s; }
         .nav-item.active { color: var(--primary); font-weight: 800; }
         .nav-item.active .nav-icon { transform: translateY(-5px); }
         
@@ -82,41 +83,46 @@
         .xp-fill { height: 100%; background: linear-gradient(90deg, #FFD700, #FFA500); width: 0%; transition: width 1s cubic-bezier(0.4, 0, 0.2, 1); }
         .rank-badge { font-size: 0.75rem; font-weight: 800; color: #fff; background: rgba(0,0,0,0.2); padding: 2px 8px; border-radius: 12px; margin-left: 6px; }
         
-        /* --- ANİMASYONLAR --- */
-        .fade-in { animation: fadeIn 0.5s cubic-bezier(0.4, 0, 0.2, 1); } @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-        
         /* --- BİLGE BAYKUŞ --- */
-        .wise-coach-container { position: fixed; bottom: 90px; right: 10px; z-index: 999; display: flex; flex-direction: column; align-items: flex-end; }
-        .wise-avatar { width: 60px; height: 60px; background: linear-gradient(135deg, #4f46e5, #9333ea); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 2rem; box-shadow: 0 10px 25px rgba(79, 70, 229, 0.4); cursor: pointer; border: 3px solid #fff; position: relative; transition: transform 0.3s; }
+        .wise-coach-container { position: fixed; bottom: 100px; right: 10px; z-index: 999; display: flex; flex-direction: column; align-items: flex-end; }
+        .wise-avatar { width: 65px; height: 65px; background: linear-gradient(135deg, #4f46e5, #9333ea); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 2.2rem; box-shadow: 0 10px 25px rgba(79, 70, 229, 0.4); cursor: pointer; border: 3px solid #fff; position: relative; transition: transform 0.3s; }
         .coach-badge { position: absolute; top: 0; right: 0; background: #ef4444; color: white; font-size: 0.75rem; width: 22px; height: 22px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; border: 2px solid white; animation: pulseBadge 2s infinite; }
-        .coach-bubble { background: white; padding: 15px 25px 15px 15px; border-radius: 20px 20px 4px 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.15); margin-bottom: 10px; max-width: 250px; font-size: 0.9rem; color: var(--text-main); border: 2px solid #e0e7ff; opacity: 0; transform: translateY(20px) scale(0.9); transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); pointer-events: auto; position: absolute; bottom: 70px; right: 0; width: max-content; font-weight: 700; z-index: 1000; cursor: pointer; position: relative; }
+        .coach-bubble { background: white; padding: 15px 25px 15px 15px; border-radius: 20px 20px 4px 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.15); margin-bottom: 10px; max-width: 250px; font-size: 0.9rem; color: var(--text-main); border: 2px solid #e0e7ff; opacity: 0; transform: translateY(20px) scale(0.9); transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); pointer-events: auto; position: absolute; bottom: 75px; right: 0; width: max-content; font-weight: 700; z-index: 1000; cursor: pointer; position: relative; }
         .coach-bubble.show { opacity: 1; transform: translateY(0) scale(1); }
         @keyframes excited { 0% { transform: scale(1) rotate(0deg); } 25% { transform: scale(1.1) rotate(-5deg); } 50% { transform: scale(1.1) rotate(5deg); } 75% { transform: scale(1.1) rotate(-5deg); } 100% { transform: scale(1) rotate(0deg); } }
         .owl-excited { animation: excited 0.8s infinite; }
         @keyframes pulseBadge { 0% { transform: scale(1); } 50% { transform: scale(1.1); } 100% { transform: scale(1); } }
-        
         .points-table { width:100%; border-collapse: collapse; margin-top:10px; font-size:0.85rem;} .points-table td { padding:8px; border-bottom:1px solid #eee; }
         .swal2-container { z-index: 10000 !important; }
 
         /* --- MOBİL UYUMLULUK (RESPONSIVE) ZIRHI --- */
         @media (max-width: 480px) {
-            body { padding: 10px; padding-bottom: 90px; }
+            body { padding: 10px; padding-bottom: 120px; }
             .container { width: 100%; }
-            .card { padding: 15px; border-radius: 20px; }
-            h2 { font-size: 1.3rem; }
-            .btn-logout-header { padding: 5px 8px; font-size: 0.7rem; }
-            #userAvatar { font-size: 2rem !important; margin-right: 10px !important; }
-            #stName { font-size: 1rem !important; }
-            .timer-display, #arenaTimerDisplay { font-size: 3.5rem !important; margin: 15px 0 !important; }
+            .card { padding: 20px 15px; border-radius: 25px; }
+            h2 { font-size: 1.4rem; }
+            .btn-logout-header { padding: 5px 10px; font-size: 0.75rem; }
+            #userAvatar { font-size: 2.2rem !important; margin-right: 10px !important; }
+            #stName { font-size: 1.1rem !important; }
+            
+            /* DÜZELTME: Menülerin Sığması */
+            .mobile-bottom-nav { justify-content: space-between; padding: 0 2px; }
+            .nav-item { min-width: auto; flex: 1; padding: 5px 0; }
+            .nav-icon { font-size: 1.4rem; margin-bottom: 2px; }
+            .nav-item span { font-size: 0.6rem; display: block; }
+            
+            /* DÜZELTME: Rakip Bekleniyor yazısı mobilde taşmasın */
+            .timer-display { font-size: 3rem; margin: 15px 0 !important; }
+            /* Uzun metinler için özel sınıf */
+            .text-mode-timer { font-size: 1.8rem !important; line-height: 1.1; margin: 10px 0; word-wrap: break-word; }
+            
             .pomo-controls, #arenaControls { flex-direction: row; flex-wrap: wrap; gap: 10px; }
             #arenaControls { flex-direction: column; } 
-            #arenaControls button, .btn-pomo { width: 100%; margin: 0; min-width: auto; max-width: none; }
+            #arenaControls button, .btn-pomo { width: 100%; margin: 0; min-width: auto; max-width: none; padding: 15px; }
             .store-grid { gap: 10px; }
             .store-card { padding: 15px 10px; }
             .modal-content { padding: 20px; width: 95%; max-height: 80vh; }
-            .mobile-bottom-nav { height: 70px; }
-            .nav-icon { font-size: 1.2rem; }
-            .nav-item span { font-size: 0.55rem; }
+            .chip-modern { padding: 10px 16px; font-size: 0.9rem; }
         }
     </style>
 </head>
@@ -275,7 +281,7 @@
                     <div style="text-align:center; padding:20px; color:#999;">Arenaya bağlanılıyor...</div>
                 </div>
                 <div style="border-top:1px solid #e2e8f0; padding-top:15px; text-align:center;">
-                     <div class="timer-display" id="arenaTimerDisplay" style="font-size: 3rem; color:var(--warning);">00:00</div>
+                     <div class="timer-display" id="arenaTimerDisplay" style="color:var(--warning);">00:00</div>
                      <button class="btn-action" id="arenaStartBtn" onclick="startArenaSession()">SAVAŞI BAŞLAT ⚔️</button>
                      <div id="arenaControls" class="hidden" style="display:flex; gap:10px; justify-content:center; margin-top:10px;">
                          <button style="background:linear-gradient(135deg, #f59e0b, #d97706); color:white; padding:10px 20px; border-radius:12px; font-weight:700;" onclick="boostArenaTime()">⚡ ZAMAN ARTIR</button>
@@ -421,18 +427,12 @@
     let previousRank = null; 
     let owlQueue = []; 
     let activeGladiators = 0;
+    let unsubClanLeaderboard = null;
 
-    // --- ZAMAN YARDIMCISI (TÜRKİYE SAATİ) ---
     function formatDateTR(timestamp) {
         if (!timestamp) return '';
         const date = timestamp.toDate ? timestamp.toDate() : new Date(timestamp);
-        return date.toLocaleString('tr-TR', {
-            timeZone: 'Europe/Istanbul',
-            day: 'numeric',
-            month: 'long',
-            hour: '2-digit',
-            minute: '2-digit'
-        });
+        return date.toLocaleString('tr-TR', { timeZone: 'Europe/Istanbul', day: 'numeric', month: 'long', hour: '2-digit', minute: '2-digit' });
     }
 
     onAuthStateChanged(auth, async(user)=>{
@@ -447,6 +447,9 @@
             document.getElementById('dashboardScreen').classList.remove('hidden');
             document.getElementById('wiseCoachContainer').style.display = 'flex';
             document.getElementById('stName').innerText = user.displayName ? user.displayName.split(' ')[0] : 'Öğrenci';
+            
+            // --- OTO DÜZELTME & BAŞLATMA ---
+            await forceRepairUserData(user.uid);
             await initStudent(user.uid);
         } else {
             currentUser=null;
@@ -454,6 +457,27 @@
             document.getElementById('authScreen').classList.remove('hidden');
         }
     });
+
+    // --- YENİ: VERİ TİPİ TAMİRCİSİ (HATA KORUMASI) ---
+    async function forceRepairUserData(uid) {
+        try {
+            const userRef = doc(db, "users", uid);
+            const snap = await getDoc(userRef);
+            if(snap.exists()) {
+                const data = snap.data();
+                const updates = {};
+                // Eğer XP veya Gold "String" olarak kalmışsa, sayıya çevir
+                if(typeof data.xp === 'string') updates.xp = parseInt(data.xp, 10) || 0;
+                if(typeof data.gold === 'string') updates.gold = parseInt(data.gold, 10) || 0;
+                if(typeof data.totalMinutes === 'string') updates.totalMinutes = parseInt(data.totalMinutes, 10) || 0;
+                
+                if(Object.keys(updates).length > 0) {
+                    await updateDoc(userRef, updates);
+                    console.log("Veri tipleri düzeltildi:", updates);
+                }
+            }
+        } catch(e) { console.error("Tamir hatası:", e); }
+    }
 
     window.switchAuthMode = (login) => { isLogin = login; document.getElementById('authBtn').innerText = isLogin ? "GİRİŞ YAP" : "KAYIT OL"; document.getElementById('regName').classList.toggle('hidden', isLogin); document.getElementById('tabLogin').classList.toggle('active', isLogin); document.getElementById('tabRegister').classList.toggle('active', !isLogin); document.getElementById('authDesc').innerText = isLogin ? "Maceraya devam etmek için giriş yap." : "Yeni bir efsane doğuyor. Otağımıza katıl."; };
     window.handleLogin = async () => { const btn = document.getElementById('authBtn'); btn.innerText = "İşleniyor..."; btn.disabled = true; const e = document.getElementById('email').value; const p = document.getElementById('password').value; try{ if(isLogin) await signInWithEmailAndPassword(auth,e,p); else { const n = document.getElementById('regName').value; if(!n) throw new Error("İsim gerekli"); const c = await createUserWithEmailAndPassword(auth,e,p); await updateProfile(c.user,{displayName: n}); } } catch(err){ document.getElementById('authError').style.display='block'; document.getElementById('authError').innerText = "Hata: " + err.message; } finally { btn.innerText = isLogin ? "GİRİŞ YAP" : "KAYIT OL"; btn.disabled = false; } };
@@ -466,9 +490,9 @@
         onSnapshot(doc(db, "users", uid), async (docSnap) => {
             const data = docSnap.data(); if(!data) return;
             
-            const userXP = data.xp || 0;
-            const userGold = data.gold || 0;
-            const userMinutes = data.totalMinutes || 0; 
+            const userXP = parseInt(data.xp) || 0; // Her zaman sayıya çevir
+            const userGold = parseInt(data.gold) || 0;
+            const userMinutes = parseInt(data.totalMinutes) || 0; 
             
             document.getElementById('stXP').innerText = userXP;
             document.getElementById('stGold').innerText = userGold;
@@ -551,42 +575,33 @@
     window.buyAvatar = async (idx, cost, btn) => { 
         if(!currentUser) return Swal.fire("Hata", "Oturum açık değil.", "error");
         
-        // DÜZELTME: Mobilde butona çift tıklamayı engelle
         btn.disabled = true; 
-        
         try { 
-            const currentGold = parseInt(document.getElementById('stGold').innerText) || 0; 
-            if(currentGold < cost) { 
-                Swal.fire("Yetersiz Altın", `Bu simge ${cost} altın değerinde.`, "error"); 
+            const currentGold = parseInt(document.getElementById('stGold').innerText, 10) || 0; 
+            const costInt = parseInt(cost, 10); 
+
+            if(currentGold < costInt) { 
+                Swal.fire("Yetersiz Altın", `Bu simge ${costInt} altın değerinde.`, "error"); 
                 btn.disabled = false;
                 return; 
             } 
             
             const item = AVATAR_SHOP[idx];
-            
-            if(confirm(`"${item.name}" simgesini ${cost} Altın karşılığında satın alıp hemen kullanmak istiyor musun?`)){ 
-                // DÜZELTME: Integere zorla (Güvenlik)
-                const costInt = parseInt(cost);
+            if(confirm(`"${item.name}" simgesini ${costInt} Altın karşılığında satın alıp hemen kullanmak istiyor musun?`)){ 
                 await updateDoc(doc(db,"users",currentUser.uid), { 
                     gold: increment(-costInt), 
                     avatar: item.icon 
                 }); 
                 
-                const avatarEl = document.getElementById('userAvatar'); 
-                avatarEl.innerHTML = item.icon; 
-                document.getElementById('stGold').innerText = currentGold - costInt;
-                
                 Swal.fire({ title: "Hayırlı Olsun!", text: "Yeni simgen rütbenle beraber parlıyor.", icon: "success", timer: 2000, showConfirmButton: false }); 
                 confetti(); 
             } else {
-                // İptal ederse butonu aç
                 btn.disabled = false;
             }
         } catch(e) { 
-            Swal.fire("Hata", "Satın alma işleminde bir sorun oluştu: " + e.message, "error"); 
+            Swal.fire("Hata", "Satın alma hatası: " + e.message, "error"); 
             btn.disabled = false;
         } 
-        // Not: Başarılı olursa buton disabled kalabilir (zaten alındı)
     };
 
     function renderClanIcons() { const c=document.getElementById('clanIconSelect'); c.innerHTML = ""; CLAN_ICONS.forEach(i => { c.innerHTML += `<div class="chip-modern" onclick="selectClanIcon(this)" style="display:flex; flex-direction:column; align-items:center; padding:10px;"><span>${i.i}</span><span style="font-size:0.7rem;">${i.n}</span></div>`; }); }
@@ -621,21 +636,23 @@
 
     function updateStudentChart(val, goal){ const ctx = document.getElementById('weeklyChart').getContext('2d'); if(myChart) myChart.destroy(); myChart = new Chart(ctx, { type: 'doughnut', data: { labels: ['Yapılan', 'Kalan'], datasets: [{ data: [val, Math.max(0, goal-val)], backgroundColor: ['#009688', '#e2e8f0'], borderWidth: 0 }] }, options: { cutout: '80%', maintainAspectRatio: false, plugins: { legend: { display: false } } } }); }
     
-    // --- GÜNCELLENMİŞ KAYDETME FONKSİYONU (MOBİL DÜZELTME) ---
+    // --- GÜNCELLENMİŞ KAYIT (HIZLI GİRİŞ HATASI ÇÖZÜMÜ) ---
     window.saveEntry = async () => { 
         const btn = document.getElementById('btnSaveEntry'); 
         if(btn.disabled) return; 
-        
+
+        // 1. DERS SEÇİMİ KONTROLÜ (Eksikse hata ver)
         const sub = document.getElementById('selectedSubject').value; 
-        // DÜZELTME: parseInt ile 10'luk tabanda sayıya zorluyoruz. Mobil klavye sorunlarını engeller.
+        if(!sub) return Swal.fire("Eksik Bilgi", "Lütfen yukarıdaki kutucuklardan bir ders seç.", "warning");
+
         const durInput = document.getElementById('entryDur').value;
         const dur = parseInt(durInput, 10); 
         
-        if(!sub) return Swal.fire("Eksik Bilgi", "Lütfen bir ders seç.", "warning");
         if(!dur || isNaN(dur)) return Swal.fire("Hata", "Lütfen geçerli bir süre gir.", "warning");
         if(dur < 10) return Swal.fire("Çok Kısa", "En az 10 dakika girmelisin.", "warning");
 
-        btn.disabled = true; btn.innerText = "İşleniyor..."; 
+        btn.disabled = true; btn.innerText = "Kaydediliyor..."; 
+
         try { 
             const offset = parseInt(document.getElementById('entryDate').value) || 0; 
             const recordDate = new Date(); 
@@ -647,31 +664,50 @@
             if (window.userClanId) { multiplier += 0.5; bonusText = " (Otağ Bonusu Aktif 🔥)"; } 
             
             const points = Math.ceil(dur * multiplier); 
+
+            // Batch kullanarak işlemleri birleştir (Veri tutarlılığı için)
+            const batch = writeBatch(db);
             
-            await addDoc(collection(db,"users",currentUser.uid,"sessions"), { 
+            const sessionRef = doc(collection(db, "users", currentUser.uid, "sessions"));
+            batch.set(sessionRef, { 
                 subject: sub, 
                 duration: dur, 
                 points: points, 
                 createdAt: recordDate, 
                 dateStr: recordDate.toLocaleDateString('tr-TR'), 
                 type: 'manual' 
-            }); 
-            
-            await updateDoc(doc(db,"users",currentUser.uid), { 
+            });
+
+            const userRef = doc(db, "users", currentUser.uid);
+            batch.update(userRef, { 
                 totalMinutes: increment(dur), 
                 xp: increment(points), 
                 gold: increment(points), 
                 lastStudyDate: serverTimestamp() 
-            }); 
+            });
             
-            await addClanPoints(currentUser.uid, points); 
+            await batch.commit();
+
+            // Otağ puanı güncellemesini ayrıca yap (Hata olursa ana işlem bozulmasın)
+            if (window.userClanId) {
+                try {
+                    await updateDoc(doc(db, "clans", window.userClanId), { totalScore: increment(points) });
+                } catch(e) { console.log("Otağ puanı güncellenemedi:", e); }
+            }
+            
             await checkStreakAndAward(currentUser.uid); 
             
-            Swal.fire("Kaydedildi!", `+${points} Çalışma Yıldız Puanı${bonusText}`, "success"); 
+            Swal.fire("Kaydedildi!", `+${points} Puan ${bonusText}`, "success"); 
             confetti(); 
+
+            // Formu sıfırla
+            document.getElementById('entryDur').value = "40";
+            document.getElementById('selectedSubject').value = "";
+            document.querySelectorAll('.chip-modern').forEach(x=>x.classList.remove('active'));
+
         } catch(e) { 
             console.error(e);
-            Swal.fire("Hata", e.message, "error"); 
+            Swal.fire("Hata", "Kayıt başarısız: " + e.message, "error"); 
         } finally { 
             setTimeout(() => { btn.disabled = false; btn.innerText = "KAYDET (+Puan) ✅"; }, 1000); 
         } 
@@ -763,8 +799,9 @@
         
         // PUSU MODU BAŞLANGICI
         isArenaWaiting = true; 
-        document.getElementById('arenaTimerDisplay').innerText = "RAKİP BEKLENİYOR..."; 
-        document.getElementById('arenaTimerDisplay').style.fontSize = "1.8rem"; 
+        const timerDisplay = document.getElementById('arenaTimerDisplay');
+        timerDisplay.classList.add('text-mode-timer'); // YAZI BOYUTUNU KÜÇÜLT (MOBİL İÇİN)
+        timerDisplay.innerText = "RAKİP BEKLENİYOR..."; 
         
         await setDoc(doc(db, "arena", currentUser.uid), { name: currentUser.displayName, subject: "Genel", startTime: serverTimestamp(), duration: 30, isActive: true, state: 'waiting', avatar: document.getElementById('userAvatar').innerText, lastHeartbeat: serverTimestamp() }); 
         
@@ -781,8 +818,9 @@
         isArenaWaiting = false; 
         isArenaRunning = true; 
         
-        document.getElementById('arenaTimerDisplay').style.fontSize = "3rem"; 
-        document.getElementById('arenaTimerDisplay').innerText = "30:00"; 
+        const timerDisplay = document.getElementById('arenaTimerDisplay');
+        timerDisplay.classList.remove('text-mode-timer'); // YAZI BOYUTUNU NORMALE DÖNDÜR
+        timerDisplay.innerText = "30:00"; 
         
         Swal.fire({ title: 'DÜŞMAN GÖRÜNDÜ!', text: 'Savaş başladı! Kılıcın keskin olsun!', icon: 'warning', timer: 1500, showConfirmButton: false }); 
         
@@ -936,18 +974,42 @@
     }); 
     document.getElementById('myClanMemberList').innerHTML = html || "<small>Kimse yok.</small>"; }
 
-    async function loadClanLeaderboard() { const list = document.getElementById('clanLeaderboard'); list.innerHTML=""; const q = query(collection(db, "clans"), orderBy("totalScore", "desc"), limit(5)); const snap = await getDocs(q); if(currentUser) { const uSnap = await getDoc(doc(db, "users", currentUser.uid)); const myClanId = uSnap.data()?.clanId; if(myClanId) { const allClansQ = query(collection(db, "clans"), orderBy("totalScore", "desc")); const allClansSnap = await getDocs(allClansQ); let myRank = 0; allClansSnap.docs.forEach((d, i) => { if(d.id === myClanId) myRank = i + 1; }); const rankDisplay = document.getElementById('myClanRankDisplay'); if(rankDisplay) rankDisplay.innerText = `#${myRank}`; } } snap.docs.forEach((d,i)=>{ const data = d.data(); list.innerHTML += `<div style="margin-bottom:5px; font-weight:600;">#${i+1} ${data.icon} ${data.name} (${data.totalScore || 0})</div>`; }); }
+    // --- DÜZELTME: Otağ Sıralaması Temizleme ---
+    async function loadClanLeaderboard() { 
+        const list = document.getElementById('clanLeaderboard'); 
+        if(!list) return;
+        
+        // Önceki dinleyiciyi kapat (varsa) - ÇİFTE GÖSTERİMİ ÖNLER
+        if(unsubClanLeaderboard) { unsubClanLeaderboard(); unsubClanLeaderboard = null; }
+
+        list.innerHTML = "Veriler çekiliyor...";
+        
+        const q = query(collection(db, "clans"), orderBy("totalScore", "desc"), limit(5)); 
+        
+        unsubClanLeaderboard = onSnapshot(q, (snap) => {
+            list.innerHTML = ""; // HER SEFERİNDE LİSTEYİ TEMİZLE
+            
+            if(snap.empty) {
+                list.innerHTML = "Henüz Otağ yok.";
+                return;
+            }
+
+            snap.docs.forEach((d,i)=>{ 
+                const data = d.data(); 
+                list.innerHTML += `<div style="margin-bottom:5px; font-weight:600; padding:5px; border-bottom:1px solid #eee;">#${i+1} ${data.icon} ${data.name} <span style="float:right; color:var(--primary);">${data.totalScore || 0} P</span></div>`; 
+            }); 
+        });
+    }
+
     async function addClanPoints(uid, points) { const u = (await getDoc(doc(db, "users", uid))).data(); if(u.clanId) await updateDoc(doc(db,"clans",u.clanId), { totalScore: increment(points) }); }
     
-    // --- DÜZELTİLEN BÖLÜMLER BURADA BAŞLIYOR ---
+    // --- MODAL FONKSİYONLARI ---
 
-    // 1. Otağ Kurma Modalını Açan Fonksiyon (Artık tanımlı)
     window.openCreateClanModal = () => {
         document.getElementById('newClanName').value = "";
         document.getElementById('modalCreateClan').classList.remove('hidden');
     };
 
-    // 2. Otağ Simgesi Seçimi (Global Scope'a ekledim)
     window.selectClanIcon = (el) => {
         document.querySelectorAll('#clanIconSelect .chip-modern').forEach(e => e.classList.remove('active'));
         el.classList.add('active');
@@ -1069,14 +1131,12 @@
     }
     window.readMsg = async(id) => { await updateDoc(doc(db,"messages",id),{read:true}); }; window.openMsgModal = () => document.getElementById('modalMsg').classList.remove('hidden');
     window.changeStudentGoal = async () => { const currentGoal = document.getElementById('targetMins').innerText; const { value: newGoal } = await Swal.fire({ title: 'Haftalık Hedef', input: 'number', inputValue: currentGoal, inputLabel: 'Kaç dakika çalışacaksın?', showCancelButton: true, confirmButtonText: 'Güncelle', inputValidator: (v) => (!v || v < 500) && 'Hedef en az 500 dakika olmalıdır! Daha azı bir Alpe yakışmaz.' }); if (newGoal) { const goalInt = parseInt(newGoal); await updateDoc(doc(db, "users", currentUser.uid), { weeklyGoal: goalInt }); document.getElementById('targetMins').innerText = goalInt; Swal.fire("Hedef Güncellendi", `Yeni hedefin: ${goalInt} dk.`, "success"); } };
-    window.switchTab=(t,el)=>{ if(el) { document.querySelectorAll('.mobile-bottom-nav .nav-item').forEach(e=>e.classList.remove('active')); el.classList.add('active'); } ['viewHome','viewPomo','viewStore','viewFuture','viewHistory', 'viewArena', 'viewClan', 'viewDesc'].forEach(x=>document.getElementById(x).classList.add('hidden')); document.getElementById('view'+t.charAt(0).toUpperCase()+t.slice(1)).classList.remove('hidden'); if(t === 'arena') listenArena(); };
+    window.switchTab=(t,el)=>{ if(el) { document.querySelectorAll('.mobile-bottom-nav .nav-item').forEach(e=>e.classList.remove('active')); el.classList.add('active'); } ['viewHome','viewPomo','viewStore','viewFuture','viewHistory', 'viewArena', 'viewClan', 'viewDesc'].forEach(x=>document.getElementById(x).classList.add('hidden')); document.getElementById('view'+t.charAt(0).toUpperCase()+t.slice(1)).classList.remove('hidden'); if(t === 'arena') listenArena(); if(t === 'clan') { loadClanLeaderboard(); } };
     window.openProfileModal=()=>{document.getElementById('editProfileName').value=currentUser.displayName||"";document.getElementById('modalProfile').classList.remove('hidden')}; window.saveUserProfile=async()=>{await updateProfile(currentUser,{displayName:document.getElementById('editProfileName').value}); await updateDoc(doc(db,"users",currentUser.uid),{displayName:document.getElementById('editProfileName').value}); location.reload();};
     
-    // Geriye kalan tanımlamalar ve tuş engellemeleri
     document.addEventListener('contextmenu', event => event.preventDefault()); document.onkeydown = function(e) { if(e.keyCode == 123) return false; if(e.ctrlKey && e.shiftKey && e.keyCode == 'I'.charCodeAt(0)) return false; if(e.ctrlKey && e.shiftKey && e.keyCode == 'C'.charCodeAt(0)) return false; if(e.ctrlKey && e.shiftKey && e.keyCode == 'J'.charCodeAt(0)) return false; if(e.ctrlKey && e.keyCode == 'U'.charCodeAt(0)) return false; }
     window.deleteDoc=deleteDoc; window.doc=doc; window.db=db; window.readMsg=window.readMsg; window.openMsgModal=window.openMsgModal;
 
-    // --- SABİT LİMİT ---
     async function getClanLimit() { return 5; }
 
     window.loadJoinableClans = async () => { 
