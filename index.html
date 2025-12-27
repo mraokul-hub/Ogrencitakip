@@ -49,8 +49,17 @@
         .chip-modern { background: #ffffff; border: 1px solid #e2e8f0; border-radius: 25px; padding: 12px 24px; font-weight: 600; color: var(--text-sub); cursor: pointer; transition: 0.2s; -webkit-tap-highlight-color: transparent; }
         .chip-modern.active { border-color: var(--primary); color: var(--primary); background: #f0fdf4; box-shadow: 0 0 0 2px rgba(0, 150, 136, 0.1); }
         
-        /* --- POMODORO --- */
+        /* --- POMODORO & SAYAÇ --- */
         .timer-display { font-size: 4.5rem; font-weight: 800; text-align: center; color: var(--primary); margin: 20px 0; line-height: 1; }
+        
+        /* DÜZELTME: Bilgisayar modunda da "RAKİP BEKLENİYOR" yazısını küçült */
+        .text-mode-timer { 
+            font-size: 2.2rem !important; /* Normalde 4.5rem olan boyutu 2.2rem'e çek */
+            line-height: 1.2;
+            margin: 10px 0;
+            word-wrap: break-word;
+        }
+
         .pomo-controls { display: flex; gap: 15px; justify-content: center; margin-bottom: 20px; flex-wrap: wrap; }
         .btn-pomo { padding: 15px 30px; border-radius: 16px; font-weight: 700; color: white; flex: 1; min-width: 120px; }
         .btn-timer-adj { width: 50px; height: 50px; border-radius: 15px; background: #e0f2f1; color: var(--primary-dark); font-size: 1.5rem; font-weight: bold; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: 0.2s; }
@@ -148,10 +157,10 @@
             #userAvatar { font-size: 2.2rem !important; margin-right: 10px !important; }
             #stName { font-size: 1.1rem !important; }
             
-            /* "RAKİP BEKLENİYOR" DÜZELTMESİ (Taşmayı önler) */
+            /* "RAKİP BEKLENİYOR" DÜZELTMESİ (Telefonda daha da küçük) */
             .timer-display { font-size: 3rem; margin: 15px 0 !important; }
             .text-mode-timer { 
-                font-size: 1.5rem !important; 
+                font-size: 1.5rem !important; /* Mobilde iyice küçült */
                 line-height: 1.2; 
                 margin: 10px 0; 
                 word-wrap: break-word; 
