@@ -16,7 +16,10 @@
         /* --- TEMEL STİLLER --- */
         .hidden { display: none !important; visibility: hidden !important; opacity: 0 !important; }
         :root { --primary: #009688; --primary-dark: #004d40; --warning: #f59e0b; --danger: #ef4444; --bg-gradient: linear-gradient(135deg, #e0f2f1 0%, #f0fdf4 100%); --text-main: #0f172a; --text-sub: #475569; --bottom-nav-height: 90px; }
-        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; user-select: none; }
+        
+        /* ⚡ TURBO DOKUNMA SİSTEMİ: Tüm elementlerde gecikmeyi kaldırır */
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; user-select: none; touch-action: manipulation; }
+        
         input, textarea { user-select: text !important; }
         body { font-family: 'Outfit', sans-serif; background: var(--bg-gradient); margin: 0; padding: 15px; min-height: 100vh; color: var(--text-main); padding-bottom: 130px; overflow-x: hidden; }
         
@@ -83,14 +86,16 @@
         .xp-fill { height: 100%; background: linear-gradient(90deg, #FFD700, #FFA500); width: 0%; transition: width 1s cubic-bezier(0.4, 0, 0.2, 1); }
         .rank-badge { font-size: 0.75rem; font-weight: 800; color: #fff; background: rgba(0,0,0,0.2); padding: 2px 8px; border-radius: 12px; margin-left: 6px; }
         
-        /* --- BİLGE BAYKUŞ (DÜZELTİLDİ: Tıklama Engeli Kalktı) --- */
+        /* --- BİLGE BAYKUŞ (GÜÇLENDİRİLDİ: Tıklama Sorunu Çözüldü) --- */
         .wise-coach-container { 
             position: fixed; bottom: 100px; right: 10px; z-index: 999; 
             display: flex; flex-direction: column; align-items: flex-end; 
-            pointer-events: none; /* KRİTİK: Tıklamalar arkaya geçsin */
+            /* KRİTİK: Kapsayıcı tıklamaları engellemez, arkaya geçirir */
+            pointer-events: none; 
         }
         .wise-avatar, .coach-bubble {
-            pointer-events: auto; /* Sadece bunlar tıklanabilir olsun */
+            /* Sadece bu elementler tıklanabilir */
+            pointer-events: auto; 
         }
         .wise-avatar { width: 65px; height: 65px; background: linear-gradient(135deg, #4f46e5, #9333ea); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 2.2rem; box-shadow: 0 10px 25px rgba(79, 70, 229, 0.4); cursor: pointer; border: 3px solid #fff; position: relative; transition: transform 0.3s; }
         .coach-badge { position: absolute; top: 0; right: 0; background: #ef4444; color: white; font-size: 0.75rem; width: 22px; height: 22px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; border: 2px solid white; animation: pulseBadge 2s infinite; }
@@ -102,16 +107,16 @@
         .points-table { width:100%; border-collapse: collapse; margin-top:10px; font-size:0.85rem;} .points-table td { padding:8px; border-bottom:1px solid #eee; }
         .swal2-container { z-index: 10000 !important; }
 
-        /* --- MOBİL UYUMLULUK (RESPONSIVE) ZIRHI - GÜNCELLENDİ --- */
+        /* --- MOBİL UYUMLULUK (RESPONSIVE) ZIRHI - TAM KORUMA --- */
         @media (max-width: 480px) {
             body { 
                 padding: 10px; 
-                padding-bottom: 130px; /* Hakan simgesi için ekstra alan */
+                padding-bottom: 130px; /* En alttaki Hakan butonu için güvenli bölge */
             }
 
-            /* --- GENEL DOKUNMA HASSASİYETİ --- */
-            button, .btn-action, .chip-modern, .nav-item, .store-card {
-                min-height: 48px; 
+            /* --- GENEL DOKUNMA HASSASİYETİ (Parmak Dostu) --- */
+            button, .btn-action, .chip-modern, .nav-item, .store-card, input, select {
+                min-height: 48px; /* İdeal dokunma hedefi yüksekliği */
                 touch-action: manipulation; 
             }
 
@@ -123,14 +128,15 @@
                 color: var(--text-main);
                 z-index: 10; 
                 position: relative;
+                font-weight: 800;
             }
 
-            /* Seçim Kutucukları */
+            /* Seçim Kutucukları (Chips) */
             .chip-modern {
                 padding: 12px 18px; 
-                margin: 3px;
+                margin: 4px;
                 font-size: 0.95rem;
-                flex: 1 1 auto; 
+                flex: 1 1 auto; /* Kutucukları ekrana yay */
                 text-align: center;
             }
 
@@ -151,7 +157,7 @@
                 word-wrap: break-word; 
             }
             
-            /* Alt Menü Düzeni */
+            /* Alt Menü Düzeni (Sıkışıklığı Giderir) */
             .mobile-bottom-nav { justify-content: space-between; padding: 0 5px; height: 80px; }
             .nav-item { min-width: auto; flex: 1; padding: 5px 0; }
             .nav-icon { font-size: 1.5rem; margin-bottom: 2px; }
@@ -159,6 +165,7 @@
             
             .modal-content { padding: 25px 20px; width: 95%; max-height: 85vh; }
             
+            /* Mağaza Izgarası */
             .store-grid { grid-template-columns: 1fr 1fr; gap: 12px; }
             .store-card { padding: 15px 5px; }
         }
